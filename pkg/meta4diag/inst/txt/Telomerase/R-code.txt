@@ -1,0 +1,15 @@
+library(meta4diag)
+
+data = readData("/Users/jingyig/Desktop/Daily/meta_analysis/meta4diag/funcs/meta4diag/inst/txt/Telomerase")
+
+
+
+outprior = makePriors(var.prior = "Invgamma", 
+            var2.prior = "Invgamma",
+            cor.prior = "normal",
+            var.par = c(0.25, 0.025),  
+            var2.par = c(0.25, 0.025), 
+            cor.par = c(0, 5),
+            init = c(0.01, 0.01, -0.1))
+
+outdata = makeData(data = Telomerase, model.type = 1, covariates = NULL)model = runModel(outdata = outdata, outprior = outpriors, model.type = 1, link = "logit", verbose =  FALSE)

@@ -1,0 +1,11 @@
+References  No.Study    TP      FP      FN      TN      
+Ito		59	25	1	8	25	
+Rahat		35	17	3	4	11	
+Kavaler   	151	88	16	16	31	
+Yoshida		109	16	3	10	80	
+Ramakumar 	195	40	1	17	137	
+Landman		77	38	6	9	24	
+Kinoshita  	54	23	0	19	12	
+Gelmini		53	27	2	6	18	
+Cheng		49	14	3	3	29	
+Cassel		73	37	22	7	7	
