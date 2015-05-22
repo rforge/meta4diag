@@ -35,7 +35,9 @@ posterior mean and standard deviations for the hyperparameters
 \keyword{summary}
 \seealso{\code{\link{plot}},\code{\link{meta4diag}}}
 \examples{
+\dontrun{
   data(Catheter)
   res <- meta4diag(data = Catheter)
   summary(res)
+}
 }

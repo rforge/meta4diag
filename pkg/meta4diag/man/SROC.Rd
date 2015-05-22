@@ -5,16 +5,16 @@
   A standard summary receiver operating chracteristic plot.
 }
 \description{
-Takes a \code{meta4diag} object produced by \code{meta4diag()} and makes the standard summary receiver operating chracteristic plot. The \code{SROC()} returns a plot of the true positive rate against the false positive rate (ROC space) for the different possible cutpoints of a diagnostic test. It shows the tradeoff between sensitivity and specificity (any increase in sensitivity will be accompanied by a decrease in specificity). The closer the curve follows the left-hand border and then the top border of the ROC space, the more accurate the test. The closer the curve comes to the 45-degree diagonal of the ROC space, the less accurate the test. The area under the curve is a measure of text accuracy.
+Takes a \code{meta4diag} object produced by \code{meta4diag()} and makes the standard summary receiver operating chracteristic plot. 
 }
 \usage{
 SROC(x,...)
-\method{SROC}{meta4diag}(x, est.type = "mean", sp.cex = 1.5, sp.pch = "*", sp.col = "red", 
-  dataShow = T, data.col = "#FF0000FF", sroc.type = 1, 
-  lineShow = T, line.lty = 1, line.lwd = 2, line.col = "black", 
-  crShow = T, cr.lty = 2, cr.lwd = 1.5, cr.col = "blue", 
-  prShow = T, pr.lty = 3, pr.lwd = 1, pr.col = "darkgray", 
-  add = FALSE, save = F, xlab, ylab, main, xlim, ylim,...)
+\method{SROC}{meta4diag}(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red",
+              dataShow="o", data.col="#FF0000FF", data.cex="scaled", data.pch=1, 
+              lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
+              crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
+              prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
+              dataFit = T, add=FALSE, save=F, xlab, ylab, main, xlim, ylim,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -34,10 +34,16 @@ SROC(x,...)
   Color of summary points.
 }
   \item{dataShow}{
-  Boolean indicating whether the original dataset is shown or not. If is TRUE, the original data will be plotted as bubbles. The size of the data points are proportional to the total number of individuals in each study. 
+  A character indicating whether the original dataset or the fitted dataset is shown or not. If is "o", the original data will be plotted. If is "f", the fitted data will be plotted. No dataset will be plotted if \code{dataShow} is not "o" or "f". 
 }
   \item{data.col}{
   Color of orignal data bubbles.
+}
+\item{data.cex}{
+  A string or a numerical value indicating the size of the plotted dataset points. If is "bubble" or "scaled", the size of the data points are proportional to the total number of individuals in each study. 
+}
+\item{data.pch}{
+  A string or a numerical value indicating the symbol of the plotted dataset points.
 }
   \item{sroc.type}{
   A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1},
@@ -87,6 +93,9 @@ SROC(x,...)
   \item{pr.col}{
   Color for the prediction region line.
 }
+\item{dataFit}{
+Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the data.
+}
   \item{add}{
   If add is TRUE, the plots are added to an existing plot, otherwise a new plot is created.
 }
@@ -114,7 +123,7 @@ SROC(x,...)
 }
 
 \details{
-Summary points, summary receiver operating characteristic line, confidence region and prediction region of the summary points are plotted.
+The \code{SROC()} returns a plot of the true positive rate against the false positive rate (1-specificity) (ROC space) for the different possible cutpoints of a diagnostic test. It shows the tradeoff between sensitivity and specificity (any increase in sensitivity will be accompanied by a decrease in specificity). The closer the curve follows the left-hand border and then the top border of the ROC space, the more accurate the test. The closer the curve comes to the 45-degree diagonal of the ROC space, the less accurate the test. The area under the curve is a measure of text accuracy. Summary points, summary receiver operating characteristic line, confidence region and prediction region of the summary points are plotted.
 
 The function \code{SROC()} gives the user flexibility to control the plots.
 }
@@ -128,7 +137,9 @@ The function \code{SROC()} gives the user flexibility to control the plots.
   \code{meta4diag}
 }
 \examples{
+\dontrun{
 data(Catheter)
 res <- meta4diag(data = Catheter)
 SROC(res, est.type="mean")
+}
 }

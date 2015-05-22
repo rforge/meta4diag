@@ -8,6 +8,14 @@ meta4diagGUI <- function(){
   }
   mrv <<- new.env()
   
+  #if (.Platform$OS.type == "windows"){
+  #}else{}
+  
+  mrv$VERSION <- "1.0.0"
+  mrv$DATE <- "2015-05-04"
+  mrv$COPYRIGHT <- "Copyright (C) 2015 INLA Group."
+
+
   ########## define some functions
   mrv$search_icon = system.file("image/search.png", package="meta4diag")
   mrv$refresh_icon = system.file("image/refresh.png",package="meta4diag")
@@ -2103,67 +2111,67 @@ meta4diagGUI <- function(){
   #########################################################
   ########### Install package
   #########################################################
-  if("INLA" %in% rownames(installed.packages()) == FALSE){
-    INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
-                                                                                         "Do you want to install INLA?","\n",
-                                                                                         "After installation, we will load the library for you!",
-                                                                                         "\n","You are welcome!",
-                                                                                         "\n","\n","This window will disappear after loading!",sep=""))
-    INLA_dialog["title"] <- "INLA installation..."
-    INLA_choices <- c("Stable version", "Testing version")
-    INLA_radio_buttons <- NULL
-    INLA_vbox <- gtkVBox(FALSE,0)
-    for(choice in INLA_choices){
-      INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
-      INLA_vbox$add(INLA_choices_button)
-      INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
-    }
-    INLA_frame <- gtkFrame("Install amazing INLA package")
-    INLA_frame$add(INLA_vbox)
-    INLA_dialog[["vbox"]]$add(INLA_frame)
-    INLA_radio_buttons[[1]]$setActive(TRUE) 
-    # sapply(INLA_radio_buttons,'[',"active")
-    sapply(INLA_radio_buttons, gSignalConnect, "toggled",
-           f = function(button, ...){
-             if(button['active']){
-               INLA_version = button$getLabel()
-               # print(INLA_version)
-               if(INLA_version=="Stable version"){
-                 mrv$repos="http://www.math.ntnu.no/inla/R/stable"
-               } else{
-                 mrv$repos="http://www.math.ntnu.no/inla/R/testing"
-               }
-             } 
-           })
-    gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-      if(response == GtkResponseType["no"]){
-        INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
-        INLA_no_dialog$run()
-        INLA_no_dialog$destroy()
-      }else{
-        install.packages("INLA", repos=mrv$repos)
-        library("INLA")
-        INLA_dialog$destroy()
-      }
-    })
-  }
-  # checke if INLA is loaded
-  if (!(sum(search()=="package:INLA"))==1){
-    INLA_dialog <- gtkMessageDialog(NULL,"destroy-eith-parent","question","yes-no",paste("R Package \"INLA\" is not loaded.","\n", "We suggest to load it.","\n",
-                                                                                         "Do you want to load INLA?",
-                                                                                         "\n","\n","This window will disappear after loading!",sep=""))
-    INLA_dialog["title"] <- "INLA loading..."
-    gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-      if(response == GtkResponseType["no"]){
-        INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be loaded!!!")
-        INLA_no_dialog$run()
-        INLA_no_dialog$destroy()
-      }else{
-        library("INLA")
-        INLA_dialog$destroy()
-      }
-    })
-  }
+#   if("INLA" %in% rownames(installed.packages()) == FALSE){
+#     INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
+#                                                                                          "Do you want to install INLA?","\n",
+#                                                                                          "After installation, we will load the library for you!",
+#                                                                                          "\n","You are welcome!",
+#                                                                                          "\n","\n","This window will disappear after loading!",sep=""))
+#     INLA_dialog["title"] <- "INLA installation..."
+#     INLA_choices <- c("Stable version", "Testing version")
+#     INLA_radio_buttons <- NULL
+#     INLA_vbox <- gtkVBox(FALSE,0)
+#     for(choice in INLA_choices){
+#       INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
+#       INLA_vbox$add(INLA_choices_button)
+#       INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
+#     }
+#     INLA_frame <- gtkFrame("Install amazing INLA package")
+#     INLA_frame$add(INLA_vbox)
+#     INLA_dialog[["vbox"]]$add(INLA_frame)
+#     INLA_radio_buttons[[1]]$setActive(TRUE) 
+#     # sapply(INLA_radio_buttons,'[',"active")
+#     sapply(INLA_radio_buttons, gSignalConnect, "toggled",
+#            f = function(button, ...){
+#              if(button['active']){
+#                INLA_version = button$getLabel()
+#                # print(INLA_version)
+#                if(INLA_version=="Stable version"){
+#                  mrv$repos="http://www.math.ntnu.no/inla/R/stable"
+#                } else{
+#                  mrv$repos="http://www.math.ntnu.no/inla/R/testing"
+#                }
+#              } 
+#            })
+#     gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
+#       if(response == GtkResponseType["no"]){
+#         INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
+#         INLA_no_dialog$run()
+#         INLA_no_dialog$destroy()
+#       }else{
+#         install.packages("INLA", repos=mrv$repos)
+#         library("INLA")
+#         INLA_dialog$destroy()
+#       }
+#     })
+#   }
+#   # checke if INLA is loaded
+#   if (!(sum(search()=="package:INLA"))==1){
+#     INLA_dialog <- gtkMessageDialog(NULL,"destroy-eith-parent","question","yes-no",paste("R Package \"INLA\" is not loaded.","\n", "We suggest to load it.","\n",
+#                                                                                          "Do you want to load INLA?",
+#                                                                                          "\n","\n","This window will disappear after loading!",sep=""))
+#     INLA_dialog["title"] <- "INLA loading..."
+#     gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
+#       if(response == GtkResponseType["no"]){
+#         INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be loaded!!!")
+#         INLA_no_dialog$run()
+#         INLA_no_dialog$destroy()
+#       }else{
+#         library("INLA")
+#         INLA_dialog$destroy()
+#       }
+#     })
+#   }
   
   
 }

@@ -8,15 +8,15 @@ makePriors <- function(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
   var2.prior = tolower(var2.prior)
   cor.prior = tolower(cor.prior)
   
-  if(any(c(var.prior, var2.prior, cor.prior)=="table")){
-    if(!is.element("INLA", installed.packages()[,1])){
-      install.packages("INLA",ependencies=TRUE, repos="http://www.math.ntnu.no/inla/R/stable")
-      require("INLA", quietly = TRUE)
-    }
-    if(!(sum(search()=="package:INLA")==1)){
-      require("INLA", quietly = TRUE)
-    }
-  }
+#   if(any(c(var.prior, var2.prior, cor.prior)=="table")){
+#     if(!is.element("INLA", installed.packages()[,1])){
+#       install.packages("INLA",ependencies=TRUE, repos="http://www.math.ntnu.no/inla/R/stable")
+#       require("INLA", quietly = TRUE)
+#     }
+#     if(!(sum(search()=="package:INLA")==1)){
+#       require("INLA", quietly = TRUE)
+#     }
+#   }
   
   if(any(c(var.prior, var2.prior, cor.prior)=="invwishart")){
     if(!is.numeric(wishart.par)){
@@ -474,7 +474,7 @@ makePriors <- function(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
 }
 
 .priorPCV <- function(u,alpha){
-  x = seq(0,7,len=1000)
+  x = seq(0,100,len=1000)
   tau = 1/x
   theta = -log(alpha)/u
   y = 0.5*theta*tau^(-1.5)*exp(-theta/sqrt(tau))*abs(-x^(-2))

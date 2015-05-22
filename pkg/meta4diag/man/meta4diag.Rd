@@ -4,24 +4,16 @@
     Function to analyse diagnostic meta-analysis with Bayesian methods using INLA.
 }
 \description{
-    Estimate a Bayesian bivariate hierarchical model fitted within INLA. The bivariate model has two levels, in the first level, the observed number of individuals in a specific group in a 2 by 2 table is binomial distributed, for example, the numbers of individuals in the group of true positive and true negative of a study \eqn{i} are modelled jointly,
-    \deqn{TP_{i} | Se_{i} \sim Binomial(TP_{i}+ FN_{i},Se_{i})}
-    \deqn{TN_{i} | Sp_{i} \sim Binomial(TN_{i}+ FP_{i},Sp_{i})}
-In the second level, two transformed accuracies with some link function (see argument \code{link}) are bivariate Gaussian distributed, continuous with the previous example,
-    \deqn{g(Se_{i}) = \mu + V_{i}\alpha + \phi_{i}}
-    \deqn{g(Sp_{i}) = \nu + U_{i}\beta + \psi_{i}}
-where \eqn{\phi_{i}} and \eqn{\psi_{i}} are bivariate Gaussian distributed with mean 0 and covariance matrix \eqn{\Sigma}. The \eqn{se} and \eqn{sp} in the example could be changed to \eqn{se} and \eqn{(1-sp)}, \eqn{(1-se)} and \eqn{sp} or \eqn{(1-se)} and \eqn{(1-sp)}, see argument \code{model.type}.
-
-The function \code{meta4diag()} depends on four internal functions which are also given in the \pkg{meta4diag} package in order to give the user flexibility and convienience to implement a list of dataset with the same prior setting or with the same dataset but different prior settings. The four internal functions are \code{makeData()}, \code{makePriors()}, \code{runModel()} and \code{makeObject()}. Details can be seen the corresponding documentations and examples.
-
-After running the function \code{meta4diag()}, a \code{meta4diag} object will be returned which contains various estimated results for later analysis, such as the posterior marginals, estimated value, standard deviations and the coresponding quaniles of the accuracies. See \code{Values}.
+    Estimate a Bayesian bivariate hierarchical model fitted within INLA. 
 }
 \usage{
-meta4diag(data = NULL, model.type = 1, var.prior = "invgamma", var2.prior, 
-  cor.prior = "normal", var.par = c(0.25, 0.025), var2.par, cor.par = c(0, 5), 
-  wishart.par = c(4, 1, 1, 0),
-  init = c(0.01, 0.01, 0), link = "logit", level = c(0.025, 0.5, 0.975), 
-  verbose = FALSE, covariates = NULL, nsample = FALSE)
+meta4diag(data=NULL, model.type = 1, 
+          var.prior = "invgamma", var2.prior = "invgamma", cor.prior = "normal",
+          var.par = c(0.25, 0.025), var2.par, cor.par = c(0,5),
+          wishart.par = c(4, 1, 1, 0),
+          init = c(0.01,0.01,0), link="logit", level=c(0.025,0.5,0.975),
+          modality = NULL, covariates = NULL,
+          verbose = FALSE, nsample=FALSE)
 }
 \arguments{
   \item{data}{
@@ -64,12 +56,29 @@ meta4diag(data = NULL, model.type = 1, var.prior = "invgamma", var2.prior,
   \item{verbose}{
 	Boolean (default:FALSE) indicating whether the program should run in a verbose model.
 }
+\item{modality}{
+  A vector specifying the categorical covariates. Only one categorical covariate is allowed at the moment. Default value is NULL. See also \code{examples}.
+}
   \item{covariates}{
-	A vector specifying the covariates. Default value is NULL. See also \code{examples}.
+	A vector specifying the continuous covariates. Default value is NULL. See also \code{examples}.
 }
   \item{nsample}{
 	A numerical value specifying the number of posterior samples, default is 5000. The posterior samples are used to compute the marginals and estimates values of log radios and diagnostic odds radios. If \code{nsample} is given, \code{summary.summarized.statistics}, \code{summary.fitted.LRpos}, \code{summary.fitted.LRneg}, \code{summary.fitted.DOR} and samples of \eqn{E(se)}, \eqn{E(sp)}, \eqn{E(1-se)} and \eqn{E(1-sp)} will be returned.
 }
+}
+
+\details{
+The bivariate model has two levels, in the first level, the observed number of individuals in a specific group in a 2 by 2 table is binomial distributed, for example, the numbers of individuals in the group of true positive and true negative of a study \eqn{i} are modelled jointly,
+    \deqn{TP_{i} | Se_{i} \sim Binomial(TP_{i}+ FN_{i},Se_{i})}
+    \deqn{TN_{i} | Sp_{i} \sim Binomial(TN_{i}+ FP_{i},Sp_{i})}
+In the second level, two transformed accuracies with some link function (see argument \code{link}) are bivariate Gaussian distributed, continuous with the previous example,
+    \deqn{g(Se_{i}) = \mu + V_{i}\alpha + \phi_{i}}
+    \deqn{g(Sp_{i}) = \nu + U_{i}\beta + \psi_{i}}
+where \eqn{\phi_{i}} and \eqn{\psi_{i}} are bivariate Gaussian distributed with mean 0 and covariance matrix \eqn{\Sigma}. The \eqn{se} and \eqn{sp} in the example could be changed to \eqn{se} and \eqn{(1-sp)}, \eqn{(1-se)} and \eqn{sp} or \eqn{(1-se)} and \eqn{(1-sp)}, see argument \code{model.type}.
+
+The function \code{meta4diag()} depends on four internal functions which are also given in the \pkg{meta4diag} package in order to give the user flexibility and convienience to implement a list of dataset with the same prior setting or with the same dataset but different prior settings. The four internal functions are \code{makeData()}, \code{makePriors()}, \code{runModel()} and \code{makeObject()}. Details can be seen the corresponding documentations and examples.
+
+After running the function \code{meta4diag()}, a \code{meta4diag} object will be returned which contains various estimated results for later analysis, such as the posterior marginals, estimated value, standard deviations and the coresponding quaniles of the accuracies. See \code{Values}.
 }
 
 \value{
@@ -155,5 +164,6 @@ data(Catheter)
 meta4diag(data = Catheter, model.type = 1, var.prior = "invgamma", cor.prior = "normal", 
   var.par = c(0.25, 0.025), cor.par = c(0, 5), init = c(0.01, 0.01, 0), 
   link = "logit", level = c(0.025, 0.5, 0.975), verbose = FALSE, covariates = NULL, 
-  nsample = FALSE)}
+  nsample = FALSE)
+}
 }

@@ -47,7 +47,9 @@ Marginal distribution, possibly with prior distribution is plotted.
 \keyword{plot}
 \seealso{\code{\link{meta4diag}}}
 \examples{
-  data(Catheter)
+\dontrun{
+data(Catheter)
   res <- meta4diag(data = Catheter)
   plot(res, var.type="var1")
+}
 }

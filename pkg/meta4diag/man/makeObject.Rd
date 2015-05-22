@@ -78,9 +78,12 @@ value (maximum 1) the more seriously.}
   \code{makeData, makePriors, runModel, meta4diag}
 }
 \examples{
-  data(Catheter)
+\dontrun{
+data(Catheter)
   outdata = makeData(Catheter)
   outpriors = makePriors()
-  model = runModel(outdata=outdata, outpriors=outpriors, model.type=1, link="logit")
+  model = runModel(outdata=outdata, outpriors=outpriors, link="logit")
   res = makeObject(outdata, outpriors, model, nsample=2000)
+}
+  
 }

@@ -313,11 +313,7 @@
     mrv$filename = filename[1]
     mrv$fileform = tolower(filename[2])
     mrv$filepath = paste(dirname(fullname),"/",sep="")
-    # if(mrv$notebook$getNPages > 1){}
-    # if(mrv$notebook$getTabLabelText(mrv$data_vbox)){}
-    # print(mrv$fileform)
-    # print(mrv$filename)
-    # print(mrv$filepath)
+    
     if(mrv$fileform == "txt"){
       df = read.table(fullname, header=TRUE)
       if(!is.data.frame(df)){
@@ -363,13 +359,13 @@
       is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
       ###### check main data
       if(!("studynames" %in% datanames)){
-        if("references" %in% datanames){
-          studynames = df$references
-          df = data.frame(studynames=studynames, df[,-which(datanames=="references")])
-        }else{
+        #if("references" %in% datanames){
+          #studynames = df$references
+          #df = data.frame(studynames=studynames, df[,-which(datanames=="references")])
+        #}else{
           studynames = paste("study[",c(1:I),"]",sep="")
           df = data.frame(studynames=studynames, df)
-        }
+        #}
       }
       datanames = colnames(df)
       if(all(fic %in% datanames)){
@@ -400,11 +396,7 @@
         df_ffic_dialog$destroy()
       }
       if(dim(df)[2]>5){
-        if(is.null(df$modality)){
-          mrv$pt_covariates = datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn"))]
-        }else{
-          mrv$pt_covariates = datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn","modality"))]
-        }
+        mrv$pt_covariates = datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn"))]
       } else{
         mrv$pt_covariates = NULL
       }
@@ -422,6 +414,49 @@
 .someAction <- function(action,env) 
   env$statusbar$push(env$statusbar$getContextId("message"), 
                  action$getName())
+
+.level_box = function(level){
+  box <- gtkVBox(homogeneous=FALSE,spacing=10)
+  level_length = length(level)
+  
+  level_table <- gtkTable(rows=ceiling(0.5*level_length),columns=2,homogeneous=FALSE)
+  level_table$setColSpacings(5)
+  level_table$setRowSpacings(3)
+  
+  level_checkgp = list()
+  for(i in 1:level_length){
+    level_checkgp[[i]] <- gtkCheckButton(level[i])
+    level_checkgp[[i]]$setActive(FALSE)
+  }
+  if((level_length%%2)==0){ # even number of covariates
+    for(i in 1:(0.5*level_length)){
+      check_ind1 = 2*i-1
+      check_ind2 = 2*i
+      level_table$attach(level_checkgp[[check_ind1]],left.attach=0,1, top.attach=(i-1),i,
+                         xoptions=c("expand","fill"),yoptions="")
+      level_table$attach(level_checkgp[[check_ind2]],left.attach=1,2, top.attach=(i-1),i,
+                         xoptions=c("expand","fill"),yoptions="")
+    }
+  }else{ 
+    if(level_length==1){
+      level_table$attach(level_checkgp[[1]],left.attach=0,1, top.attach=0,1,
+                         xoptions=c("expand","fill"),yoptions="")
+    }else{ 
+      for(i in 1:floor(0.5*level_length)){
+        check_ind1 = 2*i-1
+        check_ind2 = 2*i
+        level_table$attach(level_checkgp[[check_ind1]],left.attach=0,1, top.attach=(i-1),i,
+                           xoptions=c("expand","fill"),yoptions="")
+        level_table$attach(level_checkgp[[check_ind2]],left.attach=1,2, top.attach=(i-1),i,
+                           xoptions=c("expand","fill"),yoptions="")
+      }
+      level_table$attach(level_checkgp[[level_length]],left.attach=0,1, top.attach=floor(0.5*level_length),ceiling(0.5*level_length),
+                         xoptions=c("expand","fill"),yoptions="")
+    }
+  }
+  box$packStart(level_table, expand=FALSE,fill=FALSE)
+  return(list(box = box, level_checkgp = level_checkgp))
+}
 
 .load_spreadsheet <- function(df, name){
   model <- .create_tree_model(df)
@@ -468,47 +503,149 @@
   
   mrv$statusbar$push(mrv$info, paste("Dataset", name, "loaded.")) 
   
-  
+  ### modality control
   mrv$sidedcont1 <- gtkFrame("Modality")
   mrv$sidedcont1["border-width"]=10
   
   mrv$sidedcont1_main <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidedcont1_main["border-width"]=10
-  ### modality control
-  if(!is.null(df$modality)){
-    level_modality = as.character(unique(df$modality))
-    length_modality = length(level_modality)
+  
+#   if(!is.null(df$modality)){
+#     level_modality = as.character(unique(df$modality))
+#     length_modality = length(level_modality)
+#     
+#     mrv$sided_radio <- gtkVBox()
+#     mrv$sided_radiogp <- list()
+#     if(length_modality==1){
+#       mrv$sided_radiogp$all <- gtkRadioButton(label = "All")
+#     } else{
+#       mrv$sided_radiogp[["All"]] <- gtkRadioButton(label = "All")
+#       for(i in 1:length_modality){
+#         mrv$sided_radiogp[[level_modality[i]]] <- gtkRadioButton(mrv$sided_radiogp, label = paste("Subdata - ", level_modality[i], sep=""))
+#       }
+#     }
+#     sapply(mrv$sided_radiogp, mrv$sided_radio$packStart)
+#     mrv$sided_radio[[1]]$setActive(TRUE) 
+#     sapply(mrv$sided_radiogp,'[',"active")
+#     mrv$sided_radio_align <- gtkAlignment(xalign = 0)
+#     mrv$sided_radio_align$add(mrv$sided_radio)
+#     
+#     mrv$sidedcont1_main$packStart(mrv$sided_radio_align, expand=FALSE,fill=FALSE)
+#     
+#     sapply(mrv$sided_radiogp, gSignalConnect, "toggled",
+#            f = function(button, ...){
+#              if(button['active']){
+#                mrv$choosedata = button$getLabel()
+#              } 
+#            })
+#   }else{
+#     modality_null_label = gtkLabel("NULL")
+#     modality_null_label["width-request"]=100
+#     modality_null_label["height-request"]=100
+#     mrv$sidedcont1_main$packStart(modality_null_label, expand=FALSE,fill=FALSE)
+#   }
+  ######
+  mrv$pt_modality = mrv$pt_covariates
+  if(!is.null(mrv$pt_modality)){ 
     
-    mrv$sided_radio <- gtkVBox()
     mrv$sided_radiogp <- list()
-    if(length_modality==1){
-      mrv$sided_radiogp$all <- gtkRadioButton(label = "All")
-    } else{
-      mrv$sided_radiogp[["All"]] <- gtkRadioButton(label = "All")
-      for(i in 1:length_modality){
-        mrv$sided_radiogp[[level_modality[i]]] <- gtkRadioButton(mrv$sided_radiogp, label = paste("Subdata - ", level_modality[i], sep=""))
+    mrv$sided_radiogp[[1]] <- gtkRadioButton(label = "None")
+    for(i in 1:length(mrv$pt_modality)){
+      mrv$sided_radiogp[[i+1]] <- gtkRadioButton(mrv$sided_radiogp, label = mrv$pt_modality[i])
+    }
+    
+    length_modality = length(mrv$sided_radiogp)
+    
+    mrv$sidedcont1_table <- gtkTable(rows=ceiling(0.5*length_modality),columns=2,homogeneous=FALSE)
+    mrv$sidedcont1_table$setColSpacings(5)
+    mrv$sidedcont1_table$setRowSpacings(3)
+    
+    
+    if((length_modality%%2)==0){ # even number of covariates
+      for(i in 1:(0.5*length_modality)){
+        check_ind1 = 2*i-1
+        check_ind2 = 2*i
+        mrv$sidedcont1_table$attach(mrv$sided_radiogp[[check_ind1]],left.attach=0,1, top.attach=(i-1),i,
+                                    xoptions=c("expand","fill"),yoptions="")
+        mrv$sidedcont1_table$attach(mrv$sided_radiogp[[check_ind2]],left.attach=1,2, top.attach=(i-1),i,
+                                    xoptions=c("expand","fill"),yoptions="")
+      }# end for loop
+    }else{ # odd number of covairates
+      if(length_modality==1){
+        mrv$sidedcont1_table$attach(mrv$sided_radiogp[[1]],left.attach=0,1, top.attach=0,1,
+                                    xoptions=c("expand","fill"),yoptions="")
+      }else{ # if number of covariates is 3,5,7,9....
+        for(i in 1:floor(0.5*length_modality)){
+          check_ind1 = 2*i-1
+          check_ind2 = 2*i
+          mrv$sidedcont1_table$attach(mrv$sided_radiogp[[check_ind1]],left.attach=0,1, top.attach=(i-1),i,
+                                      xoptions=c("expand","fill"),yoptions="")
+          mrv$sidedcont1_table$attach(mrv$sided_radiogp[[check_ind2]],left.attach=1,2, top.attach=(i-1),i,
+                                      xoptions=c("expand","fill"),yoptions="")
+        }
+        mrv$sidedcont1_table$attach(mrv$sided_radiogp[[length_modality]],left.attach=0,1, 
+                                    top.attach=floor(0.5*length_modality),ceiling(0.5*length_modality),
+                                    xoptions=c("expand","fill"),yoptions="")
       }
     }
-    sapply(mrv$sided_radiogp, mrv$sided_radio$packStart)
-    mrv$sided_radio[[1]]$setActive(TRUE) 
-    sapply(mrv$sided_radiogp,'[',"active")
-    mrv$sided_radio_align <- gtkAlignment(xalign = 0)
-    mrv$sided_radio_align$add(mrv$sided_radio)
     
-    mrv$sidedcont1_main$packStart(mrv$sided_radio_align, expand=FALSE,fill=FALSE)
+    mrv$sidedcont1_main$packStart(mrv$sidedcont1_table, expand=FALSE,fill=FALSE)
+
+    mod_level = lapply(1:length(mrv$pt_modality), function(ind) as.character(unique(df[,mrv$pt_modality[ind]])))
+    bac = list()
+    mrv$choosedata = list()
+    for(k in 1:length(mrv$pt_modality)){
+      bac[[k]] = .level_box(mod_level[[k]])
+      bac[[k]]$box$hide()
+      mrv$sidedcont1_main$packStart(bac[[k]]$box, expand=FALSE,fill=FALSE)
+      
+      mrv$choosedata[[k]] = rep(NA, length(mod_level[[k]]))
+    }
     
+    sapply(c(1:length(mrv$pt_modality)), function(ind){
+      sapply(c(1:length(mod_level[[ind]])), function(kk){
+        gSignalConnect(bac[[ind]]$level_checkgp[[kk]], "toggled", f = function(button, ...){
+          if(button['active']){
+            mrv$choosedata[[ind]][kk] = button$getLabel()
+          }else{
+            mrv$choosedata[[ind]][kk] = NA
+          }
+        })
+      })
+    })
+    
+    
+    
+    
+    mrv$modality = NULL
     sapply(mrv$sided_radiogp, gSignalConnect, "toggled",
            f = function(button, ...){
              if(button['active']){
-               mrv$choosedata = button$getLabel()
+               mrv$modality = button$getLabel()
+               if(mrv$modality=="None"){
+                 mrv$modality = NULL
+                 for(ll in 1:length(mrv$pt_modality)){
+                   bac[[ll]]$box$hide()
+                 }
+               }else{
+                 which_mod = which(mrv$pt_modality %in% mrv$modality)
+                 bac[[which_mod]]$box$show()
+                 for(ll in c(1:length(mrv$pt_modality))[-which_mod]){
+                   bac[[ll]]$box$hide()
+                 }
+               }
              } 
            })
-  }else{
+    
+    
+  }else{  # no modality
     modality_null_label = gtkLabel("NULL")
     modality_null_label["width-request"]=100
     modality_null_label["height-request"]=100
     mrv$sidedcont1_main$packStart(modality_null_label, expand=FALSE,fill=FALSE)
+    mrv$modality = NULL
   }
+  
   mrv$sidedcont1$add(mrv$sidedcont1_main)
   mrv$sidedata$packStart(mrv$sidedcont1,expand=FALSE,fill=FALSE)
   ####### covariates
@@ -826,7 +963,7 @@
           level_temp = as.numeric(unlist(mrv$flevel))
           mrv$level = level_temp[-which(is.na(level_temp))]
         }
-        mrv$model = runModel(mrv$outdata, mrv$outpriors, mrv$model.type, mrv$link, mrv$level, mrv$verbose)
+        mrv$model = runModel(mrv$outdata, mrv$outpriors, mrv$link, mrv$level, mrv$verbose)
         
         mrv$nsample = mrv$sidemcont5_spinbutton$value
         
@@ -918,13 +1055,13 @@
         asCairoDevice(marginals_fixed_plot)
         par(mfrow=c(row_fixed,col_fixed),mar=c(5.1, 4.1, 4.1, 2.1))
         for(i in 1:length_fixed){
-          plot(inla.smarginal(mrv$est$marginals.fixed[[i]]),type="l",xlab=names_fixed[i],ylab="")
+          plot(INLA::inla.smarginal(mrv$est$marginals.fixed[[i]]),type="l",xlab=names_fixed[i],ylab="")
         }
         Sys.sleep(.1) 
         asCairoDevice(marginals_hyper_plot)
         par(mfrow=c(row_hyper,col_hyper),mar=c(5.1, 4.1, 4.1, 2.1))
         for(i in 1:length_hyper){
-          plot(inla.smarginal(mrv$est$marginals.hyperpar[[i]]),type="l",xlab=names_hyper[i],ylab="")
+          plot(INLA::inla.smarginal(mrv$est$marginals.hyperpar[[i]]),type="l",xlab=names_hyper[i],ylab="")
         }
         
         marginals_page_num = mrv$notebook$pageNum(marginals_page)

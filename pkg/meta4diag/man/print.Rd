@@ -1,5 +1,6 @@
 \name{print}
 \alias{print.meta4diag}
+\alias{print.summary.meta4diag}
 \title{print meta4diag object.}
 \description{
    Takes am \code{meta4diag} object produced by \code{meta4diag()} and print the model and data information such as which model type is using, how many studies in the dataset and data contains covariates or modality or not. The variable type can be used in \code{plot.meta4diag} can be found here.
@@ -25,7 +26,9 @@ The basic model setting and dataset information are printed.
 \keyword{print}
 \seealso{\code{\link{plot}}}
   \examples{
+  \dontrun{
     data(Catheter)
     res <- meta4diag(data = Catheter)
     print(res)
+  }
   }

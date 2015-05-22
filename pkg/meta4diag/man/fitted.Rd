@@ -12,7 +12,7 @@
 \arguments{
   \item{object}{A \code{meta4diag} object.}
   \item{accuracy.type}{
-    A string specifying the accuracy type. Options are "sens", "TPR", "spec", "TNR", "FPR", "FNR", "LRpos", "LRneg" and "DOR".
+    A string specifying the accuracy type. Options are "sens", "TPR", "spec", "TNR", "FPR", "FNR", "LRpos", "LRneg", "RD", "LLRpos", "LLRneg", "LDOR", and "DOR".
   }
   \item{\dots}{
     ...
@@ -28,8 +28,10 @@
 }
 
 \examples{
-  data(Catheter)
+\dontrun{
+data(Catheter)
   res <- meta4diag(data = Catheter, nsample=2000)
   fitted(res, accuracy.type="sens")
   fitted(res, accuracy.type="DOR")
+}  
 }

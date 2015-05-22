@@ -8,14 +8,14 @@
  Forest plot.
 }
 \description{
-Takes am \code{meta4diag} object produced by \code{meta4diag()} and draws a forest plot together with a table of text. A forest plot is a graphical representation of a meta-analysis. It is usually accompanied by a table listing references (author and date) of the studies included in the meta-analysis. In the main device each line represents one study in the meta-analysis, plotted according to the estimated result. The estimated accuracy for each study is plotted as points in the middle and credible intervals as arrows. The size of the estimated accuracy for each study can be chosen to be propotional to the number of individuals in each study. A diamond indicates the overall summary point.
+Takes a \code{meta4diag} object produced by \code{meta4diag()} and draws a forest plot together with a table of text. 
 }
 \usage{
-\method{forest}{meta4diag}(x, accuracy.type = "sens", est.type = "mean", 
-  p.cex = "scaled", p.pch = 15, p.col = "black", 
-  nameShow = "right", dataShow = "center", ciShow = "left", cex = 1, 
-  shade.col = "gray", arrow.col = "black", arrow.lty = 1, arrow.lwd = 1, 
-  main = "Forest Plot", main.cex = 1.5,...)
+\method{forest}{meta4diag}(x, accuracy.type="sens", est.type="mean", p.cex="scaled", p.pch=15, p.col="black",
+                            nameShow="right", dataShow="center", ciShow="left", text.cex=1,
+                            shade.col="gray", arrow.col="black", arrow.lty=1, arrow.lwd=1,
+                            cut=c(0,1), intervals=c(0.025,0.975),
+                            main="Forest Plot", main.cex=1.5, axis.cex=1,...)
 \method{forest.grid}{meta4diag}(x, accuracy.type = "sens", est.type = "mean", 
 nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
 }
@@ -34,10 +34,10 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
   Points size of study specific estimate.
 }
   \item{p.pch}{
-  Points symbol of study specific estimate..
+  Points symbol of study specific estimate.
 }
   \item{p.col}{
-  Points color of study specific estimate..
+  Points color of study specific estimate.
 }
   \item{nameShow}{
   Boolean indicating whether the study names is shown or not. Can also be a string indicating the position to show the study names. Options are "left", "center" and "right".
@@ -48,7 +48,7 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
   \item{ciShow}{
   Boolean indicating whether the credible intervals is shown or not. Can also be a string indicating the position to show the values of credible intervals. Options are "left", "center" and "right".
 }
-  \item{cex}{
+  \item{text.cex}{
   The magnification to be used for the table text.
 }
   \item{shade.col}{
@@ -63,11 +63,20 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
   \item{arrow.lwd}{
   Arrow line width.
 }
+\item{cut}{
+ Boolean indicating the arrows should be cut or not. Or a length 2 nuerical vector indicating the cut position.
+}
   \item{main}{
   A overall title for the plot.
 }
   \item{main.cex}{
-  Title size.
+  The magnification to be used for main titles.
+}
+  \item{axis.cex}{
+  The magnification to be used for axis annotation.
+}
+\item{intervals}{
+  A numercial vector with length 2 specifying the credible intervals that is of interst. The values should be taken from the argument levels (see meta4diag). The first value should be smaller than 0.5 and the second value should be larger than 0.5. 
 }
 \item{graphwidth}{
   A numerical value indicating the main plot device size.
@@ -81,7 +90,7 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
 }
 
 \details{
-Estimated accuracies and the correspoing credible intervals for each study are plotted. Together shown in the plot with the study names, the original dataset and the values of accuracies and the credible intervals.
+A forest plot is a graphical representation of a meta-analysis. It is usually accompanied by a table listing references (author and date) of the studies included in the meta-analysis. In the main device each line represents one study in the meta-analysis, plotted according to the estimated result. The estimated accuracy for each study is plotted as points in the middle and credible intervals as arrows. The size of the estimated accuracy for each study can be chosen to be propotional to the number of individuals in each study. A diamond indicates the overall summary point. Estimated accuracies and the correspoing credible intervals for each study are plotted. Together shown in the plot with the study names, the original dataset and the values of accuracies and the credible intervals.
 
 The function \code{forest()} gives the user flexibility to control the plots.
 }
@@ -93,7 +102,9 @@ The function \code{forest()} gives the user flexibility to control the plots.
 }
 
 \examples{
+\dontrun{
 data(Catheter)
 res <- meta4diag(data = Catheter)
 forest(res, accuracy.type = "sens")
+}
 }
