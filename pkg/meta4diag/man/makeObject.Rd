@@ -7,7 +7,7 @@
   Takes a internal data list, an internal prior setting list and an \code{INLA} object produced by \code{makeData()}, \code{makePriors()} and \code{runModel()}, respectively and makes a \code{meta4diag} object which contains various informations for latter use for analysing. This function is used in the main function \code{meta4diag()} and can also be used as a separate function.
 }
 \usage{
-  makeObject(outdata, outpriors, model, nsample=5000)
+  makeObject(outdata, outpriors, model, nsample=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,7 +21,7 @@
     A \code{INLA} object. Get from function \code{runModel()}.
   }
   \item{nsample}{
-    A numerical value specifying the number of posterior samples, default is 5000. The posterior samples are used to compute the marginals and estimates values of non-linear functions, such as log radios and diagnostic odds radios. If \code{nsample} is given, \code{summary.summarized.statistics}, \code{summary.fitted.LRpos}, \code{summary.fitted.LRneg}, \code{summary.fitted.DOR} and samples of \eqn{E(se)}, \eqn{E(sp)}, \eqn{E(1-se)} and \eqn{E(1-sp)} will be returned.
+    A numerical value specifying the number of posterior samples, default is FALSE. The posterior samples are used to compute the marginals and estimates values of non-linear functions, such as log radios and diagnostic odds radios. If \code{nsample} is given, \code{summary.summarized.statistics}, \code{summary.fitted.LRpos}, \code{summary.fitted.LRneg}, \code{summary.fitted.DOR} and samples of \eqn{E(se)}, \eqn{E(sp)}, \eqn{E(1-se)} and \eqn{E(1-sp)} will be returned.
   }
 }
 

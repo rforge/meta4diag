@@ -4,7 +4,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
                             nameShow="right", dataShow="center", ciShow="left", text.cex=1,
                             shade.col="gray", arrow.col="black", arrow.lty=1, arrow.lwd=1,
                             cut=c(0,1), intervals=c(0.025,0.975),
-                            main="Forest Plot", main.cex=1.5, axis.cex=1,...){
+                            main="Forest plot", main.cex=1.5, axis.cex=1,...){
   
   op <- par(no.readonly = TRUE)
   if(length(accuracy.type)!=1){stop("Argument \"accuracy.type\" could only be one character string.")}
@@ -33,8 +33,8 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   if(est.type=="median"){est.type="0.5quant"}
   
   ###### check intervals
-  if(!all(intervals %in% x$misc$level)){
-    stop(paste("Argument \"intervals\" has to the values of levels. The options are ",paste(x$misc$level,collapse=", "),sep=""))
+  if(!all(intervals %in% x$misc$quantiles)){
+    stop(paste("Argument \"intervals\" has to the values of quantiles. The options are ",paste(x$misc$quantiles,collapse=", "),sep=""))
   }
   if(intervals[1]>=0.5){
     stop("The first element of argument \"intervals\" has to be smaller than 0.5.")
@@ -337,7 +337,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   figure_width = max(name_width,data1_width,data2_width,ci_width)*2.3
   
   if(missing(main)){
-    main = paste("Forest plot for ",fitname,sep="")
+    main = paste("Forest plot for ",tolower(fitname),sep="")
   }
   
   flags = c(nameFlag, dataFlag, ciFlag)*1

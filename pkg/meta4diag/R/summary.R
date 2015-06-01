@@ -23,12 +23,10 @@ print.summary.meta4diag = function(x,...){
   cat('Time used: \n')
   print(x$cpu.used)
   cat('\n')
-  cat('\n')
   cat('Fixed effects: \n')
   fixed = round(x[["summary.fixed"]],4)
   print(fixed)
   if(!is.null(x[["summary.expected.logits"]])){
-    cat('\n')
     cat('\n')
     cat('-------------------')
     cat('\n')
@@ -36,13 +34,11 @@ print.summary.meta4diag = function(x,...){
     print(summarised.fixed)
   }
   cat('\n')
-  cat('\n')
   cat('Model hyperpar: \n')
   hyperpar = round(x[["summary.hyperpar"]],4)
   rownames(hyperpar)  = paste(rownames(x[["summary.hyperpar"]])," ",sep="")
   print(hyperpar)
   if(!is.null(x[["summary.expected.logits"]])){
-    cat('\n')
     cat('\n')
     cat('-------------------')
     cat('\n')
@@ -57,14 +53,13 @@ print.summary.meta4diag = function(x,...){
   }
   
   cat('\n')
-  cat('\n')
   mlik = round(x$mlik,4)
   names(mlik) = ""
   cat(paste("Marginal log-likelihood: ",mlik,sep=""))
   cat('\n')
-  cat('\n')
   cat('Variable names for marginal plotting: \n')
   cat("      ")
   cat(paste(x$var.type,collapse=", "))
+  cat("\n")
 }
 

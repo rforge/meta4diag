@@ -204,30 +204,9 @@
     dir.create(file.path(x$filepath, x$filename))
   }
   result_name = paste(folder_name,"Estimated_Result.txt",sep="/")
+  a = summary(x$est)
   sink(result_name)
-  cat('Time used: \n')
-  print(x$est$cpu.used)
-  cat('\n')
-  cat('\n')
-  cat('Fixed effects: \n')
-  fixed = rbind(round(x$est[["summary.fixed"]],4), rep("-------",6),
-                round(x$est[["summary.summarized.fixed"]],4))
-  rownames(fixed)  = c(rownames(x$est[["summary.fixed"]]), " ", rownames(x$est[["summary.summarized.fixed"]]))
-  print(fixed)
-  cat('\n')
-  cat('\n')
-  cat('Model hyperpar: \n')
-  hyperpar = round(x$est[["summary.hyperpar"]],4)
-  rownames(hyperpar)  = paste(rownames(x$est[["summary.hyperpar"]])," ",sep="")
-  print(hyperpar)
-  cat('\n')
-  cat(paste('Correlation between ',paste(rownames(x$est[["summary.summarized.fixed"]]),collapse=" and ")," is ",round(x$est$summarized.fixed.correlation.matrix[1,2],4),".",sep=""))
-  cat('\n')
-  cat('\n')
-  mlik = t(as.matrix(x$est$mlik[2,]))
-  rownames(mlik) = "Marginal log-likelihood: "
-  colnames(mlik) = ""
-  print(mlik)
+  print(a)
   sink()
   readLines(result_name, n = -1L, warn = FALSE)
 }
@@ -426,7 +405,7 @@
   level_checkgp = list()
   for(i in 1:level_length){
     level_checkgp[[i]] <- gtkCheckButton(level[i])
-    level_checkgp[[i]]$setActive(FALSE)
+    level_checkgp[[i]]$setActive(TRUE)
   }
   if((level_length%%2)==0){ # even number of covariates
     for(i in 1:(0.5*level_length)){
@@ -591,19 +570,19 @@
     
     mrv$sidedcont1_main$packStart(mrv$sidedcont1_table, expand=FALSE,fill=FALSE)
 
-    mod_level = lapply(1:length(mrv$pt_modality), function(ind) as.character(unique(df[,mrv$pt_modality[ind]])))
+    mrv$mod_level = lapply(1:length(mrv$pt_modality), function(ind) as.character(unique(df[,mrv$pt_modality[ind]])))
     bac = list()
     mrv$choosedata = list()
     for(k in 1:length(mrv$pt_modality)){
-      bac[[k]] = .level_box(mod_level[[k]])
+      bac[[k]] = .level_box(mrv$mod_level[[k]])
       bac[[k]]$box$hide()
       mrv$sidedcont1_main$packStart(bac[[k]]$box, expand=FALSE,fill=FALSE)
       
-      mrv$choosedata[[k]] = rep(NA, length(mod_level[[k]]))
+      mrv$choosedata[[k]] = mrv$mod_level[[k]]
     }
     
     sapply(c(1:length(mrv$pt_modality)), function(ind){
-      sapply(c(1:length(mod_level[[ind]])), function(kk){
+      sapply(c(1:length(mrv$mod_level[[ind]])), function(kk){
         gSignalConnect(bac[[ind]]$level_checkgp[[kk]], "toggled", f = function(button, ...){
           if(button['active']){
             mrv$choosedata[[ind]][kk] = button$getLabel()
@@ -939,23 +918,37 @@
             mrv$covariates = covariates_temp[-which(is.na(covariates_temp))]
           } 
         }
-        mrv$statusbar$push(mrv$info, paste("Model Running.....Please wait......")) 
+        mrv$statusbar$push(mrv$info, paste("Prior making.....Please wait......")) 
         mrv$outpriors = makePriors(var.prior = mrv$var.prior, var2.prior=mrv$var2.prior, cor.prior=mrv$cor.prior,
                                    var.par = mrv$var.par, var2.par=mrv$var2.par, cor.par=mrv$cor.par,
                                    init = c(0.01, 0.01, -0.1))
-        if(!is.null(mrv$datafile$modality)){
-          if(mrv$choosedata=="All"){
-            mrv$partialdata = NULL
+        # print(names(mrv$outpriors))
+        if(is.null(mrv$outpriors)){
+          mrv$statusbar$push(mrv$info, paste("Prior making problems.....code stop running....Please contact developer......"))
+          stop()
+        }
+        mrv$statusbar$push(mrv$info, paste("Prior made. Data making......Please wait......")) 
+        if(!is.null(mrv$modality)){
+          ind = which(mrv$modality %in% mrv$pt_modality)
+          mrv$partialdata = mrv$choosedata[[ind]]
+          if(all(is.na(mrv$partialdata))){
             mrv$impdata = mrv$datafile
+            mrv$modality = NULL
           }else{
-            mrv$partialdata = mrv$choosedata
-            mrv$impdata = mrv$datafile[mrv$datafile$modality==mrv$choosedata,]
+            partialName = mrv$partialdata[!is.na(mrv$partialdata)]
+            partialInd = which(mrv$datafile[,mrv$modality] %in% partialName)
+            mrv$impdata = mrv$datafile[partialInd,]
           }
         }else{
-          mrv$partialdata = NULL
           mrv$impdata = mrv$datafile
         }
-        mrv$outdata = makeData(data = mrv$impdata, model.type = mrv$model.type, covariates = mrv$covariates)
+        mrv$outdata = makeData(data = mrv$impdata, model.type = mrv$model.type, covariates = mrv$covariates, modality = mrv$modality)
+        if(is.null(mrv$outdata)){
+          mrv$statusbar$push(mrv$info, paste("Data making problems.....code stop running....Please contact developer......"))
+          stop()
+        }
+        # print(mrv$outdata)
+        mrv$statusbar$push(mrv$info, paste("Prior made. Data made. Model running......Please wait......")) 
         
         if(all(is.na(mrv$flevel))){
           mrv$level = c(0.5)
@@ -963,11 +956,20 @@
           level_temp = as.numeric(unlist(mrv$flevel))
           mrv$level = level_temp[-which(is.na(level_temp))]
         }
-        mrv$model = runModel(mrv$outdata, mrv$outpriors, mrv$link, mrv$level, mrv$verbose)
-        
+        mrv$model = runModel(outdata = mrv$outdata, outpriors = mrv$outpriors, link = mrv$link, level = mrv$level, verbose = mrv$verbose)
+        if(!mrv$model$ok){
+          mrv$statusbar$push(mrv$info, paste("Model running problems.....code stop running....Please contact developer......"))
+          stop()
+        }
         mrv$nsample = mrv$sidemcont5_spinbutton$value
-        
-        mrv$est = makeObject(mrv$outdata, mrv$outpriorss, mrv$model, mrv$nsample)
+         
+        mrv$est = makeObject(mrv$outdata, mrv$outpriors, mrv$model, mrv$nsample)
+        # print(mrv$est)
+        if(is.null(mrv$est)){
+          mrv$statusbar$push(mrv$info, paste("Model running problems.....code stop running....Please contact developer......"))
+          stop()
+        }
+        mrv$statusbar$push(mrv$info, paste("Prior made. Data made. Model made......"))
         ###################################################
         ## construct Result page
         ###################################################
@@ -1230,13 +1232,30 @@
         sroc_page_event = .pageEventsLabel("SROC Plot")      
         mrv$notebook$appendPage(mrv$sroc_page, sroc_page_event)
         
+        col.collect = c("aquamarine","blueviolet","brown","red","green","darkblue",
+                        "cyan","chocolate","chartreuse","darkgoldenrod","deepskyblue",
+                        "darkorange","darkorchid","deeppink","hotpink","magenta")
+        
+        if(!is.null(mrv$modality)){
+          nl = length(mrv$partialdata)
+          if(nl!=1){
+            ad.col = col.collect[1:(nl-1)]
+            col = c(mrv$cr.col, ad.col)
+            mrv$cr.col = col
+            mrv$sp.col = col
+            mrv$pr.col = col
+            mrv$line.col = col
+          }
+        }
+        
         Sys.sleep(.1) 
         asCairoDevice(mrv$sroc_plot)
-        SROC(mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex,sp.pch=mrv$sp.pch,sp.col=mrv$sp.col,
-             dataShow=mrv$dataShow, data.col=mrv$data.col,
-             sroc.type=mrv$sroc.type, lineShow=mrv$lineShow, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
+        SROC(x=mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex, sp.pch=mrv$sp.pch, sp.col=mrv$sp.col,
+             dataShow=mrv$dataShow, data.col=mrv$data.col, data.cex=mrv$data.cex, data.pch=mrv$data.pch, 
+             lineShow=mrv$lineShow, sroc.type=mrv$sroc.type, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
              crShow=mrv$crShow, cr.lty=mrv$cr.lty, cr.lwd=mrv$cr.lwd, cr.col=mrv$cr.col,
-             prShow=mrv$prShow, pr.lty=mrv$pr.lty, pr.lwd=mrv$pr.lwd,  pr.col=mrv$pr.col)
+             prShow=mrv$prShow, pr.lty=mrv$pr.lty, pr.lwd=mrv$pr.lwd,  pr.col=mrv$pr.col,
+             dataFit = T, add=FALSE)
         
         sroc_page_num = mrv$notebook$pageNum(mrv$sroc_page)
         mrv$notebook$setCurrentPage(sroc_page_num)
@@ -1258,11 +1277,12 @@
           mrv$sroc_label_cex = sroc_lab_size$getValue()
           Sys.sleep(.1) 
           asCairoDevice(mrv$sroc_plot)
-          SROC(mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex,sp.pch=mrv$sp.pch,sp.col=mrv$sp.col,
-               dataShow=mrv$dataShow, data.col=mrv$data.col,
-               sroc.type=mrv$sroc.type, lineShow=mrv$lineShow, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
+          SROC(x=mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex, sp.pch=mrv$sp.pch, sp.col=mrv$sp.col,
+               dataShow=mrv$dataShow, data.col=mrv$data.col, data.cex=mrv$data.cex, data.pch=mrv$data.pch, 
+               lineShow=mrv$lineShow, sroc.type=mrv$sroc.type, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
                crShow=mrv$crShow, cr.lty=mrv$cr.lty, cr.lwd=mrv$cr.lwd, cr.col=mrv$cr.col,
                prShow=mrv$prShow, pr.lty=mrv$pr.lty, pr.lwd=mrv$pr.lwd,  pr.col=mrv$pr.col,
+               dataFit = T, add=FALSE,
                main=mrv$sroc_main_text, cex.main=mrv$sroc_main_cex, cex.axis=mrv$sroc_axis_cex,
                xlab=mrv$sroc_xlabel, ylab=mrv$sroc_ylabel, cex.lab=mrv$sroc_label_cex)
         })
@@ -1295,11 +1315,12 @@
               png(filename = filename,
                   width = width, height = height, units = "in", res=300)
             }
-            SROC(mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex,sp.pch=mrv$sp.pch,sp.col=mrv$sp.col,
-                 dataShow=mrv$dataShow, data.col=mrv$data.col,
-                 sroc.type=mrv$sroc.type, lineShow=mrv$lineShow, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
+            SROC(x=mrv$est, est.type=mrv$est.type, sp.cex=mrv$sp.cex, sp.pch=mrv$sp.pch, sp.col=mrv$sp.col,
+                 dataShow=mrv$dataShow, data.col=mrv$data.col, data.cex=mrv$data.cex, data.pch=mrv$data.pch, 
+                 lineShow=mrv$lineShow, sroc.type=mrv$sroc.type, line.lty=mrv$line.lty, line.lwd=mrv$line.lwd, line.col=mrv$line.col,
                  crShow=mrv$crShow, cr.lty=mrv$cr.lty, cr.lwd=mrv$cr.lwd, cr.col=mrv$cr.col,
                  prShow=mrv$prShow, pr.lty=mrv$pr.lty, pr.lwd=mrv$pr.lwd,  pr.col=mrv$pr.col,
+                 dataFit = T, add=FALSE,
                  main=mrv$sroc_main_text, cex.main=mrv$sroc_main_cex, cex.axis=mrv$sroc_axis_cex,
                  xlab=mrv$sroc_xlabel, ylab=mrv$sroc_ylabel, cex.lab=mrv$sroc_label_cex)
             dev.off()
@@ -1427,11 +1448,11 @@
         
         Sys.sleep(.1) 
         asCairoDevice(forest_plot)
-        forest(mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
+        forest(x = mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
                p.cex=mrv$forest.pcex, p.pch=mrv$forest.pch, p.col=mrv$forest.pcol,
                nameShow=mrv$forest.nameShow, dataShow=mrv$forest.dataShow, ciShow=mrv$forest.ciShow,
-               cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
-               main="Forest Plot", main.cex=1.5)
+               text.cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
+               main="Forest Plot", main.cex=1.5, cut=TRUE, intervals=c(0.025,0.975))
         
         forest_page_num = mrv$notebook$pageNum(mrv$forest_page)
         
@@ -1447,10 +1468,11 @@
           mrv$forest_axis_cex = forest_axis_size$getValue()
           Sys.sleep(.1) 
           asCairoDevice(forest_plot)
-          forest(mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
+          forest(x = mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
                  p.cex=mrv$forest.pcex, p.pch=mrv$forest.pch, p.col=mrv$forest.pcol,
                  nameShow=mrv$forest.nameShow, dataShow=mrv$forest.dataShow, ciShow=mrv$forest.ciShow,
-                 cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
+                 text.cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
+                 cut=TRUE, intervals=c(0.025,0.975),
                  main=mrv$forest_main_text, main.cex=mrv$forest_main_cex, cex.axis=mrv$forest_axis_cex)
           })
         
@@ -1479,10 +1501,11 @@
               png(filename = filename,
                   width = width, height = height, units = "in", res=300)
             }
-            forest(mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
+            forest(x = mrv$est, accuracy.type=mrv$accuracy, est.type=mrv$forest.est.type, 
                    p.cex=mrv$forest.pcex, p.pch=mrv$forest.pch, p.col=mrv$forest.pcol,
                    nameShow=mrv$forest.nameShow, dataShow=mrv$forest.dataShow, ciShow=mrv$forest.ciShow,
-                   cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
+                   text.cex=mrv$forest.text.size, shade.col=mrv$forest.scol, arrow.col="black",
+                   cut=TRUE, intervals=c(0.025,0.975),
                    main=mrv$forest_main_text, main.cex=mrv$forest_main_cex, cex.axis=mrv$forest_axis_cex)
             dev.off()
           }

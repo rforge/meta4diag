@@ -6,7 +6,7 @@
 }
 \usage{
 runModel(outdata, outpriors, link = "logit", 
-  level = c(0.025, 0.5, 0.975), verbose = FALSE)
+  quantiles = c(0.025, 0.5, 0.975), verbose = FALSE)
 }
 \arguments{
   \item{outdata}{
@@ -18,7 +18,7 @@ runModel(outdata, outpriors, link = "logit",
   \item{link}{
 	A string specifying the link function used in the model. Options are "logit", "probit" and "cloglog".
 }
-  \item{level}{
+  \item{quantiles}{
 	A vector of quantiles, p(0), p(1),... to compute for each posterior marginal. The function returns, for each posterior marginal, the values x(0), x(1),... such that \deqn{Prob(X<x)=p.}{Prob(X<x)=p.}
   The default value are c(0.025, 0.5, 0.975). Not matter what other values are going to be given, the estimates for these 3 quantiles are always returned.
 }
@@ -53,7 +53,7 @@ if(requireNamespace("INLA", quietly = TRUE)) {
    outpriors = makePriors(var.prior = "invgamma", cor.prior = "normal", 
                           var.par = c(0.25, 0.025), cor.par = c(0, 5))
    runModel(outdata, outpriors, link = "logit", 
-            level = c(0.025, 0.5, 0.975), verbose = FALSE)
+            quantiles = c(0.025, 0.5, 0.975), verbose = FALSE)
 }
 }
 }

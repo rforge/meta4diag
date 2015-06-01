@@ -5,7 +5,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
                           lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
                           crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
                           prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-                          dataFit = T, add=FALSE, save=F, xlab, ylab, main, xlim, ylim,...){
+                          dataFit = T, add=FALSE, save=F, main, xlim, ylim,...){
   if(class(x)!="meta4diag"){stop("Wrong input given!")}
   if(is.character(data.cex)){
     data.cex = tolower(data.cex)
@@ -261,26 +261,60 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
   }
   
   if(missing(xlim)){
-    if(x$misc$model.type==1){xlim = c(1,0)}
-    if(x$misc$model.type==2){xlim = c(0,1)}
-    if(x$misc$model.type==3){xlim = c(1,0)}
-    if(x$misc$model.type==4){xlim = c(0,1)}
+    if(x$misc$model.type %in% c(1,3)){
+      xlim = c(1,0)
+      x.at = seq(1,0,by=-0.2)
+      x.labels = as.character(1-x.at)
+    }
+    if(x$misc$model.type %in% c(2,4)){
+      xlim = c(0,1)
+      x.at = seq(0,1,by=0.2)
+      x.labels = as.character(x.at)
+    }
   }else{
+    if(x$misc$model.type %in% c(1,3)){
+      xlim = 1-xlim
+    }
     if(x$misc$model.type==1){if(xlim[1]<xlim[2]){xlim = c(xlim[2],xlim[1])}}
     if(x$misc$model.type==2){if(xlim[2]<xlim[1]){xlim = c(xlim[2],xlim[1])}}
     if(x$misc$model.type==3){if(xlim[1]<xlim[2]){xlim = c(xlim[2],xlim[1])}}
     if(x$misc$model.type==4){if(xlim[2]<xlim[1]){xlim = c(xlim[2],xlim[1])}}
+    x.temp = seq(xlim[1],xlim[2],len=4)
+    x.at = unique(c(x.temp[1], round(x.temp[c(2,3)],1), x.temp[4]))
+    if(x$misc$model.type %in% c(1,3)){
+      x.labels = as.character(1-x.at)
+    }
+    if(x$misc$model.type %in% c(2,4)){
+      x.labels = as.character(x.at)
+    }
   }
   if(missing(ylim)){
-    if(x$misc$model.type==1){ylim = c(0,1)}
-    if(x$misc$model.type==2){ylim = c(0,1)}
-    if(x$misc$model.type==3){ylim = c(1,0)}
-    if(x$misc$model.type==4){ylim = c(1,0)}
+    if(x$misc$model.type %in% c(1,2)){
+      ylim = c(0,1)
+      y.at = seq(0,1,by=0.2)
+      y.labels = as.character(y.at)
+    }
+    if(x$misc$model.type %in% c(3,4)){
+      ylim = c(1,0)
+      y.at = seq(1,0,by=-0.2)
+      y.labels = as.character(1-y.at)
+    }
   }else{
+    if(x$misc$model.type %in% c(3,4)){
+      ylim = 1-ylim
+    }
     if(x$misc$model.type==1){if(ylim[2]<ylim[1]){ylim = c(ylim[2],ylim[1])}}
     if(x$misc$model.type==2){if(ylim[2]<ylim[1]){ylim = c(ylim[2],ylim[1])}}
     if(x$misc$model.type==3){if(ylim[1]<ylim[2]){ylim = c(ylim[2],ylim[1])}}
     if(x$misc$model.type==4){if(ylim[1]<ylim[2]){ylim = c(ylim[2],ylim[1])}}
+    y.temp = seq(ylim[1],ylim[2],len=4)
+    y.at = unique(c(y.temp[1], round(y.temp[c(2,3)],1), y.temp[4]))
+    if(x$misc$model.type %in% c(1,2)){
+      y.labels = as.character(y.at)
+    }
+    if(x$misc$model.type %in% c(3,4)){
+      y.labels = as.character(1-y.at)
+    }
   }
   
   if(tolower(data.cex)=="scaled"){
@@ -335,13 +369,13 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     
   }else{
     
-    if(missing(main)){main="SROC Plot"}
-    if(missing(xlab)){xlab = fitname[2]}
-    if(missing(ylab)){ylab = fitname[1]}
+    if(missing(main)){main="SROC plot"}
 
     par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 2.1))
-    plot(-10,-10,xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,main=main,asp=1,
-         xaxs = "i",family="sans",xaxt="s",yaxt="s",bty="o",...)
+    plot(-10,-10,xlim=xlim,ylim=ylim,main=main,asp=1,
+         xaxs = "i",family="sans",xaxt="n",yaxt="n",bty="o", xlab="1-Specificity", ylab="Sensitivity")
+    axis(1, at = x.at, labels = x.labels)
+    axis(2, at = y.at, labels = y.labels)
     if(dataShow=="o" || dataShow=="f"){
       if(data.cex=="bubble"){
         data.col = col2rgb(data.col,alpha=F)

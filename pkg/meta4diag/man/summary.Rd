@@ -1,4 +1,5 @@
 \name{summary}
+\alias{summary}
 \alias{summary.meta4diag}
 \title{Summary meta4diag object.}
 \description{

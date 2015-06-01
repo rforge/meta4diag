@@ -14,7 +14,7 @@ SROC(x,...)
               lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
               crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
               prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-              dataFit = T, add=FALSE, save=F, xlab, ylab, main, xlim, ylim,...)
+              dataFit = T, add=FALSE, save=F, main, xlim, ylim,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -101,12 +101,6 @@ Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the
 }
   \item{save}{
   If save is TRUE, the plots are saved(pdf format) automatically in the working directory. save could also be a file name, i.e. \code{save="plot1.eps"}, a file with name plot1 and eps format will be saved in the working directory.
-}
-  \item{xlab}{
-  A title for the x axis.
-}
-  \item{ylab}{
-  A title for the y axis.
 }
   \item{main}{
   A overall title for the plot.

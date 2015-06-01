@@ -2,7 +2,7 @@ meta4diag = function(data=NULL, model.type = 1,
                      var.prior = "invgamma", var2.prior = "invgamma", cor.prior = "normal",
                      var.par = c(0.25, 0.025), var2.par, cor.par = c(0,5),
                      wishart.par = c(4, 1, 1, 0),
-                     init = c(0.01,0.01,0), link="logit", level=c(0.025,0.5,0.975),
+                     init = c(0.01,0.01,0), link="logit", quantiles=c(0.025,0.5,0.975),
                      modality=NULL, covariates = NULL,
                      verbose = FALSE, nsample=FALSE){
   
@@ -65,7 +65,7 @@ meta4diag = function(data=NULL, model.type = 1,
   outdata = makeData(data = data, model.type = model.type, modality = modality, covariates = covariates)
   
   ################ Run model in INLA
-  model = runModel(outdata=outdata, outpriors=outpriors, link=link, level=level, verbose = verbose)
+  model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose)
   
   ##########################  construct the result
   res = makeObject(outdata, outpriors, model, nsample=nsample)

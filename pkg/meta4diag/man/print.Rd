@@ -1,4 +1,5 @@
 \name{print}
+\alias{print}
 \alias{print.meta4diag}
 \alias{print.summary.meta4diag}
 \title{print meta4diag object.}

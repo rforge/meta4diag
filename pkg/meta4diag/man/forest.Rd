@@ -15,7 +15,7 @@ Takes a \code{meta4diag} object produced by \code{meta4diag()} and draws a fores
                             nameShow="right", dataShow="center", ciShow="left", text.cex=1,
                             shade.col="gray", arrow.col="black", arrow.lty=1, arrow.lwd=1,
                             cut=c(0,1), intervals=c(0.025,0.975),
-                            main="Forest Plot", main.cex=1.5, axis.cex=1,...)
+                            main="Forest plot", main.cex=1.5, axis.cex=1,...)
 \method{forest.grid}{meta4diag}(x, accuracy.type = "sens", est.type = "mean", 
 nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
 }
@@ -76,7 +76,7 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
   The magnification to be used for axis annotation.
 }
 \item{intervals}{
-  A numercial vector with length 2 specifying the credible intervals that is of interst. The values should be taken from the argument levels (see meta4diag). The first value should be smaller than 0.5 and the second value should be larger than 0.5. 
+  A numercial vector with length 2 specifying the credible intervals that is of interst. The values should be taken from the argument quantiles (see meta4diag). The first value should be smaller than 0.5 and the second value should be larger than 0.5. 
 }
 \item{graphwidth}{
   A numerical value indicating the main plot device size.

@@ -147,6 +147,8 @@ meta4diagGUI <- function(){
     grid.newpage()
     if(Size=="scaled"){
       grid.draw(grid.points(x = unit(c(0.2,0.5,0.8),"npc"), y = unit(rep(0.5,3),"npc"), pch = 1,gp = gpar(ylim=c(0,1),cex=c(0.3,0.8,1.5))))
+    }else if(Size=="bubble"){
+      grid.draw(grid.points(x = unit(c(0.2,0.5,0.8),"npc"), y = unit(rep(0.5,3),"npc"), pch = 16,gp = gpar(ylim=c(0,1),cex=c(0.3,0.8,1.5),col=rep("green",3))))
     }else{
       grid.draw(grid.points(x = unit(c(0.2,0.5,0.8),"npc"), y = unit(rep(0.5,3),"npc"), pch = 1,gp = gpar(ylim=c(0,1),cex=rep(as.numeric(Size),3))))
     }
@@ -158,6 +160,27 @@ meta4diagGUI <- function(){
   
   gtkPointsSizeComboBox <- function(init.active){
     pcex_vector <- c("scaled", as.character(seq(0.5,2.5,by=0.5)))
+    store <- gtkListStore(c("GObject","gchararray"))
+    for(i in 1:length(pcex_vector)){
+      iter <- store$Append()
+      store$SetValue(iter$iter, 0,  makePixbufForPointsSize(pcex_vector[i]))
+      store$SetValue(iter$iter, 1, pcex_vector[i])
+    }
+    combo <- gtkComboBox(model=store)
+    crp = gtkCellRendererPixbuf()
+    crp['xalign'] <- 0
+    combo$packStart(crp, expand=FALSE)
+    combo$addAttribute(crp, "pixbuf", 0)
+    crt = gtkCellRendererText()
+    crt['xalign'] <- 1
+    combo$packStart(crt)
+    combo$addAttribute(crt, "text", 1)
+    combo$setActive(init.active)
+    return(combo)
+  } 
+  
+  gtkPointsSizeComboBox_bubble <- function(init.active){
+    pcex_vector <- c("bubble","scaled", as.character(seq(0.5,2.5,by=0.5)))
     store <- gtkListStore(c("GObject","gchararray"))
     for(i in 1:length(pcex_vector)){
       iter <- store$Append()
@@ -203,7 +226,7 @@ meta4diagGUI <- function(){
     iter <- cb$GetActiveIter()
     if(iter$retval){
       value = store$GetValue(iter$iter,1)$value
-      if(value %in% c("scaled","@","+","%","#","*","o","O")){
+      if(value %in% c("bubble","scaled","@","+","%","#","*","o","O")){
         data <- value
       }else{
         data <- as.numeric(value) 
@@ -360,7 +383,7 @@ meta4diagGUI <- function(){
   mrv$sidecont1_main["border-width"]=10
   mrv$sidecont1_show <- gtkHBox()
   mrv$sidecont1_combo <- gtkComboBoxNewText()
-  sapply(c("Inv-gamma","PC"), mrv$sidecont1_combo$appendText)
+  sapply(c("Inv-gamma","PC","Half-cauchy"), mrv$sidecont1_combo$appendText)
   mrv$sidecont1_show$packStart(gtkLabel("Prior:  "),expand=FALSE,fill=FALSE)
   mrv$sidecont1_show$packStart(mrv$sidecont1_combo,expand=TRUE,fill=TRUE)
   mrv$sidecont1_combo$setActive(-1)
@@ -373,13 +396,26 @@ meta4diagGUI <- function(){
   sidecont1_invgamma_list <- list(mrv$sidecont1_a_label, mrv$sidecont1_a_entry, mrv$sidecont1_b_label, mrv$sidecont1_b_entry)
   
   mrv$sidecont1_u_label <- sidebarLabel("u: ", 1)
-  mrv$sidecont1_alpha_label <- sidebarLabel("alpha: ", 1)
+  mrv$sidecont1_alpha_label <- sidebarLabel("a: ", 1)
   mrv$sidecont1_u_entry <- sidebarEntry("3", 10, 0)
   mrv$sidecont1_alpha_entry <- sidebarEntry("0.05", 10, 0)
   sidecont1_pc_list <- list(mrv$sidecont1_u_label, mrv$sidecont1_u_entry, mrv$sidecont1_alpha_label, mrv$sidecont1_alpha_entry)
   
+  mrv$sidecont1_gamma_label <- sidebarLabel("gamma: ", 1)
+  mrv$sidecont1_gamma_entry <- sidebarEntry("3", 10, 0)
+  sidecont1_hcauchy_list <- list(mrv$sidecont1_gamma_label, mrv$sidecont1_gamma_entry)
+  
+  mrv$sidecont1_m_label <- sidebarLabel("mean: ", 1)
+  mrv$sidecont1_m_entry <- sidebarEntry("3", 10, 0)
+  mrv$sidecont1_v_label <- sidebarLabel("variance: ", 1)
+  mrv$sidecont1_v_entry <- sidebarEntry("1", 10, 0)
+  sidecont1_tnorm_list <- list(mrv$sidecont1_m_label, mrv$sidecont1_m_entry, mrv$sidecont1_v_label, mrv$sidecont1_v_entry)
+  
   mrv$sidecont1_input1 <- sidebarTable(3, 3, sidecont1_invgamma_list)
   mrv$sidecont1_input2 <- sidebarTable(3, 3, sidecont1_pc_list)
+  mrv$sidecont1_input3 <- sidebarTable(3, 3, sidecont1_hcauchy_list)
+  mrv$sidecont1_input4 <- sidebarTable(3, 3, sidecont1_tnorm_list)
+  
   
   mrv$sidecont1_input1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont1_input1_figurebt <- sidebarPlotButton()    
@@ -516,6 +552,7 @@ meta4diagGUI <- function(){
   
   mrv$sidecont2_input1 <- sidebarTable(3, 3, sidecont2_invgamma_list)
   mrv$sidecont2_input2 <- sidebarTable(3, 3, sidecont2_pc_list)
+  
   
   mrv$sidecont2_input1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont2_input1_figurebt <- sidebarPlotButton()
@@ -1145,7 +1182,7 @@ meta4diagGUI <- function(){
          })
   
   ############ sidebar level
-  mrv$sidemcont3 <- gtkFrame("Levels")
+  mrv$sidemcont3 <- gtkFrame("Quantiles")
   mrv$sidemcont3["border-width"]=10
   
   mrv$sidemcont3_main <- gtkVBox(homogeneous=FALSE,spacing=10)
@@ -1256,7 +1293,7 @@ meta4diagGUI <- function(){
   mrv$sidemodel$packStart(mrv$sidemcont1,expand=FALSE,fill=FALSE)
   mrv$sidemodel$packStart(mrv$sidemcont2,expand=FALSE,fill=FALSE)
   mrv$sidemodel$packStart(mrv$sidemcont3,expand=FALSE,fill=FALSE)
-  mrv$sidemodel$packStart(mrv$sidemcont4,expand=FALSE,fill=FALSE)
+  #mrv$sidemodel$packStart(mrv$sidemcont4,expand=FALSE,fill=FALSE)
   mrv$sidemodel$packStart(mrv$sidemcont5,expand=FALSE,fill=FALSE)
   
   ##########################################
@@ -1321,7 +1358,7 @@ meta4diagGUI <- function(){
   mrv$sidepcont1_table$setRowSpacings(7)
   
   ### summary points symbol
-  mrv$sidepcont1_type_label <- sidebarLabel("Point Symbol:",1)
+  mrv$sidepcont1_type_label <- sidebarLabel("Summary Point Symbol:",1)
   
   mrv$sidepcont1_type_combo <- gtkPointsTypeComboBox(0)
   
@@ -1337,7 +1374,7 @@ meta4diagGUI <- function(){
   })
   
   ### summary points size
-  mrv$sidepcont1_size_label <- sidebarLabel("Point Size:",1)
+  mrv$sidepcont1_size_label <- sidebarLabel("Summary Point Size:",1)
   
   mrv$sidepcont1_size_combo <- gtkPointsSizeComboBox_simple(0)
   
@@ -1347,7 +1384,7 @@ meta4diagGUI <- function(){
     mrv$sp.cex <- getValueFromFigureCombo(cb)
   })
   ### summary points color
-  mrv$sidepcont1_color_label <- sidebarLabel("Point Color:",1)
+  mrv$sidepcont1_color_label <- sidebarLabel("Summary Point Color:",1)
   mrv$sidepcont1_color_button <- gtkColorButton(gdkColorParse(palette()[2])$color)
   mrv$sp.col = palette()[2]
   gSignalConnect(mrv$sidepcont1_color_button, "color-set", function(button, ...) {
@@ -1365,7 +1402,7 @@ meta4diagGUI <- function(){
   mrv$sidepcont1_table$attach(mrv$sidepcont1_color_label,left.attach=0,1, top.attach=2,3,
                               xoptions=c("expand","fill"),yoptions="")
   mrv$sidepcont1_table$attach(mrv$sidepcont1_color_button,left.attach=1,2, top.attach=2,3,
-                              xoptions=c("fill"),yoptions="")
+                              xoptions="fill",yoptions="")
   
   ## pack table to main box
   mrv$sidepcont1_main$packStart(mrv$sidepcont1_table, expand=FALSE,fill=FALSE)
@@ -1379,37 +1416,78 @@ meta4diagGUI <- function(){
   mrv$sidepcont2_main <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidepcont2_main["border-width"]=10
   
-  mrv$sidepcont2_radio <- gtkHBox()
+  mrv$sidepcont2_radio_table <- gtkTable(rows=1,columns=3,homogeneous=FALSE)
+  mrv$sidepcont2_radio_table$setColSpacings(5)
+  mrv$sidepcont2_radio_table$setRowSpacings(7)
+  
   mrv$sidepcont2_radiogp <- list()
-  mrv$sidepcont2_radiogp$bubbul <- gtkRadioButton(label = "Show")
+  mrv$sidepcont2_radiogp$o <- gtkRadioButton(label = "Original")
+  mrv$sidepcont2_radiogp$f <- gtkRadioButton(mrv$sidepcont2_radiogp,label = "Fitted")
   mrv$sidepcont2_radiogp$nshow <- gtkRadioButton(mrv$sidepcont2_radiogp, label = "Not Show")
-  sapply(mrv$sidepcont2_radiogp, mrv$sidepcont2_radio$packStart)
-  mrv$sidepcont2_radio[[1]]$setActive(TRUE) 
   sapply(mrv$sidepcont2_radiogp,'[',"active")
-  mrv$sidepcont2_radio_align <- gtkAlignment(xalign = 0)
-  mrv$sidepcont2_radio_align$add(mrv$sidepcont2_radio)
-  # pack Show or not in main box
-  mrv$sidepcont2_main$packStart(mrv$sidepcont2_radio_align, expand=FALSE,fill=FALSE)
-  mrv$dataShow = T
+  
+  mrv$sidepcont2_radio_table$attach(mrv$sidepcont2_radiogp$o,left.attach=0,1, top.attach=0,1,
+                                    xoptions=c("expand","fill"),yoptions="")
+  mrv$sidepcont2_radio_table$attach(mrv$sidepcont2_radiogp$f,left.attach=1,2, top.attach=0,1,
+                                    xoptions=c("expand","fill"),yoptions="")
+  mrv$sidepcont2_radio_table$attach(mrv$sidepcont2_radiogp$nshow,left.attach=2,3, top.attach=0,1,
+                                    xoptions=c("expand","fill"),yoptions="")
+
+  # pack data radio table in main box
+  mrv$sidepcont2_main$packStart(mrv$sidepcont2_radio_table, expand=FALSE,fill=FALSE)
+  mrv$dataShow = "o"
   sapply(mrv$sidepcont2_radiogp, gSignalConnect, "toggled",
          f = function(button, ...){
            if(button['active']){
-             if(button$getLabel()=="Show"){
-               mrv$dataShow = T
+             if(button$getLabel()=="Original"){
+               mrv$dataShow = "o"
+             }else if(button$getLabel()=="Fitted"){
+               mrv$dataShow = "f"
              }else{
                mrv$dataShow = F
              }
            } 
          })
   ####### other things in a table
-  mrv$sidepcont2_table <- gtkTable(rows=1,columns=2,homogeneous=FALSE)
+  mrv$sidepcont2_table <- gtkTable(rows=3,columns=2,homogeneous=FALSE)
   mrv$sidepcont2_table$setColSpacings(5)
   mrv$sidepcont2_table$setRowSpacings(7)
+  ### data points symbol
+  mrv$sidepcont2_type_label <- sidebarLabel("Data Point Symbol:",1)
+  
+  mrv$sidepcont2_type_combo <- gtkPointsTypeComboBox(0)
+  
+  iter = mrv$sidepcont2_type_combo$GetActiveIter()
+  value = mrv$sidepcont2_type_combo$GetModel()$GetValue(iter$iter,1)$value
+  if(value %in% c("@","+","%","#","*","o","O")){
+    mrv$data.pch <- value
+  }else{
+    mrv$data.pch <- as.numeric(value) 
+  }
+  gSignalConnect(mrv$sidepcont2_type_combo, "changed",function(cb){
+    mrv$data.pch <- getValueFromFigureCombo(cb) 
+  })
+  
+  ### data points size
+  mrv$sidepcont2_size_label <- sidebarLabel("Data Point Size:",1)
+  
+  mrv$sidepcont2_size_combo <- gtkPointsSizeComboBox_bubble(0)
+  
+  iter = mrv$sidepcont2_size_combo$GetActiveIter()
+  value = mrv$sidepcont2_size_combo$GetModel()$GetValue(iter$iter,1)$value
+  if(value %in% c("bubble","scaled")){
+    mrv$data.cex <- value
+  }else{
+    mrv$data.cex <- as.numeric(value) 
+  }
+  gSignalConnect(mrv$sidepcont2_size_combo, "changed",function(cb){
+    mrv$data.cex <- getValueFromFigureCombo(cb)
+  })
   
   ### data bubble color
-  mrv$sidepcont2_color_label <- sidebarLabel("      Bubble Color:",1)
+  mrv$sidepcont2_color_label <- sidebarLabel("Data Point Color:",1)
   mrv$sidepcont2_color_button <- gtkColorButton(gdkColorParse("lawngreen")$color)
-  
+  mrv$sidepcont2_color_button[["width-request"]] = 70
   tempcol = mrv$sidepcont2_color_button$color
   tempalpha = mrv$sidepcont2_color_button$alpha
   mrv$data.col = rgb(red=tempcol$red, green=tempcol$green, blue=tempcol$blue, alpha=tempalpha, maxColorValue=65535)
@@ -1417,10 +1495,18 @@ meta4diagGUI <- function(){
     mrv$data.col = rgb(red=button$color$red, green=button$color$green, blue=button$color$blue, alpha=button$alpha, maxColorValue=65535)
   })
   ## pack table
-  mrv$sidepcont2_table$attach(mrv$sidepcont2_color_label,left.attach=0,1, top.attach=0,1,
-                              xoptions="",yoptions="")
-  mrv$sidepcont2_table$attach(mrv$sidepcont2_color_button,left.attach=1,2, top.attach=0,1,
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_type_label,left.attach=0,1, top.attach=0,1,
                               xoptions=c("expand","fill"),yoptions="")
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_type_combo,left.attach=1,2, top.attach=0,1,
+                              xoptions="fill",yoptions="")
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_size_label,left.attach=0,1, top.attach=1,2,
+                              xoptions=c("expand","fill"),yoptions="")
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_size_combo,left.attach=1,2, top.attach=1,2,
+                              xoptions="fill",yoptions="")
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_color_label,left.attach=0,1, top.attach=2,3,
+                              xoptions=c("expand","fill"),yoptions="")
+  mrv$sidepcont2_table$attach(mrv$sidepcont2_color_button,left.attach=1,2, top.attach=2,3,
+                              xoptions="fill",yoptions="")
   
   ## pack table to main box
   mrv$sidepcont2_main$packStart(mrv$sidepcont2_table, expand=FALSE,fill=FALSE)
@@ -1514,19 +1600,19 @@ meta4diagGUI <- function(){
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_func_label,left.attach=0,1, top.attach=0,1,
                                  xoptions=c("expand","fill"),yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_func_combo,left.attach=1,2, top.attach=0,1,
-                                 xoptions=c("expand","fill"),yoptions="")
+                                 xoptions="fill",yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_type_label,left.attach=0,1, top.attach=1,2,
                                  xoptions=c("expand","fill"),yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_type_combo,left.attach=1,2, top.attach=1,2,
-                                 xoptions=c("expand","fill"),yoptions="")
+                                 xoptions="fill",yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_width_label,left.attach=0,1, top.attach=2,3,
                                  xoptions=c("expand","fill"),yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_width_combo,left.attach=1,2, top.attach=2,3,
-                                 xoptions=c("expand","fill"),yoptions="")
+                                 xoptions="fill",yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_color_label,left.attach=0,1, top.attach=3,4,
                                  xoptions=c("expand","fill"),yoptions="")
   mrv$sidepsrocline_table$attach(mrv$sidepsrocline_color_button,left.attach=1,2, top.attach=3,4,
-                                 xoptions=c("expand","fill"),yoptions="")
+                                 xoptions="fill",yoptions="")
   
   ## pack line
   mrv$sidepsrocline_main$packStart(mrv$sidepsrocline_table, expand=FALSE,fill=FALSE)
@@ -2000,6 +2086,10 @@ meta4diagGUI <- function(){
     mrv$forest.text.size = mrv$sidefocont7_spinbutton$value
   })
   
+  ######    
+
+  
+  
   #########
   mrv$sideforest$packStart(mrv$sidefocont1,expand=FALSE,fill=FALSE)
   mrv$sideforest$packStart(mrv$sidefocont7,expand=FALSE,fill=FALSE)
@@ -2008,6 +2098,7 @@ meta4diagGUI <- function(){
   mrv$sideforest$packStart(mrv$sidefocont3,expand=FALSE,fill=FALSE)
   mrv$sideforest$packStart(mrv$sidefocont4,expand=FALSE,fill=FALSE)
   mrv$sideforest$packStart(mrv$sidefocont5,expand=FALSE,fill=FALSE)
+  #mrv$sideforest$packStart(mrv$sidefocont8,expand=FALSE,fill=FALSE)
   ########################################## 
   #####    pack all pages to side notebook
   ##########################################
