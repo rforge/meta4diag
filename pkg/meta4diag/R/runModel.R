@@ -1,16 +1,6 @@
 runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5, 0.975), verbose=FALSE){
-  
   if(requireNamespace("INLA", quietly = TRUE)){
-#     if(!is.element("INLA", installed.packages()[,1])){
-#       install.packages("INLA",dependencies=TRUE, repos="http://www.math.ntnu.no/inla/R/testing")
-#       require("INLA", quietly = TRUE)
-#     }
-#     if (!(sum(search()=="package:INLA")==1)){
-#       require("INLA", quietly = TRUE)
-#     }
-    
     model.type = outdata$model.type
-    
     N = dim(outdata$internaldata)[1]
     varnames = names(outdata$internaldata)
     nnv = c("studynames", "Y", "id", "Ntrials") 
@@ -41,8 +31,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
         lc1.ind  = agrep("mu", varnames, max.distance=0)
         lc2.ind  = agrep("nu", varnames, max.distance=0)
         
-        lc1text = paste("inla.make.lincomb(",paste(varnames[lc1.ind], "=1",sep="", collapse = ", "),")",sep="")
-        lc2text = paste("inla.make.lincomb(",paste(varnames[lc2.ind], "=1",sep="", collapse = ", "),")",sep="")
+        lc1text = paste("INLA::inla.make.lincomb(",paste(varnames[lc1.ind], "=1",sep="", collapse = ", "),")",sep="")
+        lc2text = paste("INLA::inla.make.lincomb(",paste(varnames[lc2.ind], "=1",sep="", collapse = ", "),")",sep="")
         
         lc1 = eval(parse(text=lc1text))
         names(lc1) = names.summarized.fitted[1]
@@ -76,8 +66,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
           names.summarized.fitted = paste("mean(",link,".",names.fitted,".",umname,")",sep="")
           lc1.ind = agrep(paste("mu.",umname,sep=""), varnames, max.distance=0)
           lc2.ind = agrep(paste("nu.",umname,sep=""), varnames, max.distance=0)
-          lc1text_um = paste("inla.make.lincomb(",paste(varnames[lc1.ind], "=1", sep="", collapse = ", "),")",sep="")
-          lc2text_um = paste("inla.make.lincomb(",paste(varnames[lc2.ind], "=1", sep="", collapse = ", "),")",sep="")
+          lc1text_um = paste("INLA::inla.make.lincomb(",paste(varnames[lc1.ind], "=1", sep="", collapse = ", "),")",sep="")
+          lc2text_um = paste("INLA::inla.make.lincomb(",paste(varnames[lc2.ind], "=1", sep="", collapse = ", "),")",sep="")
           lc1_um = eval(parse(text=lc1text_um))
           names(lc1_um) = names.summarized.fitted[1]
           lc1 = append(lc1, lc1_um)
@@ -97,8 +87,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
           
           lc1.ind  = c(agrep(paste("mu.",umname,sep=""), varnames, max.distance=0), agrep("alpha", varnames, max.distance=0))
           lc2.ind  = c(agrep(paste("nu.",umname,sep=""), varnames, max.distance=0), agrep("beta", varnames, max.distance=0))
-          lc1text = paste("inla.make.lincombs(",paste(varnames[lc1.ind], "=", data[mu.ind,varnames[lc1.ind]],sep="", collapse = ", "),")",sep="")
-          lc2text = paste("inla.make.lincombs(",paste(varnames[lc2.ind], "=", data[nu.ind,varnames[lc2.ind]],sep="", collapse = ", "),")",sep="")
+          lc1text = paste("INLA::inla.make.lincombs(",paste(varnames[lc1.ind], "=", data[mu.ind,varnames[lc1.ind]],sep="", collapse = ", "),")",sep="")
+          lc2text = paste("INLA::inla.make.lincombs(",paste(varnames[lc2.ind], "=", data[nu.ind,varnames[lc2.ind]],sep="", collapse = ", "),")",sep="")
           lc1_um = eval(parse(text=lc1text))
           names(lc1_um) = paste("mean(",link,".",names.fitted[1],".",umname,".",1:length(mu.ind),")",sep="")
           lc1 = append(lc1, lc1_um)
@@ -153,11 +143,12 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
       } 
     }
     
-    model$model.type=model.type
+    model$model.type = model.type
     model$link = link
     model$quantiles = quantiles
-    model$verbose=verbose
+    model$verbose = verbose
     model$outdata = data
+    model$wishart.flag = outpriors$wishart.flag
     
     if(link=="logit"){
       model$g = function(x){return(log(x/(1-x)))}
@@ -174,6 +165,9 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
     
     return(model)
   }else{
-    stop("R package INLA is required, please install and load it!")
+    stop("INLA need to be installed and loaded!\n
+         Please use the following commants to install and load INLA,\n
+         install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
+         library(INLA) \n")
   }
 }

@@ -2,10 +2,11 @@
 \alias{plot.meta4diag}
 \title{Default meta4diag plotting.}
 \description{
-   Takes am \code{meta4diag} object produced by \code{meta4diag()} and plot the posterior marginals (possibly with underlying priors) for hyperparameter and fixed effects.
+   Takes a \code{meta4diag} object produced by \code{meta4diag()} and plot the posterior marginals (possibly with underlying priors) for hyperparameters and fixed effects.
  }
 \usage{
-  \method{plot}{meta4diag}(x, var.type="var1", add=FALSE, overlay.prior = TRUE, save = FALSE, width=5, height=5, ...)
+  \method{plot}{meta4diag}(x, var.type="var1", add=FALSE, overlay.prior = TRUE, 
+      save = FALSE, width=5, height=5, ...)
 }
 \arguments{
   \item{x}{
@@ -35,7 +36,7 @@
 }
 
 \details{
-Marginal distribution, possibly with prior distribution is plotted.
+Posterior marginal distribution possibly with underlying prior distribution is plotted.
 }
 
 \value{
@@ -47,8 +48,9 @@ Marginal distribution, possibly with prior distribution is plotted.
 \keyword{plot}
 \seealso{\code{\link{meta4diag}}}
 \examples{
-\dontrun{
-data(Catheter)
+if(requireNamespace("INLA", quietly = TRUE)){
+  require("INLA", quietly = TRUE)
+  data(Catheter)
   res <- meta4diag(data = Catheter)
   plot(res, var.type="var1")
 }

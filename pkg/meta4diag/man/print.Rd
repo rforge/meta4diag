@@ -2,9 +2,10 @@
 \alias{print}
 \alias{print.meta4diag}
 \alias{print.summary.meta4diag}
+\alias{print.fitted.meta4diag}
 \title{print meta4diag object.}
 \description{
-   Takes am \code{meta4diag} object produced by \code{meta4diag()} and print the model and data information such as which model type is using, how many studies in the dataset and data contains covariates or modality or not. The variable type can be used in \code{plot.meta4diag} can be found here.
+   Takes an \code{meta4diag} object which is obtained by function \code{meta4diag()} and print the model and data information such as model type used in the model, number of studies in the dataset and the name of covariates which are contained in the model. The variable type used in \code{plot.meta4diag} can be found here.
  }
 \usage{
   \method{print}{meta4diag}(x, ...)
@@ -13,12 +14,12 @@
   \item{x}{
     A \code{meta4diag} object.
   }
-  \item{\dots}{...}
+  \item{\dots}{Further arguments passed to or from other methods.}
 }
 \details{
 The basic model setting and dataset information are printed.
 }
-\value{The return value is a list of the files created (if any).}
+\value{The return value is invisible NULL.}
 
 \author{
   Jingyi Guo \email{jingyi.guo@math.ntnu.no} and Andrea Riebler \email{andrea.riebler@math.ntnu.no}
@@ -26,10 +27,12 @@ The basic model setting and dataset information are printed.
   
 \keyword{print}
 \seealso{\code{\link{plot}}}
-  \examples{
-  \dontrun{
-    data(Catheter)
-    res <- meta4diag(data = Catheter)
-    print(res)
-  }
-  }
+
+\examples{
+if(requireNamespace("INLA", quietly = TRUE)){
+  require("INLA", quietly = TRUE)
+  data(Catheter)
+  res <- meta4diag(data = Catheter)
+  print(res)
+}
+}

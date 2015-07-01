@@ -14,6 +14,7 @@ export(meta4diag,
 	summary.meta4diag,
 	print.meta4diag,
 	print.summary.meta4diag,
+	print.fitted.meta4diag,
 	makeObject)
 
 
@@ -22,6 +23,7 @@ S3method(crosshair,meta4diag)
 S3method(forest,meta4diag)
 S3method(fitted,meta4diag)
 S3method(print,summary.meta4diag)
+S3method(print,fitted.meta4diag)
 S3method(print,meta4diag)
 S3method(plot,meta4diag)
 S3method(summary,meta4diag)

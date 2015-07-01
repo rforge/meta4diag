@@ -6,7 +6,7 @@
 Crosshair Plot.
 }
 \description{
-Takes a \code{meta4diag} object produced by \code{meta4diag()} and produces a crosshair plot or adds such a plot to an existing plot. Crosshair plots go back to Phillips et al. (2010).
+Takes a \code{meta4diag} object produced by the function \code{meta4diag()} and produces a crosshair plot or adds such a plot to an existing plot. Crosshair plots go back to Phillips et al. (2010).
 }
 \usage{
 crosshair(x,...)
@@ -18,13 +18,13 @@ crosshair(x,...)
   A \code{meta4diag} object.
 }
   \item{est.type}{
-  The estimates type used to make SROC plot. Options are "mean" and "median".
+  The estimates type used to make crosshair plot. Options are "mean" and "median".
 }
   \item{add}{
   If add is TRUE, the plots are added to an existing plot, otherwise a new plot is created.
 }
   \item{save}{
-  If save is TRUE, the plots are saved(pdf format) automatically in the folder where the data is loaded. save could also be a file name, i.e. \code{save="plot1.eps"}, a file with name plot1 and eps format will be saved in the folder where the data is loaded.
+  If save is TRUE, the plots are saved (pdf format) automatically in the folder where the data is loaded. save could also be a file name, i.e. \code{save="plot1.eps"}, a file with name plot1 and eps format will be saved in the folder where the data is loaded.
 }
  \item{xlim}{
   A numeric value, giving the x coordinates ranges.
@@ -51,14 +51,17 @@ crosshair(x,...)
 }
 
 \author{
-  Jingyi Guo and Andrea Riebler 
+  Jingyi Guo
 }
 
 \seealso{
   \code{meta4diag}
 }
 \examples{
-\dontrun{data(Catheter)}
-\dontrun{res <- meta4diag(data = Catheter)}
-\dontrun{crosshair(res, est.type="mean")}
+if(requireNamespace("INLA", quietly = TRUE)){
+  require("INLA", quietly = TRUE)
+  data(Catheter)
+  res <- meta4diag(data = Catheter)
+  crosshair(res, est.type="mean")
+}
 }

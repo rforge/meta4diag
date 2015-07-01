@@ -4,7 +4,7 @@
 
 \title{Get the estimated values of accuracies for each study.}
 \description{
-   Takes am \code{meta4diag} object produced by \code{meta4diag()} and returns the estimated accuracy, such as sensitivity, specificity, odds ratios and likelihood ratios for each study.
+   Takes a \code{meta4diag} object produced by \code{meta4diag()} and returns the estimated study specified accuracies, such as sensitivity, specificity, odds ratios and likelihood ratios for each study.
  }
 \usage{
 \method{fitted}{meta4diag}(object, accuracy.type = "sens",...)
@@ -30,23 +30,24 @@
           
   }
   \item{\dots}{
-    ...
+    Arguments to be passes to methods.
   }
 }
 
 \value{
-  A dataframe with the estimated mean, standard deviation and the corresponding quantiles of the accuracies of each sudy.
+  A data frame with the estimated mean, standard deviation and the corresponding quantiles, which are specified by user when the user runs the main function \code{meta4diag()}, of the accuracies of each sudy.
 }
 
 \author{
-  Jingyi Guo and Andrea Riebler 
+  Jingyi Guo
 }
 
 \examples{
-\dontrun{
-data(Catheter)
+if(requireNamespace("INLA", quietly = TRUE)){
+  require("INLA", quietly = TRUE)
+  data(Catheter)
   res <- meta4diag(data = Catheter, nsample=2000)
   fitted(res, accuracy.type="sens")
   fitted(res, accuracy.type="DOR")
-}  
+}
 }

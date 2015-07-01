@@ -22,7 +22,7 @@
 \author{
   Jingyi Guo and Andrea Riebler 
 }
-
+\seealso{\code{\link{meta4diag}}}
 \examples{
 \dontrun{meta4diagGUI()}
 }

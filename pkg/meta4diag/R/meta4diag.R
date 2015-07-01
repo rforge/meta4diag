@@ -6,15 +6,10 @@ meta4diag = function(data=NULL, model.type = 1,
                      modality=NULL, covariates = NULL,
                      verbose = FALSE, nsample=FALSE){
   
-  ############### check if inla is installed and loaded
-#   if(!is.element("INLA", installed.packages()[,1])){
-#     install.packages("INLA",dependencies=TRUE, repos="http://www.math.ntnu.no/inla/R/testing")
-#     require("INLA", quietly = TRUE)
-#   }
-#   if (!(sum(search()=="package:INLA")==1)){
-#     require("INLA", quietly = TRUE)
-#   }
-  
+  var.prior = tolower(var.prior)
+  var2.prior = tolower(var2.prior)
+  cor.prior = tolower(cor.prior)
+   
   ################ check data
   if(!is.data.frame(data)){
     stop("Data MUST be a data frame!!!")
@@ -50,13 +45,18 @@ meta4diag = function(data=NULL, model.type = 1,
     stop("Argument \"verbose\" can ONLY be logic, either \"TRUE\" or \"FALSE\"!!!")
   }
   
-  if(missing(var2.par)){
-    if(var2.prior==var.prior){
-      var2.par = var.par
-    }else{
-      stop("Please give the parameters of the prior for second variance component!")
+  if(any(c(var.prior, var2.prior, cor.prior)=="invwishart")){
+    var.prior = var2.prior = cor.prior = "invwishart"
+  }else{
+    if(missing(var2.par)){
+      if(var2.prior==var.prior){
+        var2.par = var.par
+      }else{
+        stop("Please give the parameters of the prior for second variance component!")
+      }
     }
   }
+
   ################ Make prior, and in the makePrior function, check var.prior, var.par, cor.prior, cor.par and init
   outpriors = makePriors(var.prior=var.prior, var2.prior=var2.prior, cor.prior=cor.prior, 
                          var.par=var.par, var2.par=var2.par, cor.par=cor.par, init=init)

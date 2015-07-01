@@ -37,12 +37,14 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     est$marginals.fixed = model[["marginals.fixed"]]
     
     ############# hyperpar: need transformation
-    names.var = paste("var(",model$link,"s.",est$names.fitted,")",sep="")
-    names.cor = paste("cor(",model$link,"s)",sep="")
+    names.var = c("var_phi","var_psi")
+    names.cor = "cor"
+    #names.var = paste("var(",model$link,"s.",est$names.fitted,")",sep="")
+    #names.cor = paste("cor(",model$link,"s)",sep="")
     tau1.marginals = model[["marginals.hyperpar"]][[1]]
-    var1.marginals = INLA::inla.tmarginal(function(x) 1/x, tau1.marginals, n=n.marginal.point)
+    var1.marginals = INLA::inla.tmarginal(function(x) 1/x, tau1.marginals, n=1024)
     tau2.marginals = model[["marginals.hyperpar"]][[2]]
-    var2.marginals = INLA::inla.tmarginal(function(x) 1/x, tau2.marginals, n=n.marginal.point)  
+    var2.marginals = INLA::inla.tmarginal(function(x) 1/x, tau2.marginals, n=1024)  
     marginals.hyperpar.temp = list()
     marginals.hyperpar.temp[[names.var[1]]] = var1.marginals
     marginals.hyperpar.temp[[names.var[2]]] = var2.marginals
@@ -66,69 +68,74 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     ######## Expected g=="logit","probit","cloglog" E(g(..)) and E(g(..))
     if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
       if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
-        est[[paste("summary.expected.",model$link,"s",sep="")]] = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
-        est[[paste("marginals.expected.",model$link,"s",sep="")]] = model[["marginals.lincomb.derived"]]
-        est[[paste("correlation.matrix.expected.",model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.correlation.matrix
-        est[[paste("covariance.matrix.expected.",model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.covariance.matrix
-        est[[paste("correlation.expected.",model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.correlation.matrix[1,2]
-        names(est[[paste("correlation.expected.",model$link,"s",sep="")]]) = paste("cor(expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("covariance.expected.",model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.covariance.matrix[1,2]
-        names(est[[paste("covariance.expected.",model$link,"s",sep="")]]) = paste("cov(expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
+        est$summary.expected.gtransformed.accuracy = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
+        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
+        est$correlation.matrix.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix
+        est$covariance.matrix.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix
+        est$correlation.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix[1,2]
+        names(est$correlation.linear.comb) = "Cor(mu, nu)"
+        est$covariance.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix[1,2]
+        names(est$covariance.linear.comb) = "Cov(mu, nu)"
       } else{
         names.summarized.fixed1 = paste("mean(",model$link,".",est$names.fitted[1],".",studynames,")",sep="")
         names.summarized.fixed2 = paste("mean(",model$link,".",est$names.fitted[2],".",studynames,")",sep="")
         names.summarized.fixed = c(names.summarized.fixed1, names.summarized.fixed2)
-        est[[paste("summary.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
-        est[[paste("marginals.study.specific.expected.",model$link,"s",sep="")]] = model[["marginals.lincomb.derived"]]
-        rownames(est[[paste("summary.study.specific.expected.",model$link,"s",sep="")]]) = names.summarized.fixed
-        names(est[[paste("marginals.study.specific.expected.",model$link,"s",sep="")]]) = names.summarized.fixed
-        est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]] = do.call(rbind, lapply(1:length(studynames), 
-                                                                                                           function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
-        colnames(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]]) = paste("cor(study.specific.expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]])
-        rownames(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]]) = studynames
-        est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(do.call(rbind, lapply(1:length(studynames), 
-                                                                                                                    function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
-        colnames(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]]) = paste("cov(study.specific.expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]])
-        rownames(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]]) = studynames
+        est$summary.expected.gtransformed.accuracy = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
+        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
+        rownames(est$summary.expected.gtransformed.accuracy) = names.summarized.fixed
+        names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
+        
+        est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
+            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
+        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
+        rownames(est$correlation.linear.comb) = studynames
+        
+        est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
+            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
+        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
+        rownames(est$covariance.linear.comb) = studynames
       }
     }else{
       um = as.character(unique(outdata$originaldata[,outdata$modality.setting]))
       if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
-        est[[paste("summary.expected.", model$link,"s",sep="")]] = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
-        est[[paste("marginals.expected.", model$link,"s",sep="")]] = model[["marginals.lincomb.derived"]]
-        est[[paste("correlation.matrix.expected.", model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.correlation.matrix
-        est[[paste("covariance.matrix.expected.", model$link,"s",sep="")]] = model[["misc"]]$lincomb.derived.covariance.matrix
-        est[[paste("correlation.expected.", model$link,"s",sep="")]] = do.call(rbind, lapply(1:length(um), 
-                                                                                             function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(um)]))
+        est$summary.expected.gtransformed.accuracy = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
+        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
+        est$correlation.matrix.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix
+        est$covariance.matrix.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix
         
-        colnames(est[[paste("correlation.expected.", model$link,"s",sep="")]]) = paste("cor(expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("correlation.expected.", model$link,"s",sep="")]] = as.matrix(est[[paste("correlation.expected.", model$link,"s",sep="")]])
-        rownames(est[[paste("correlation.expected.", model$link,"s",sep="")]]) = um
-        est[[paste("covariance.expected.", model$link,"s",sep="")]] = do.call(rbind, lapply(1:length(um), 
-                                                                                            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(um)]))
-        colnames(est[[paste("covariance.expected.", model$link,"s",sep="")]]) = paste("cov(expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("covariance.expected.", model$link,"s",sep="")]] = as.matrix(est[[paste("covariance.expected.", model$link,"s",sep="")]])
-        rownames(est[[paste("covariance.expected.", model$link,"s",sep="")]]) = um
+        est$correlation.linear.comb = do.call(rbind, lapply(1:length(um), 
+                     function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(um)]))
+        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
+        rownames(est$correlation.linear.comb) = um
+        
+        est$covariance.linear.comb = do.call(rbind, lapply(1:length(um), 
+                     function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(um)]))
+        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
+        rownames(est$covariance.linear.comb) = um
       } else{
         names.summarized.fixed1 = paste("mean(",model$link,".",est$names.fitted[1],".",studynames,")",sep="")
         names.summarized.fixed2 = paste("mean(",model$link,".",est$names.fitted[2],".",studynames,")",sep="")
         names.summarized.fixed = c(names.summarized.fixed1, names.summarized.fixed2)
-        est[[paste("summary.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
-        est[[paste("marginals.study.specific.expected.",model$link,"s",sep="")]] = model[["marginals.lincomb.derived"]]
-        rownames(est[[paste("summary.study.specific.expected.",model$link,"s",sep="")]]) = names.summarized.fixed
-        names(est[[paste("marginals.study.specific.expected.",model$link,"s",sep="")]]) = names.summarized.fixed
-        est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]] = do.call(rbind, lapply(1:length(studynames), 
-                                                                                                           function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
-        colnames(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]]) = paste("cor(study.specific.expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]])
-        rownames(est[[paste("correlation.study.specific.expected.",model$link,"s",sep="")]]) = studynames
-        est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(do.call(rbind, lapply(1:length(studynames), 
-                                                                                                                    function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
-        colnames(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]]) = paste("cov(study.specific.expected.",model$link,".",paste(est$names.fitted, collapse=" & "),")",sep="")
-        est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]] = as.matrix(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]])
-        rownames(est[[paste("covariance.study.specific.expected.",model$link,"s",sep="")]]) = studynames
+        est$summary.expected.gtransformed.accuracy = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
+        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
+        rownames(est$summary.expected.gtransformed.accuracy) = names.summarized.fixed
+        names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
+        
+        est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
+            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
+        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
+        rownames(est$correlation.linear.comb) = studynames
+        
+        est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
+            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
+        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
+        rownames(est$covariance.linear.comb) = studynames
       }
     }
     
@@ -168,8 +175,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         summary.expected.accuracy.transform = as.matrix(summary.expected.accuracy.transform)
         rownames(summary.expected.accuracy.transform) = names.expected.accuracy.transform
         
-        est$summary.expected.accuracies = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
-        est$marginals.expected.accuracies = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
+        est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
+        est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
       } else{
         ####### original----from model
         names.expected.accuracy.original1 = paste("mean(",est$names.fitted[1],".",studynames,")",sep="")
@@ -199,8 +206,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         summary.expected.accuracy.transform = do.call(rbind, suminfo)
         rownames(summary.expected.accuracy.transform) = names.expected.accuracy.transform
         
-        est$summary.expected.study.specific.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
-        est$marginals.expected.study.specific.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
+        est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
+        est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
       }
     }else{
       um = as.character(unique(outdata$originaldata[,outdata$modality.setting]))
@@ -230,8 +237,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         summary.expected.accuracy.transform = do.call(rbind, suminfo)
         rownames(summary.expected.accuracy.transform) = names.expected.accuracy.transform
         
-        est$summary.expected.accuracies = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
-        est$marginals.expected.accuracies = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
+        est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
+        est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
       } else{
         ####### original----from model
         names.expected.accuracy.original1 = paste("mean(",est$names.fitted[1],".",studynames,")",sep="")
@@ -261,8 +268,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         summary.expected.accuracy.transform = do.call(rbind, suminfo)
         rownames(summary.expected.accuracy.transform) = names.expected.accuracy.transform
         
-        est$summary.expected.study.specific.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
-        est$marginals.expected.study.specific.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
+        est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
+        est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
       }
     }
     
@@ -334,8 +341,9 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
       if(abs(nsample - round(nsample)) < .Machine$double.eps^0.5){
         est$misc$nsample = nsample
       }else{
-        message("Argument \"nsample\" should be a integer, we round the given number to interger.")
-        est$misc$nsample = round(nsample, digits = 0)
+        # message("Argument \"nsample\" should be a integer, we round the given number to interger.")
+        nsample = round(nsample, digits = 0)
+        est$misc$nsample = nsample
       }
     }else{
       message("Argument \"nsample\" should be TRUE, FALSE or a integer, we set it to FALSE!")
@@ -612,6 +620,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     est$misc$var.prior.list = outpriors$original.setting$var1
     est$misc$var2.prior.list = outpriors$original.setting$var2
     est$misc$cor.prior.list = outpriors$original.setting$cor
+    est$misc$wishart.par = outpriors$original.setting$wishart.par
+    est$misc$wishart.flag = model$wishart.flag
     
     if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
       est$misc$covariates.flag=FALSE
@@ -638,6 +648,9 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     class(est) = 'meta4diag'
     return(est)
   }else{
-    stop("R package INLA is required, please install and load it!")
+    stop("INLA need to be installed and loaded!\n
+         Please use the following commants to install and load INLA,\n
+         install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
+         library(INLA) \n")
   }
 }

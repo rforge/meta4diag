@@ -13,7 +13,7 @@ runModel(outdata, outpriors, link = "logit",
 	A data file for internal use.
 }
   \item{outpriors}{
-	A list prior settings for internal use.
+	A list of prior settings prepared for internal use, see \code{makePriors}.
 }
   \item{link}{
 	A string specifying the link function used in the model. Options are "logit", "probit" and "cloglog".
@@ -23,7 +23,7 @@ runModel(outdata, outpriors, link = "logit",
   The default value are c(0.025, 0.5, 0.975). Not matter what other values are going to be given, the estimates for these 3 quantiles are always returned.
 }
   \item{verbose}{
-	Boolean (default:FALSE) indicating whether the program should run in a verbose model.
+	Boolean (default:FALSE) indicating whether the program should run in a verbose mode.
 }
 }
 
@@ -44,9 +44,8 @@ runModel(outdata, outpriors, link = "logit",
   \code{makeData, makePriors, makeObject, meta4diag, inla}
 }
 \examples{
-\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)) {
-   require(INLA)
+   require("INLA", quietly = TRUE)
    data(Catheter)
 
    outdata = makeData(data=Catheter,model.type=1,covariates="type")
@@ -54,6 +53,5 @@ if(requireNamespace("INLA", quietly = TRUE)) {
                           var.par = c(0.25, 0.025), cor.par = c(0, 5))
    runModel(outdata, outpriors, link = "logit", 
             quantiles = c(0.025, 0.5, 0.975), verbose = FALSE)
-}
 }
 }

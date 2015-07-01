@@ -48,7 +48,7 @@ makeData <- function(data = NULL, model.type = 1, modality = NULL, covariates = 
         stop("Covariates are given! Number of covariates can NOT be larger than number of variables!!! ")
       }
       if(is.numeric(covariates)){
-        if(covariates %in% c(1:length(datanames))){
+        if(all(covariates %in% c(1:length(datanames)))){
           covariates = datanames[covariates]
         }else{
           cov.flag = FALSE

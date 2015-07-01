@@ -25,6 +25,13 @@
   return(z)
 }
 
+################################################################
+################################################################
+####
+####             Prior Plot functions
+####
+################################################################
+################################################################
 .priorInvgamma <- function(a,b,xmax){
   x = seq(0,100,len=1000)
   tau = 1/x
@@ -40,6 +47,104 @@
   plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
 }
 
+.priorHalfCauchy = function(gamma,xmax){
+  sig = c(seq(0,3,by=0.001),seq(3,10,by=0.1),seq(10,1000,by=1))
+  sig = unique(sig)
+  pi_sig = 2*gamma/(pi*(sig^2+gamma^2))
+  x = sig^2
+  y = pi_sig*abs(0.5/sig)
+  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+}
+
+.priorSigmaTnorm <- function(m, v, xmax){
+  par.sig = sqrt(v)
+  x = seq(0,7,len=1000)
+  var.sig = sqrt(x)
+  pi.var.sig = 1/par.sig*dnorm((var.sig-m)/par.sig)/(1-pnorm(-m/par.sig))
+  y = 0.5*pi.var.sig/var.sig
+  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+}
+
+.priorUniformSig = function(xmax){
+  sig = c(seq(0,3,by=0.001),seq(3,10,by=0.1),seq(10,1000,by=1))
+  sig = unique(sig)
+  pi_sig = rep(1/max(sig),length(sig))
+  x = sig^2
+  y = pi_sig*abs(0.5/sig)
+  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+}
+
+.priorTableSigma = function(xmax){
+  x = mrv$priorfile$x
+  if(any(x<=0)){
+    var1dialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
+                                    "Please check the input prior, variance should be in [0, infinity]!")
+    if (var1dialog$run()==GtkResponseType["ok"]){
+      stop("")
+    }
+    var1dialog$destroy()
+  }
+  y = mrv$priorfile$y
+  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+}
+
+.priorTableRho = function(xmax){
+  x = mrv$priorfile$x
+  if(any(x< -1 | x>1)){
+    rhodialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
+                                  "Please check the input prior, correlation should be in [-1, 1]!")
+    if (rhodialog$run()==GtkResponseType["ok"]){
+      stop("")
+    }
+    rhodialog$destroy()
+  }
+  y = mrv$priorfile$y
+  plot(x,y,xlab=expression(rho),ylab=expression(pi(rho)),type="l",xlim=c(-1,xmax))
+}
+
+.priorInvWishart = function(nu,R11,R22,R12,xmax){
+  R = matrix(c(R11,R12,R12,R22),2,2)
+  detR = det(R)
+  gamma_p = gamma(0.5*nu)*gamma(0.5*(nu-1))*sqrt(pi)
+  const = detR^(0.5*nu)/((2^nu)*gamma_p)
+  sig1 = seq(0.01,20,by=0.1)
+  sig2 = seq(0.01,10,by=0.1)
+  cor = seq(-0.99999,0.99999,by=0.01)
+  M1 = matrix(0,length(sig1),length(sig2))
+  for(i in 1:length(sig1)){
+    M = lapply(sig2, function(y){
+      S1 = matrix(c(sig1[i]^2,0,0,y^2),2,2)
+      detS = det(S1)
+      RS = R*solve(S1)
+      pi_S1 = const*detS^(-0.5*(nu+3))*exp(-0.5*(RS[1,1]+RS[2,2]))
+      return(pi_S1)
+    })
+    M1[i,] = unlist(M)
+  }
+  M2 = matrix(0,length(sig1),length(cor))
+  for(i in 1:length(sig1)){
+    M = lapply(cor, function(y){
+      S1 = matrix(sig1[i]^2*c(1,y,y,1),2,2)
+      detS = det(S1)
+      RS = R*solve(S1)
+      pi_S1 = const*detS^(-0.5*(nu+3))*exp(-0.5*(RS[1,1]+RS[2,2]))
+      return(pi_S1)
+    })
+    M2[i,] = unlist(M)
+  }
+  par(mfrow=c(1,2))
+  contour(sig1,sig2,M1, nlevel=10,xlim=c(0,xmax),ylim=c(0,xmax),xlab=expression(sigma[1]^2),ylab=expression(sigma[2]^2))
+  contour(sig1,cor,M2, nlevel=10,xlim=c(0,xmax),ylim=c(-1,1),xlab=expression(sigma^2),ylab=expression(rho))
+}
+
+.priorRhoBetaPlot <- function(a,b){
+  # get the density of old normal prior of correlation parameter "rho"
+  rho=c(seq(-1,-0.9,len=500),seq(-0.9001,0.8999,len=500),seq(0.9,1,len=500))
+  z = 0.5*(rho+1)
+  dens = 0.5*dbeta(z,shape1=a,shape2=b)
+  plot(-1,-1,xlim=c(-1,1), ylim=c(0,5),xlab=expression(rho),ylab=expression(pi(rho)))
+  lines(rho,dens,lty=1,lwd=1)
+}
 
 .priorRhoNormalPlot <- function(mean,variance){
   rho=c(seq(-1,-0.9,len=500),seq(-0.9001,0.8999,len=500),seq(0.9,1,len=500))

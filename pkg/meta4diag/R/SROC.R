@@ -1,11 +1,11 @@
 SROC <- function(x, ...) UseMethod("SROC")
 
 SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red",
-                          dataShow="o", data.col="#FF0000FF", data.cex="scaled", data.pch=1, 
+                          dataShow="o", data.col="#FF0000FF", data.cex="bubble", data.pch=1, 
                           lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
                           crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
                           prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-                          dataFit = T, add=FALSE, save=F, main, xlim, ylim,...){
+                          dataFit = T, add=FALSE, save=F, main="", xlim, ylim,...){
   if(class(x)!="meta4diag"){stop("Wrong input given!")}
   if(is.character(data.cex)){
     data.cex = tolower(data.cex)
@@ -108,17 +108,17 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       if(length(line.col)!=mod.level){line.col = rep(line.col[1],mod.level)}
       
       
-      mean.A = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",x$misc$link,"s",sep="")]][ind,est.type]))
-      mean.B = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",x$misc$link,"s",sep="")]][(ind+mod.level),est.type]))
+      mean.A = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[ind,est.type]))
+      mean.B = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[(ind+mod.level),est.type]))
       var1 = rep(x[["summary.hyperpar"]][1,est.type], mod.level)
       var2 = rep(x[["summary.hyperpar"]][2,est.type], mod.level)
       rho = rep(x[["summary.hyperpar"]][3,est.type], mod.level)
       
-      sd.A = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",x$misc$link,"s",sep="")]][ind,2]))
-      sd.B = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",x$misc$link,"s",sep="")]][(ind+mod.level),2]))
+      sd.A = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[ind,2]))
+      sd.B = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[(ind+mod.level),2]))
       
       # confidence
-      r = x[["correlation.expected.logits"]]
+      r = x[["correlation.linear.comb"]]
       t.conf.A = lapply(1:mod.level, function(ind) mean.A[ind] + sd.A[ind]*c*cos(t))
       t.conf.B = lapply(1:mod.level, function(ind) mean.B[ind] + sd.B[ind]*c*cos(t + acos(r[ind])))
       
@@ -141,43 +141,57 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       if(sroc.type==1){
         g.yy = lapply(1:mod.level, function(ind) mean.A[ind] + rho[ind]*sqrt(var1[ind]/var2[ind])*(g.xx-mean.B[ind]))
       }else if(sroc.type==2){
-        if(rho<0){
-          if(x$misc$model.type==2 || x$misc$model.type==3){
-            g.yy = lapply(1:mod.level, function(ind) (var1[ind]-var2[ind]-sqrt((var2[ind]-var1[ind])^2+
-                                                                                     4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
+        g.yy = lapply(1:mod.level, function(ind){
+          if(rho[ind]<0){
+            if(x$misc$model.type==2 || x$misc$model.type==3){
+              g.yy = (var1[ind]-var2[ind]-sqrt((var2[ind]-var1[ind])^2+
+                               4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind]
+            }else{
+              g.yy = (var1[ind]-var2[ind]+sqrt((var2[ind]-var1[ind])^2+
+                               4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind]
+            }
           }else{
-            g.yy = lapply(1:mod.level, function(ind) (var1[ind]-var2[ind]+sqrt((var2[ind]-var1[ind])^2+
-                                                                                     4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
+            if(x$misc$model.type==1 || x$misc$model.type==4){
+              g.yy = (var1[ind]-var2[ind]-sqrt((var2[ind]-var1[ind])^2+4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind]
+            }else{
+              g.yy = (var1[ind]-var2[ind]+sqrt((var2[ind]-var1[ind])^2+4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind]
+            }
           }
-        }else{
-          if(x$misc$model.type==1 || x$misc$model.type==4){
-            g.yy = lapply(1:mod.level, function(ind) (var1[ind]-var2[ind]-sqrt((var2[ind]-var1[ind])^2+4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
-          }else{
-            g.yy = lapply(1:mod.level, function(ind) (var1[ind]-var2[ind]+sqrt((var2[ind]-var1[ind])^2+4*rho[ind]^2*var1[ind]*var2[ind]))/(2*rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
-          }
-        }
+          return(g.yy)
+        })
+        
       }else if(sroc.type==3){
-        g.yy = lapply(1:mod.level, function(ind) (var1[ind] + rho[ind]*sqrt(var1[ind]*var2[ind]))/(var2[ind] + rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
+        if(x$misc$model.type==2 || x$misc$model.type==3){
+          g.yy = lapply(1:mod.level, function(ind) (var1[ind] + rho[ind]*sqrt(var1[ind]*var2[ind]))/(var2[ind] + rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
+        }else{
+          g.yy = lapply(1:mod.level, function(ind) -(var1[ind] - rho[ind]*sqrt(var1[ind]*var2[ind]))/(var2[ind] - rho[ind]*sqrt(var1[ind]*var2[ind]))*(g.xx-mean.B[ind])+mean.A[ind])
+        }
+        
       }else if(sroc.type==4){
         g.yy = lapply(1:mod.level, function(ind) mean.A[ind] + 1/rho[ind]*sqrt(var1[ind]/var2[ind])*(g.xx-mean.B[ind]))
       }else if(sroc.type==5){
-        g.yy = lapply(1:mod.level, function(ind) mean.A[ind] + sqrt(var1[ind]/var2[ind])*(g.xx-mean.B[ind]))
+        if(x$misc$model.type==2 || x$misc$model.type==3){
+          g.yy = lapply(1:mod.level, function(ind) mean.A[ind] + sqrt(var1[ind]/var2[ind])*(g.xx-mean.B[ind]))
+        }else{
+          g.yy = lapply(1:mod.level, function(ind) mean.A[ind] - sqrt(var1[ind]/var2[ind])*(g.xx-mean.B[ind]))
+        }
+        
       }else{stop("Please give the correct sroc type, which is 1, 2, 3, 4 or 5.")}
       invg.xx = x$misc$inv.g(g.xx)
       invg.yy = lapply(1:mod.level, function(ind) x$misc$inv.g(g.yy[[ind]]))
       
     }else{ ### no covariates, no modality
-      mean.A = x[[paste("summary.expected.",x$misc$link,"s",sep="")]][1,est.type]
-      mean.B = x[[paste("summary.expected.",x$misc$link,"s",sep="")]][2,est.type]
+      mean.A = x$summary.expected.gtransformed.accuracy[1,est.type]
+      mean.B = x$summary.expected.gtransformed.accuracy[2,est.type]
       var1 = x[["summary.hyperpar"]][1,est.type]
       var2 = x[["summary.hyperpar"]][2,est.type]
       rho = x[["summary.hyperpar"]][3,est.type]
       
-      sd.A = x[[paste("summary.expected.",x$misc$link,"s",sep="")]][1,2]
-      sd.B = x[[paste("summary.expected.",x$misc$link,"s",sep="")]][2,2]
+      sd.A = x$summary.expected.gtransformed.accuracy[1,2]
+      sd.B = x$summary.expected.gtransformed.accuracy[2,2]
       
       # confidence
-      r = x[["correlation.expected.logits"]]
+      r = x[["correlation.linear.comb"]]
       mu.A = mean.A + sd.A*c*cos(t)
       mu.B = mean.B + sd.B*c*cos(t + acos(r))
       
@@ -197,7 +211,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       
       #### SROC Line
       if(sroc.type==1){
-        g.yy = mean.A + rho*sqrt(var1/var2)*(g.xx-mean.B)
+          g.yy = mean.A + rho*sqrt(var1/var2)*(g.xx-mean.B)
       }else if(sroc.type==2){
         if(rho<0){
           if(x$misc$model.type==2 || x$misc$model.type==3){
@@ -213,11 +227,19 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
           }
         }
       }else if(sroc.type==3){
-        g.yy = (var1 + rho*sqrt(var1*var2))/(var2 + rho*sqrt(var1*var2))*(g.xx-mean.B)+mean.A
+        if(x$misc$model.type==2 || x$misc$model.type==3){
+          g.yy = (var1 + rho*sqrt(var1*var2))/(var2 + rho*sqrt(var1*var2))*(g.xx-mean.B)+mean.A
+        }else{
+          g.yy = -(var1 - rho*sqrt(var1*var2))/(var2 - rho*sqrt(var1*var2))*(g.xx-mean.B)+mean.A
+        }  
       }else if(sroc.type==4){
         g.yy = mean.A + 1/rho*sqrt(var1/var2)*(g.xx-mean.B)
       }else if(sroc.type==5){
-        g.yy = mean.A + sqrt(var1/var2)*(g.xx-mean.B)
+        if(x$misc$model.type==2 || x$misc$model.type==3){
+          g.yy = mean.A + sqrt(var1/var2)*(g.xx-mean.B)
+        }else{
+          g.yy = mean.A - sqrt(var1/var2)*(g.xx-mean.B)
+        }
       }else{stop("Please give the correct sroc type, which is 1, 2, 3, 4 or 5.")}
       invg.xx = x$misc$inv.g(g.xx)
       invg.yy = x$misc$inv.g(g.yy)
@@ -319,7 +341,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
   
   if(tolower(data.cex)=="scaled"){
     xrange = N
-    info = 1/xrange
+    info = xrange
     info = info/max(info)
     info = info*2
   }
@@ -368,8 +390,6 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     }
     
   }else{
-    
-    if(missing(main)){main="SROC plot"}
 
     par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 2.1))
     plot(-10,-10,xlim=xlim,ylim=ylim,main=main,asp=1,

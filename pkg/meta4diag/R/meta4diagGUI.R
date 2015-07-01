@@ -11,8 +11,8 @@ meta4diagGUI <- function(){
   #if (.Platform$OS.type == "windows"){
   #}else{}
   
-  mrv$VERSION <- "1.0.0"
-  mrv$DATE <- "2015-05-04"
+  mrv$VERSION <- "1.0.2"
+  mrv$DATE <- "2015-06-22"
   mrv$COPYRIGHT <- "Copyright (C) 2015 INLA Group."
 
 
@@ -262,7 +262,7 @@ meta4diagGUI <- function(){
     sub = list("Submenu", NULL, "S_ub", NULL, NULL, NULL),
     open = list("Open", "gtk-open", "_Open", "<ctrl>0", 
                 "Select a TXT or Rdata or CSV file to load data", .open_cb),
-    save = list("Save", "gtk-save", "_Save", "<alt>S", 
+    save = list("Save", "gtk-save", "_Save", "<ctrl>S", 
                 "Save document", .save_cb),
     quit = list("Quit", "gtk-quit", "_Quit", "<ctrl>Q", 
                 "Quit the application", .quit_cb),
@@ -273,9 +273,11 @@ meta4diagGUI <- function(){
                 "Redo change", .someAction),
     exe = list("Execute", "gtk-execute", "_Execute", "<ctrl>R",
                "Build model with R-INLA",.executeFile),
+    stp = list("Stop", "gtk-stop", "_Stop", "<ctrl>C",
+               "Stop running",.stop_cb),
+    about = list("About", NULL, "_About", NULL, "About meta4diag", .aboutgui),
     help = list("Help",NULL,"_Help",NULL,NULL,NULL),
-    tips = list("Tips",NULL,"_UseTooltips",NULL,NULL,NULL),
-    about = list("About",NULL,"_About",NULL,NULL,NULL)
+    tips = list("Tips",NULL,"_UseTooltips",NULL,NULL,NULL)
   )
   
   mrv$action_group = gtkActionGroup("meta4diagActions")
@@ -361,21 +363,32 @@ meta4diagGUI <- function(){
     return(bt)
   }
   
+  sidebarLoadPriorButton <- function(){
+    bt <- gtkButton("Load Prior")
+    bt['image'] <- gtkImage(filename=mrv$search_icon,size="button")
+    return(bt)
+  }
+  
   sidebarAcceptButton <- function(){
     bt <- gtkButton("Accept")
     bt['image'] <- gtkImage(stock.id="gtk-apply",size="button")
     return(bt)
   }
-  #################################
-  ######   sidebar priors
-  #################################
+  ##################################################################
+  ##################################################################
+  ######
+  ######                   sidebar priors
+  ######
+  ##################################################################
+  ##################################################################
   mrv$sideprior <- gtkVBox(homogeneous=FALSE)
   mrv$sideprior_title <- gtkImage(filename=mrv$sidebar_icon[[1]])    #### maybe change move file to folder
   mrv$sideprior$packStart(mrv$sideprior_title,expand=FALSE,fill=FALSE)
   
   mrv$sideprior_window <- sidebarScrolledWindow(mrv$sideprior)
-  
-  ### component 1 - first variance
+  ##################################################################
+  ###                 component 1 - first variance
+  ##################################################################
   mrv$sidecont1 <- gtkFrame("First Variance")
   mrv$sidecont1["border-width"]=10
   
@@ -383,28 +396,29 @@ meta4diagGUI <- function(){
   mrv$sidecont1_main["border-width"]=10
   mrv$sidecont1_show <- gtkHBox()
   mrv$sidecont1_combo <- gtkComboBoxNewText()
-  sapply(c("Inv-gamma","PC","Half-cauchy"), mrv$sidecont1_combo$appendText)
+  sapply(c("Inv-gamma(var)","PC(std)","Half-Cauchy(std)","Truncated-normal(std)","Uniform(std)","Table(var)","Inv-Wishart(cov.mat)"), mrv$sidecont1_combo$appendText)
   mrv$sidecont1_show$packStart(gtkLabel("Prior:  "),expand=FALSE,fill=FALSE)
   mrv$sidecont1_show$packStart(mrv$sidecont1_combo,expand=TRUE,fill=TRUE)
   mrv$sidecont1_combo$setActive(-1)
   mrv$sidecont1_main$packStart(mrv$sidecont1_show,expand=FALSE,fill=FALSE)
   
+  # Inv-gamma
   mrv$sidecont1_a_label <- sidebarLabel("shape: ",1)
   mrv$sidecont1_b_label <- sidebarLabel("rate: ",1)
   mrv$sidecont1_a_entry <- sidebarEntry("0.25", 10, 0)
   mrv$sidecont1_b_entry <- sidebarEntry("0.025", 10, 0)
   sidecont1_invgamma_list <- list(mrv$sidecont1_a_label, mrv$sidecont1_a_entry, mrv$sidecont1_b_label, mrv$sidecont1_b_entry)
-  
+  # PC
   mrv$sidecont1_u_label <- sidebarLabel("u: ", 1)
   mrv$sidecont1_alpha_label <- sidebarLabel("a: ", 1)
   mrv$sidecont1_u_entry <- sidebarEntry("3", 10, 0)
   mrv$sidecont1_alpha_entry <- sidebarEntry("0.05", 10, 0)
   sidecont1_pc_list <- list(mrv$sidecont1_u_label, mrv$sidecont1_u_entry, mrv$sidecont1_alpha_label, mrv$sidecont1_alpha_entry)
-  
+  # half-cauchy
   mrv$sidecont1_gamma_label <- sidebarLabel("gamma: ", 1)
   mrv$sidecont1_gamma_entry <- sidebarEntry("3", 10, 0)
   sidecont1_hcauchy_list <- list(mrv$sidecont1_gamma_label, mrv$sidecont1_gamma_entry)
-  
+  # truncated-normal
   mrv$sidecont1_m_label <- sidebarLabel("mean: ", 1)
   mrv$sidecont1_m_entry <- sidebarEntry("3", 10, 0)
   mrv$sidecont1_v_label <- sidebarLabel("variance: ", 1)
@@ -416,19 +430,44 @@ meta4diagGUI <- function(){
   mrv$sidecont1_input3 <- sidebarTable(3, 3, sidecont1_hcauchy_list)
   mrv$sidecont1_input4 <- sidebarTable(3, 3, sidecont1_tnorm_list)
   
-  
+  # Inv-gamma
   mrv$sidecont1_input1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont1_input1_figurebt <- sidebarPlotButton()    
   mrv$sidecont1_input1_savebt <- sidebarAcceptButton()
   mrv$sidecont1_input1_buttonbox$packStart(mrv$sidecont1_input1_figurebt,expand=T,fill=T)
   mrv$sidecont1_input1_buttonbox$packStart(mrv$sidecont1_input1_savebt,expand=T,fill=T)
-  
+  # PC
   mrv$sidecont1_input2_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont1_input2_figurebt <- sidebarPlotButton()
   mrv$sidecont1_input2_savebt <- sidebarAcceptButton()
   mrv$sidecont1_input2_buttonbox$packStart(mrv$sidecont1_input2_figurebt,expand=T,fill=T)
   mrv$sidecont1_input2_buttonbox$packStart(mrv$sidecont1_input2_savebt,expand=T,fill=T)
+  # half-cauchy
+  mrv$sidecont1_input3_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont1_input3_figurebt <- sidebarPlotButton()
+  mrv$sidecont1_input3_savebt <- sidebarAcceptButton()
+  mrv$sidecont1_input3_buttonbox$packStart(mrv$sidecont1_input3_figurebt,expand=T,fill=T)
+  mrv$sidecont1_input3_buttonbox$packStart(mrv$sidecont1_input3_savebt,expand=T,fill=T)
+  # t-normal
+  mrv$sidecont1_input4_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont1_input4_figurebt <- sidebarPlotButton()
+  mrv$sidecont1_input4_savebt <- sidebarAcceptButton()
+  mrv$sidecont1_input4_buttonbox$packStart(mrv$sidecont1_input4_figurebt,expand=T,fill=T)
+  mrv$sidecont1_input4_buttonbox$packStart(mrv$sidecont1_input4_savebt,expand=T,fill=T)
+  # Unif
+  mrv$sidecont1_input5_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont1_input5_figurebt <- sidebarPlotButton()
+  mrv$sidecont1_input5_savebt <- sidebarAcceptButton()
+  mrv$sidecont1_input5_buttonbox$packStart(mrv$sidecont1_input5_figurebt,expand=T,fill=T)
+  mrv$sidecont1_input5_buttonbox$packStart(mrv$sidecont1_input5_savebt,expand=T,fill=T)
+  # table
+  mrv$sidecont1_input6_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont1_input6_figurebt <- sidebarLoadPriorButton()
+  mrv$sidecont1_input6_savebt <- sidebarAcceptButton()
+  mrv$sidecont1_input6_buttonbox$packStart(mrv$sidecont1_input6_figurebt,expand=T,fill=T)
+  mrv$sidecont1_input6_buttonbox$packStart(mrv$sidecont1_input6_savebt,expand=T,fill=T)
   
+  # hide boxes
   mrv$sidecont1_hide11 <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidecont1_hide11$hide()
   mrv$sidecont1_hide12 <- gtkVBox(homogeneous=FALSE,spacing=10)
@@ -437,29 +476,29 @@ meta4diagGUI <- function(){
   mrv$sidecont1_hide21$hide()
   mrv$sidecont1_hide22 <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidecont1_hide22$hide()
+  mrv$sidecont1_hide31 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide31$hide()
+  mrv$sidecont1_hide32 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide32$hide()
+  mrv$sidecont1_hide41 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide41$hide()
+  mrv$sidecont1_hide42 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide42$hide()
+  mrv$sidecont1_hide5 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide5$hide()
+  mrv$sidecont1_hide6 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont1_hide6$hide()
   
   mrv$sidecont1_hide11$packStart(mrv$sidecont1_input1,expand=FALSE,fill=FALSE)
   mrv$sidecont1_hide12$packStart(mrv$sidecont1_input1_buttonbox,expand=FALSE,fill=FALSE)
   mrv$sidecont1_hide21$packStart(mrv$sidecont1_input2,expand=FALSE,fill=FALSE)
   mrv$sidecont1_hide22$packStart(mrv$sidecont1_input2_buttonbox,expand=FALSE,fill=FALSE)
-  
-  
-  
-  gSignalConnect(mrv$sidecont1_combo, "changed", function(button, ...) {
-    tau1density = gtkComboBoxGetActiveText(button)
-    if(tau1density=="Inv-gamma"){
-      mrv$sidecont1_hide21$hide()
-      mrv$sidecont1_hide22$hide()
-      mrv$sidecont1_hide11$show()
-      mrv$sidecont1_hide12$show()
-      
-    } else {
-      mrv$sidecont1_hide11$hide()
-      mrv$sidecont1_hide12$hide()
-      mrv$sidecont1_hide21$show()
-      mrv$sidecont1_hide22$show()
-    }
-  })
+  mrv$sidecont1_hide31$packStart(mrv$sidecont1_input3,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_hide32$packStart(mrv$sidecont1_input3_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_hide41$packStart(mrv$sidecont1_input4,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_hide42$packStart(mrv$sidecont1_input4_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_hide5$packStart(mrv$sidecont1_input5_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_hide6$packStart(mrv$sidecont1_input6_buttonbox,expand=FALSE,fill=FALSE)
   
   gSignalConnect(mrv$sidecont1_a_entry, "changed", function(entry){
     mrv$sidecont1_hide12$show()
@@ -481,24 +520,30 @@ meta4diagGUI <- function(){
     .checkNumEntry(entry)
   })
   
+  gSignalConnect(mrv$sidecont1_gamma_entry, "changed", function(entry){
+    mrv$sidecont1_hide32$show()
+    .checkNumEntry(entry)
+  })
   
+  gSignalConnect(mrv$sidecont1_m_entry, "changed", function(entry){
+    mrv$sidecont1_hide42$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont1_v_entry, "changed", function(entry){
+    mrv$sidecont1_hide42$show()
+    .checkNumEntry(entry)
+  })
+  
+  # Inv-gamma
   gSignalConnect(mrv$sidecont1_input1_figurebt, "clicked", function(button) {
     .manipulate(parent=list(mrv$sidecont1_a_entry,mrv$sidecont1_b_entry),
-                .priorInvgamma(a = a, b = b, xmax = xlim),
-                a = .slider(parent=mrv$sidecont1_a_entry,min=0.000001,max=4,step=0.001),
-                b = .slider(parent=mrv$sidecont1_b_entry,min=0.000001,max=4,step=0.001),
+                .priorInvgamma(a = shape, b = rate, xmax = xlim),
+                shape = .slider(parent=mrv$sidecont1_a_entry,min=0.000001,max=4,step=0.001),
+                rate = .slider(parent=mrv$sidecont1_b_entry,min=0.000001,max=4,step=0.001),
                 xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
   })
-  gSignalConnect(mrv$sidecont1_input2_figurebt, "clicked", function(button,...) {
-    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
-    if(tau1density=="PC"){
-      .manipulate(parent=list(mrv$sidecont1_u_entry,mrv$sidecont1_alpha_entry),
-                  .priorSigmaPC(u = u, alpha = alpha, xmax = xlim),
-                  u = .slider(parent=mrv$sidecont1_u_entry,min=0.000001,max=10,step=0.01),
-                  alpha = .slider(parent=mrv$sidecont1_alpha_entry,min=0.000001,max=0.9999999,step=0.001),
-                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
-    }
-  })
+  
   gSignalConnect(mrv$sidecont1_input1_savebt, "clicked", function(button) {
     tau1.a = as.numeric(gtkEntryGetText(mrv$sidecont1_a_entry))
     tau1.b = as.numeric(gtkEntryGetText(mrv$sidecont1_b_entry))
@@ -506,6 +551,18 @@ meta4diagGUI <- function(){
     mrv$var.par = c(tau1.a,tau1.b)
     mrv$sidecont1_hide11$show()
     mrv$sidecont1_hide12$hide()
+  })
+
+  # PC
+  gSignalConnect(mrv$sidecont1_input2_figurebt, "clicked", function(button,...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(tau1density=="PC(std)"){
+      .manipulate(parent=list(mrv$sidecont1_u_entry,mrv$sidecont1_alpha_entry),
+                  .priorSigmaPC(u = u, alpha = a, xmax = xlim),
+                  u = .slider(parent=mrv$sidecont1_u_entry,min=0.000001,max=10,step=0.01),
+                  a = .slider(parent=mrv$sidecont1_alpha_entry,min=0.000001,max=0.9999999,step=0.001),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
   })
   
   gSignalConnect(mrv$sidecont1_input2_savebt, "clicked", function(button) {
@@ -517,14 +574,92 @@ meta4diagGUI <- function(){
     mrv$sidecont1_hide22$hide()
   })
   
+  # Half-cauchy
+  gSignalConnect(mrv$sidecont1_input3_figurebt, "clicked", function(button,...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(tau1density=="Half-Cauchy(std)"){
+      .manipulate(parent=list(mrv$sidecont1_gamma_entry),
+                  .priorHalfCauchy(gamma=gamma, xmax = xlim),
+                  gamma = .slider(parent=mrv$sidecont1_gamma_entry,min=0.000001,max=10,step=0.01),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont1_input3_savebt, "clicked", function(button) {
+    tau1.gamma = as.numeric(gtkEntryGetText(mrv$sidecont1_gamma_entry))
+    mrv$var.prior = "HCauchy"
+    mrv$var.par = c(tau1.gamma)
+    mrv$sidecont1_hide31$show()
+    mrv$sidecont1_hide32$hide()
+  })
+  
+  # Truncated-normal
+  gSignalConnect(mrv$sidecont1_input4_figurebt, "clicked", function(button,...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(tau1density=="Truncated-normal(std)"){
+      .manipulate(parent=list(mrv$sidecont1_m_entry, mrv$sidecont1_v_entry),
+                  .priorSigmaTnorm(m=mean, v=variance, xmax = xlim),
+                  mean = .slider(parent=mrv$sidecont1_m_entry,min=0.000001,max=10,step=0.01),
+                  variance = .slider(parent=mrv$sidecont1_v_entry,min=0.000001,max=10,step=0.01),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont1_input4_savebt, "clicked", function(button) {
+    tau1.m = as.numeric(gtkEntryGetText(mrv$sidecont1_m_entry))
+    tau1.v = as.numeric(gtkEntryGetText(mrv$sidecont1_v_entry))
+    mrv$var.prior = "Tnormal"
+    mrv$var.par = c(tau1.m, tau1.v)
+    mrv$sidecont1_hide41$show()
+    mrv$sidecont1_hide42$hide()
+  })
+
+  # Uniform
+  gSignalConnect(mrv$sidecont1_input5_figurebt, "clicked", function(button,...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(tau1density=="Uniform(std)"){
+      .manipulate(parent=list(hide_parent),
+                  .priorUniformSig(xmax = xlim),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont1_input5_savebt, "clicked", function(button) {
+    mrv$var.prior = "Unif"
+    mrv$sidecont1_hide5$hide()
+  })
+  
+  # Table
+  gSignalConnect(mrv$sidecont1_input6_figurebt, "clicked", function(button,...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(tau1density=="Table(var)"){
+      .open_prior_Sigma(window=mrv$main_window)
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont1_input6_savebt, "clicked", function(button) {
+    mrv$var.prior = "Table"
+    mrv$var.par = mrv$priorfile
+    mrv$sidecont1_hide6$hide()
+  })
+
+  
   mrv$sidecont1_main$packStart(mrv$sidecont1_hide11,expand=FALSE,fill=FALSE)
   mrv$sidecont1_main$packStart(mrv$sidecont1_hide12,expand=FALSE,fill=FALSE)
   mrv$sidecont1_main$packStart(mrv$sidecont1_hide21,expand=FALSE,fill=FALSE)
   mrv$sidecont1_main$packStart(mrv$sidecont1_hide22,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide31,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide32,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide41,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide42,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide5,expand=FALSE,fill=FALSE)
+  mrv$sidecont1_main$packStart(mrv$sidecont1_hide6,expand=FALSE,fill=FALSE)
   mrv$sidecont1$add(mrv$sidecont1_main)
   
   
-  ### component 2-second variance
+  ##################################################################
+  ###                 component 2 - second variance
+  ##################################################################
   mrv$sidecont2 <- gtkFrame("Second Variance")
   mrv$sidecont2["border-width"]=10
   
@@ -532,40 +667,77 @@ meta4diagGUI <- function(){
   mrv$sidecont2_main["border-width"]=10
   mrv$sidecont2_show <- gtkHBox()
   mrv$sidecont2_combo <- gtkComboBoxNewText()
-  sapply(c("Inv-gamma","PC"), mrv$sidecont2_combo$appendText)
+  sapply(c("Inv-gamma(var)","PC(std)","Half-Cauchy(std)","Truncated-normal(std)","Uniform(std)","Table(var)","Inv-Wishart(cov.mat)"), mrv$sidecont2_combo$appendText)
   mrv$sidecont2_show$packStart(gtkLabel("Prior:  "),expand=FALSE,fill=FALSE)
   mrv$sidecont2_show$packStart(mrv$sidecont2_combo,expand=TRUE,fill=TRUE)
   mrv$sidecont2_combo$setActive(-1)
   mrv$sidecont2_main$packStart(mrv$sidecont2_show,expand=FALSE,fill=FALSE)
-  
+  # Inv-gamma
   mrv$sidecont2_a_label <- sidebarLabel("shape: ",1)
   mrv$sidecont2_b_label <- sidebarLabel("rate: ",1)
   mrv$sidecont2_a_entry <- sidebarEntry("0.25", 10, 0)
   mrv$sidecont2_b_entry <- sidebarEntry("0.025", 10, 0)
   sidecont2_invgamma_list <- list(mrv$sidecont2_a_label, mrv$sidecont2_a_entry, mrv$sidecont2_b_label, mrv$sidecont2_b_entry)
-  
+  # PC
   mrv$sidecont2_u_label <- sidebarLabel("u: ",1)
-  mrv$sidecont2_alpha_label <- sidebarLabel("alpha: ",1)
+  mrv$sidecont2_alpha_label <- sidebarLabel("a: ",1)
   mrv$sidecont2_u_entry <- sidebarEntry("3", 10, 0)
   mrv$sidecont2_alpha_entry <- sidebarEntry("0.05", 10, 0)
   sidecont2_pc_list <- list(mrv$sidecont2_u_label, mrv$sidecont2_u_entry, mrv$sidecont2_alpha_label, mrv$sidecont2_alpha_entry)
+  # half-cauchy
+  mrv$sidecont2_gamma_label <- sidebarLabel("gamma: ", 1)
+  mrv$sidecont2_gamma_entry <- sidebarEntry("3", 10, 0)
+  sidecont2_hcauchy_list <- list(mrv$sidecont2_gamma_label, mrv$sidecont2_gamma_entry)
+  # truncated-normal
+  mrv$sidecont2_m_label <- sidebarLabel("mean: ", 1)
+  mrv$sidecont2_m_entry <- sidebarEntry("3", 10, 0)
+  mrv$sidecont2_v_label <- sidebarLabel("variance: ", 1)
+  mrv$sidecont2_v_entry <- sidebarEntry("1", 10, 0)
+  sidecont2_tnorm_list <- list(mrv$sidecont2_m_label, mrv$sidecont2_m_entry, mrv$sidecont2_v_label, mrv$sidecont2_v_entry)
   
   mrv$sidecont2_input1 <- sidebarTable(3, 3, sidecont2_invgamma_list)
   mrv$sidecont2_input2 <- sidebarTable(3, 3, sidecont2_pc_list)
+  mrv$sidecont2_input3 <- sidebarTable(3, 3, sidecont2_hcauchy_list)
+  mrv$sidecont2_input4 <- sidebarTable(3, 3, sidecont2_tnorm_list)
   
-  
+  # Inv-gamma
   mrv$sidecont2_input1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont2_input1_figurebt <- sidebarPlotButton()
   mrv$sidecont2_input1_savebt <- sidebarAcceptButton()
   mrv$sidecont2_input1_buttonbox$packStart(mrv$sidecont2_input1_figurebt,expand=T,fill=T)
   mrv$sidecont2_input1_buttonbox$packStart(mrv$sidecont2_input1_savebt,expand=T,fill=T)
-  
+  # PC
   mrv$sidecont2_input2_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont2_input2_figurebt <- sidebarPlotButton()
   mrv$sidecont2_input2_savebt <- sidebarAcceptButton()
   mrv$sidecont2_input2_buttonbox$packStart(mrv$sidecont2_input2_figurebt,expand=T,fill=T)
   mrv$sidecont2_input2_buttonbox$packStart(mrv$sidecont2_input2_savebt,expand=T,fill=T)
+  # half-cauchy
+  mrv$sidecont2_input3_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont2_input3_figurebt <- sidebarPlotButton()
+  mrv$sidecont2_input3_savebt <- sidebarAcceptButton()
+  mrv$sidecont2_input3_buttonbox$packStart(mrv$sidecont2_input3_figurebt,expand=T,fill=T)
+  mrv$sidecont2_input3_buttonbox$packStart(mrv$sidecont2_input3_savebt,expand=T,fill=T)
+  # t-normal
+  mrv$sidecont2_input4_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont2_input4_figurebt <- sidebarPlotButton()
+  mrv$sidecont2_input4_savebt <- sidebarAcceptButton()
+  mrv$sidecont2_input4_buttonbox$packStart(mrv$sidecont2_input4_figurebt,expand=T,fill=T)
+  mrv$sidecont2_input4_buttonbox$packStart(mrv$sidecont2_input4_savebt,expand=T,fill=T)
+  # Unif
+  mrv$sidecont2_input5_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont2_input5_figurebt <- sidebarPlotButton()
+  mrv$sidecont2_input5_savebt <- sidebarAcceptButton()
+  mrv$sidecont2_input5_buttonbox$packStart(mrv$sidecont2_input5_figurebt,expand=T,fill=T)
+  mrv$sidecont2_input5_buttonbox$packStart(mrv$sidecont2_input5_savebt,expand=T,fill=T)
+  # table
+  mrv$sidecont2_input6_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont2_input6_figurebt <- sidebarLoadPriorButton()
+  mrv$sidecont2_input6_savebt <- sidebarAcceptButton()
+  mrv$sidecont2_input6_buttonbox$packStart(mrv$sidecont2_input6_figurebt,expand=T,fill=T)
+  mrv$sidecont2_input6_buttonbox$packStart(mrv$sidecont2_input6_savebt,expand=T,fill=T)
   
+  # hide boxed
   mrv$sidecont2_hide11 <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidecont2_hide11$hide()
   mrv$sidecont2_hide21 <- gtkVBox(homogeneous=FALSE,spacing=10)
@@ -574,26 +746,31 @@ meta4diagGUI <- function(){
   mrv$sidecont2_hide12$hide()
   mrv$sidecont2_hide22 <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidecont2_hide22$hide()
+  mrv$sidecont2_hide31 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide31$hide()
+  mrv$sidecont2_hide32 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide32$hide()
+  mrv$sidecont2_hide41 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide41$hide()
+  mrv$sidecont2_hide42 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide42$hide()
+  mrv$sidecont2_hide5 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide5$hide()
+  mrv$sidecont2_hide6 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont2_hide6$hide()
   
   mrv$sidecont2_hide11$packStart(mrv$sidecont2_input1,expand=FALSE,fill=FALSE)
   mrv$sidecont2_hide12$packStart(mrv$sidecont2_input1_buttonbox,expand=FALSE,fill=FALSE)
   mrv$sidecont2_hide21$packStart(mrv$sidecont2_input2,expand=FALSE,fill=FALSE)
   mrv$sidecont2_hide22$packStart(mrv$sidecont2_input2_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide31$packStart(mrv$sidecont2_input3,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide32$packStart(mrv$sidecont2_input3_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide41$packStart(mrv$sidecont2_input4,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide42$packStart(mrv$sidecont2_input4_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide5$packStart(mrv$sidecont2_input5_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_hide6$packStart(mrv$sidecont2_input6_buttonbox,expand=FALSE,fill=FALSE)
   
-  gSignalConnect(mrv$sidecont2_combo, "changed", function(button, ...) {
-    tau2density = gtkComboBoxGetActiveText(button)
-    if(tau2density=="Inv-gamma"){
-      mrv$sidecont2_hide21$hide()
-      mrv$sidecont2_hide22$hide()
-      mrv$sidecont2_hide11$show()
-      mrv$sidecont2_hide12$show()
-    } else {
-      mrv$sidecont2_hide11$hide()
-      mrv$sidecont2_hide12$hide()
-      mrv$sidecont2_hide21$show()
-      mrv$sidecont2_hide22$show()
-    }
-  })
+  
   
   gSignalConnect(mrv$sidecont2_a_entry, "changed", function(entry){
     mrv$sidecont2_hide12$show()
@@ -615,23 +792,30 @@ meta4diagGUI <- function(){
     .checkNumEntry(entry)
   })
   
+  gSignalConnect(mrv$sidecont2_gamma_entry, "changed", function(entry){
+    mrv$sidecont2_hide32$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont2_m_entry, "changed", function(entry){
+    mrv$sidecont2_hide42$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont2_v_entry, "changed", function(entry){
+    mrv$sidecont2_hide42$show()
+    .checkNumEntry(entry)
+  })
+  
+  # Inv-gamma
   gSignalConnect(mrv$sidecont2_input1_figurebt, "clicked", function(button) {
     .manipulate(parent=list(mrv$sidecont2_a_entry,mrv$sidecont2_b_entry),
-                .priorInvgamma(a,b,xlim),
-                a = .slider(parent=mrv$sidecont2_a_entry,label="a",min=0.000001,max=4,step=0.001),
-                b = .slider(parent=mrv$sidecont2_b_entry,label="b",min=0.000001,max=4,step=0.001),
+                .priorInvgamma(a = shape,b = rate,xmax = xlim),
+                shape = .slider(parent=mrv$sidecont2_a_entry,min=0.000001,max=4,step=0.001),
+                rate = .slider(parent=mrv$sidecont2_b_entry,min=0.000001,max=4,step=0.001),
                 xlim = .slider(parent=hide_parent,label="xlim",min=1,max=20,step=1))
   })
-  gSignalConnect(mrv$sidecont2_input2_figurebt, "clicked", function(button,...) {
-    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
-    if(tau2density=="PC"){
-      .manipulate(parent=list(mrv$sidecont2_u_entry,mrv$sidecont2_alpha_entry),
-                  .priorSigmaPC(u, alpha, xlim),
-                  u = .slider(parent=mrv$sidecont2_u_entry,label="u",min=0.000001,max=10,step=0.01),
-                  alpha = .slider(parent=mrv$sidecont2_alpha_entry,label="alpha",min=0.000001,max=0.9999999,step=0.001),
-                  xlim = .slider(parent=hide_parent,min=1,label="xlim",max=20,step=1))
-    }
-  })
+  
   gSignalConnect(mrv$sidecont2_input1_savebt, "clicked", function(button) {
     tau2.a = as.numeric(gtkEntryGetText(mrv$sidecont2_a_entry))
     tau2.b = as.numeric(gtkEntryGetText(mrv$sidecont2_b_entry))
@@ -639,6 +823,18 @@ meta4diagGUI <- function(){
     mrv$var2.par = c(tau2.a,tau2.b)
     mrv$sidecont2_hide11$show()
     mrv$sidecont2_hide12$hide()
+  })
+  
+  # PC
+  gSignalConnect(mrv$sidecont2_input2_figurebt, "clicked", function(button,...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(tau2density=="PC(std)"){
+      .manipulate(parent=list(mrv$sidecont2_u_entry,mrv$sidecont2_alpha_entry),
+                  .priorSigmaPC(u, a, xlim),
+                  u = .slider(parent=mrv$sidecont2_u_entry,min=0.000001,max=10,step=0.01),
+                  a = .slider(parent=mrv$sidecont2_alpha_entry,min=0.000001,max=0.9999999,step=0.001),
+                  xlim = .slider(parent=hide_parent,min=1,label="xlim",max=20,step=1))
+    }
   })
   
   gSignalConnect(mrv$sidecont2_input2_savebt, "clicked", function(button) {
@@ -650,14 +846,91 @@ meta4diagGUI <- function(){
     mrv$sidecont2_hide22$hide()
   })
   
+  # Half-cauchy
+  gSignalConnect(mrv$sidecont2_input3_figurebt, "clicked", function(button,...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(tau2density=="Half-Cauchy(std)"){
+      .manipulate(parent=list(mrv$sidecont2_gamma_entry),
+                  .priorHalfCauchy(gamma=gamma, xmax = xlim),
+                  gamma = .slider(parent=mrv$sidecont2_gamma_entry,min=0.000001,max=10,step=0.01),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont2_input3_savebt, "clicked", function(button) {
+    tau2.gamma = as.numeric(gtkEntryGetText(mrv$sidecont2_gamma_entry))
+    mrv$var2.prior = "HCauchy"
+    mrv$var2.par = c(tau2.gamma)
+    mrv$sidecont2_hide31$show()
+    mrv$sidecont2_hide32$hide()
+  })
+  
+  # Truncated-normal
+  gSignalConnect(mrv$sidecont2_input4_figurebt, "clicked", function(button,...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(tau2density=="Truncated-normal(std)"){
+      .manipulate(parent=list(mrv$sidecont2_m_entry, mrv$sidecont2_v_entry),
+                  .priorSigmaTnorm(m=mean, v=variance, xmax = xlim),
+                  mean = .slider(parent=mrv$sidecont2_m_entry,min=0.000001,max=10,step=0.01),
+                  variance = .slider(parent=mrv$sidecont2_v_entry,min=0.000001,max=10,step=0.01),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont2_input4_savebt, "clicked", function(button) {
+    tau2.m = as.numeric(gtkEntryGetText(mrv$sidecont2_m_entry))
+    tau2.v = as.numeric(gtkEntryGetText(mrv$sidecont2_v_entry))
+    mrv$var2.prior = "Tnormal"
+    mrv$var2.par = c(tau2.m, tau2.v)
+    mrv$sidecont2_hide41$show()
+    mrv$sidecont2_hide42$hide()
+  })
+  
+  # Uniform
+  gSignalConnect(mrv$sidecont2_input5_figurebt, "clicked", function(button,...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(tau2density=="Uniform(std)"){
+      .manipulate(parent=list(hide_parent),
+                  .priorUniformSig(xmax = xlim),
+                  xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont2_input5_savebt, "clicked", function(button) {
+    mrv$var2.prior = "Unif"
+    mrv$sidecont2_hide5$hide()
+  })
+  
+  # Table
+  gSignalConnect(mrv$sidecont2_input6_figurebt, "clicked", function(button,...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(tau2density=="Table(var)"){
+      .open_prior_Sigma(window=mrv$main_window)
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont2_input6_savebt, "clicked", function(button) {
+    mrv$var2.prior = "Table"
+    mrv$var2.par = mrv$priorfile
+    mrv$sidecont2_hide6$hide()
+  })
+  
+
   mrv$sidecont2_main$packStart(mrv$sidecont2_hide11,expand=FALSE,fill=FALSE)
   mrv$sidecont2_main$packStart(mrv$sidecont2_hide12,expand=FALSE,fill=FALSE)
   mrv$sidecont2_main$packStart(mrv$sidecont2_hide21,expand=FALSE,fill=FALSE)
   mrv$sidecont2_main$packStart(mrv$sidecont2_hide22,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide31,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide32,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide41,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide42,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide5,expand=FALSE,fill=FALSE)
+  mrv$sidecont2_main$packStart(mrv$sidecont2_hide6,expand=FALSE,fill=FALSE)
   mrv$sidecont2$add(mrv$sidecont2_main)
   
-  
-  #### component3 - correlation
+  ##################################################################
+  ####                   component3 - correlation
+  ##################################################################
   mrv$sidecont3 <- gtkFrame("Correlation")
   mrv$sidecont3["border-width"]=10
   
@@ -665,7 +938,7 @@ meta4diagGUI <- function(){
   mrv$sidecont3_main["border-width"]=10
   mrv$sidecont3_show <- gtkHBox()
   mrv$sidecont3_combo <- gtkComboBoxNewText()
-  sapply(c("Gaussian","PC"), mrv$sidecont3_combo$appendText)
+  sapply(c("Gaussian(Fisher-z)","PC(cor)","Beta(transf.cor)","Table(cor)","Inv-Wishart(cov.mat)"), mrv$sidecont3_combo$appendText)
   mrv$sidecont3_show$packStart(gtkLabel("Prior:  "),expand=FALSE,fill=FALSE)
   mrv$sidecont3_show$packStart(mrv$sidecont3_combo,expand=TRUE,fill=TRUE)
   mrv$sidecont3_combo$setActive(-1)
@@ -677,31 +950,31 @@ meta4diagGUI <- function(){
   mrv$sidecont3_hide12$hide()
   mrv$sidecont3_hide2 <- gtkVBox(homogeneous=FALSE,spacing=10)
   mrv$sidecont3_hide2$hide()
+  mrv$sidecont3_hide31 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont3_hide31$hide()
+  mrv$sidecont3_hide32 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont3_hide32$hide()
+  mrv$sidecont3_hide4 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont3_hide4$hide()
+  ####################
+  # Normal
+  ####################
+  mrv$sidecont3_m_label <- sidebarLabel("mu: ",1)
+  mrv$sidecont3_v_label <- sidebarLabel("variance: ",1)
+  mrv$sidecont3_m_entry <- sidebarEntry("0", 10, 0)
+  mrv$sidecont3_v_entry <- sidebarEntry("5", 10, 0)
+  sidecont3_Gaussian_list <- list(mrv$sidecont3_m_label, mrv$sidecont3_m_entry, mrv$sidecont3_v_label, mrv$sidecont3_v_entry)
   
-  mrv$sidecont3_input1 <- gtkTable(rows=3,columns=2,homogeneous=FALSE)
-  mrv$sidecont3_input1$setColSpacings(3)
-  mrv$sidecont3_input1$setRowSpacings(3)
-  
-  mrv$sidecont3_a_label <- sidebarLabel("mu: ",1)
-  mrv$sidecont3_b_label <- sidebarLabel("variance: ",1)
-  mrv$sidecont3_a_entry <- sidebarEntry("0", 10, 0)
-  mrv$sidecont3_b_entry <- sidebarEntry("5", 10, 0)
-  
-  mrv$sidecont3_input1$attach(mrv$sidecont3_a_label,left.attach=0,1, top.attach=0,1,
-                              xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_input1$attach(mrv$sidecont3_a_entry,left.attach=1,2, top.attach=0,1,
-                              xoptions="",yoptions="")
-  mrv$sidecont3_input1$attach(mrv$sidecont3_b_label,left.attach=0,1, top.attach=1,2,
-                              xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_input1$attach(mrv$sidecont3_b_entry,left.attach=1,2, top.attach=1,2,
-                              xoptions="",yoptions="")
+  mrv$sidecont3_input1 <- sidebarTable(3, 3, sidecont3_Gaussian_list)
   
   mrv$sidecont3_input1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
   mrv$sidecont3_input1_figurebt <- sidebarPlotButton()
   mrv$sidecont3_input1_savebt <- sidebarAcceptButton()
   mrv$sidecont3_input1_buttonbox$packStart(mrv$sidecont3_input1_figurebt,expand=T,fill=T)
   mrv$sidecont3_input1_buttonbox$packStart(mrv$sidecont3_input1_savebt,expand=T,fill=T)
-  
+  ####################
+  # PC
+  ####################
   mrv$sidecont3_input2 <- gtkTable(rows=4,columns=2,homogeneous=FALSE)
   mrv$sidecont3_input2$setColSpacings(5)
   mrv$sidecont3_input2$setRowSpacings(3)
@@ -725,7 +998,6 @@ meta4diagGUI <- function(){
   sapply(mrv$sidecont3_radiogp,'[',"active")
   mrv$sidecont3_radio_align <- gtkAlignment(xalign = 0)
   mrv$sidecont3_radio_align$add(mrv$sidecont3_radio)
-  
   
   mrv$sidecont3_input2$attach(mrv$sidecont3_ref_label,left.attach=0,1, top.attach=0,1,
                               xoptions=c("expand","fill"),yoptions="")
@@ -755,37 +1027,16 @@ meta4diagGUI <- function(){
   mrv$sidecont3_input2_subhide32$hide()
   
   ## here starts sub-hide 1: left-extrem
-  mrv$sidecont3_sub1_input <- gtkTable(rows=3,columns=2,homogeneous=FALSE)
-  mrv$sidecont3_sub1_input$setColSpacings(3)
-  mrv$sidecont3_sub1_input$setRowSpacings(3)
-  
-  mrv$sidecont3_sub1_U1_label <- gtkLabel("u-min: ")
-  mrv$sidecont3_sub1_U1_label["xalign"]=1
-  mrv$sidecont3_sub1_A1_label <- gtkLabel("alpha1: ")
-  mrv$sidecont3_sub1_A1_label["xalign"]=1
-  mrv$sidecont3_sub1_U1_entry <- gtkEntry()
-  mrv$sidecont3_sub1_U1_entry["text"]="-0.95"
-  mrv$sidecont3_sub1_U1_entry["width-chars"]=10
-  mrv$sidecont3_sub1_U1_entry["xalign"]=0
-  mrv$sidecont3_sub1_A1_entry <- gtkEntry()
-  mrv$sidecont3_sub1_A1_entry["text"]="0.05"
-  mrv$sidecont3_sub1_A1_entry["width-chars"]=10
-  mrv$sidecont3_sub1_A1_entry["xalign"]=0
-  
-  mrv$sidecont3_sub1_input$attach(mrv$sidecont3_sub1_U1_label,left.attach=0,1, top.attach=0,1,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub1_input$attach(mrv$sidecont3_sub1_U1_entry,left.attach=1,2, top.attach=0,1,
-                                  xoptions="",yoptions="")
-  mrv$sidecont3_sub1_input$attach(mrv$sidecont3_sub1_A1_label,left.attach=0,1, top.attach=1,2,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub1_input$attach(mrv$sidecont3_sub1_A1_entry,left.attach=1,2, top.attach=1,2,
-                                  xoptions="",yoptions="")
+  mrv$sidecont3_sub1_U1_label <- sidebarLabel("u-min: ",1)
+  mrv$sidecont3_sub1_A1_label <- sidebarLabel("a1: ",1)
+  mrv$sidecont3_sub1_U1_entry <- sidebarEntry("-0.95", 10, 0)
+  mrv$sidecont3_sub1_A1_entry <- sidebarEntry("0.05", 10, 0)
+  sidecont3_sub1_list <- list(mrv$sidecont3_sub1_U1_label, mrv$sidecont3_sub1_U1_entry, mrv$sidecont3_sub1_A1_label, mrv$sidecont3_sub1_A1_entry)
+  mrv$sidecont3_sub1_input <- sidebarTable(3, 3, sidecont3_sub1_list)
   
   mrv$sidecont3_sub1_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
-  mrv$sidecont3_sub1_figurebt <- gtkButton("Plot")
-  mrv$sidecont3_sub1_figurebt['image'] <- gtkImage(filename=mrv$search_icon,size="button")   #### change folder
-  mrv$sidecont3_sub1_savebt <- gtkButton("Accept")
-  mrv$sidecont3_sub1_savebt['image'] <- gtkImage(stock.id="gtk-apply",size="button")
+  mrv$sidecont3_sub1_figurebt <- sidebarPlotButton()
+  mrv$sidecont3_sub1_savebt <- sidebarAcceptButton()
   mrv$sidecont3_sub1_buttonbox$packStart(mrv$sidecont3_sub1_figurebt,expand=T,fill=T)
   mrv$sidecont3_sub1_buttonbox$packStart(mrv$sidecont3_sub1_savebt,expand=T,fill=T)
   
@@ -794,29 +1045,17 @@ meta4diagGUI <- function(){
   mrv$sidecont3_input2_subhide12$packStart(mrv$sidecont3_sub1_buttonbox,expand=FALSE,fill=FALSE)
   
   ## here starts sub-hide 2: right extreme
-  mrv$sidecont3_sub2_input <- gtkTable(rows=3,columns=2,homogeneous=FALSE)
-  mrv$sidecont3_sub2_input$setColSpacings(3)
-  mrv$sidecont3_sub2_input$setRowSpacings(3)
-  
   mrv$sidecont3_sub2_U2_label <- sidebarLabel("u-max: ",1)
-  mrv$sidecont3_sub2_A2_label <- sidebarLabel("alpha2: ",1)
+  mrv$sidecont3_sub2_A2_label <- sidebarLabel("a2: ",1)
   mrv$sidecont3_sub2_U2_entry <- sidebarEntry("0.95", 10, 0)
   mrv$sidecont3_sub2_A2_entry <- sidebarEntry("0.05", 10, 0)
+  sidecont3_sub2_list <- list(mrv$sidecont3_sub2_U2_label, mrv$sidecont3_sub2_U2_entry, mrv$sidecont3_sub2_A2_label, mrv$sidecont3_sub2_A2_entry)
+  mrv$sidecont3_sub2_input <- sidebarTable(3, 3, sidecont3_sub2_list)
   
-  mrv$sidecont3_sub2_input$attach(mrv$sidecont3_sub2_U2_label,left.attach=0,1, top.attach=0,1,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub2_input$attach(mrv$sidecont3_sub2_U2_entry,left.attach=1,2, top.attach=0,1,
-                                  xoptions="",yoptions="")
-  mrv$sidecont3_sub2_input$attach(mrv$sidecont3_sub2_A2_label,left.attach=0,1, top.attach=1,2,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub2_input$attach(mrv$sidecont3_sub2_A2_entry,left.attach=1,2, top.attach=1,2,
-                                  xoptions="",yoptions="")
   
   mrv$sidecont3_sub2_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
-  mrv$sidecont3_sub2_figurebt <- gtkButton("Plot")
-  mrv$sidecont3_sub2_figurebt['image'] <- gtkImage(filename=mrv$search_icon,size="button")   #### change folder
-  mrv$sidecont3_sub2_savebt <- gtkButton("Accept")
-  mrv$sidecont3_sub2_savebt['image'] <- gtkImage(stock.id="gtk-apply",size="button")
+  mrv$sidecont3_sub2_figurebt <- sidebarPlotButton()
+  mrv$sidecont3_sub2_savebt <- sidebarAcceptButton()
   mrv$sidecont3_sub2_buttonbox$packStart(mrv$sidecont3_sub2_figurebt,expand=T,fill=T)
   mrv$sidecont3_sub2_buttonbox$packStart(mrv$sidecont3_sub2_savebt,expand=T,fill=T)
   
@@ -825,43 +1064,22 @@ meta4diagGUI <- function(){
   mrv$sidecont3_input2_subhide22$packStart(mrv$sidecont3_sub2_buttonbox,expand=FALSE,fill=FALSE)
   
   
-  # here starts sub-hide 3: double side
-  mrv$sidecont3_sub3_input <- gtkTable(rows=5,columns=2,homogeneous=FALSE)
-  mrv$sidecont3_sub3_input$setColSpacings(3)
-  mrv$sidecont3_sub3_input$setRowSpacings(3)
-  
+  # here starts sub-hide 3: double side  
   mrv$sidecont3_sub3_U1_label <- sidebarLabel("u-min: ",1)
-  mrv$sidecont3_sub3_A1_label <- sidebarLabel("alpha1: ",1)
+  mrv$sidecont3_sub3_A1_label <- sidebarLabel("a1: ",1)
   mrv$sidecont3_sub3_U1_entry <- sidebarEntry("-0.95", 10, 0)
   mrv$sidecont3_sub3_A1_entry <- sidebarEntry("0.05", 10, 0)
-  
   mrv$sidecont3_sub3_U2_label <- sidebarLabel("u-max: ",1)
-  mrv$sidecont3_sub3_A2_label <- sidebarLabel("alpha2: ",1)
+  mrv$sidecont3_sub3_A2_label <- sidebarLabel("a2: ",1)
   mrv$sidecont3_sub3_U2_entry <- sidebarEntry("0.95", 10, 0)
   mrv$sidecont3_sub3_A2_entry <- sidebarEntry("0.05", 10, 0)
-  
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_U1_label,left.attach=0,1, top.attach=0,1,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_U1_entry,left.attach=1,2, top.attach=0,1,
-                                  xoptions="",yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_A1_label,left.attach=0,1, top.attach=1,2,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_A1_entry,left.attach=1,2, top.attach=1,2,
-                                  xoptions="",yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_U2_label,left.attach=0,1, top.attach=2,3,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_U2_entry,left.attach=1,2, top.attach=2,3,
-                                  xoptions="",yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_A2_label,left.attach=0,1, top.attach=3,4,
-                                  xoptions=c("expand","fill"),yoptions="")
-  mrv$sidecont3_sub3_input$attach(mrv$sidecont3_sub3_A2_entry,left.attach=1,2, top.attach=3,4,
-                                  xoptions="",yoptions="")
+  sidecont3_sub3_list <- list(mrv$sidecont3_sub3_U1_label, mrv$sidecont3_sub3_U1_entry, mrv$sidecont3_sub3_A1_label, mrv$sidecont3_sub3_A1_entry,
+                              mrv$sidecont3_sub3_U2_label, mrv$sidecont3_sub3_U2_entry, mrv$sidecont3_sub3_A2_label, mrv$sidecont3_sub3_A2_entry)
+  mrv$sidecont3_sub3_input <- sidebarTable(3, 3, sidecont3_sub3_list)
   
   mrv$sidecont3_sub3_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
-  mrv$sidecont3_sub3_figurebt <- gtkButton("Plot")
-  mrv$sidecont3_sub3_figurebt['image'] <- gtkImage(filename=mrv$search_icon,size="button")
-  mrv$sidecont3_sub3_savebt <- gtkButton("Accept")
-  mrv$sidecont3_sub3_savebt['image'] <- gtkImage(stock.id="gtk-apply",size="button")
+  mrv$sidecont3_sub3_figurebt <- sidebarPlotButton()
+  mrv$sidecont3_sub3_savebt <- sidebarAcceptButton()
   mrv$sidecont3_sub3_buttonbox$packStart(mrv$sidecont3_sub3_figurebt,expand=T,fill=T)
   mrv$sidecont3_sub3_buttonbox$packStart(mrv$sidecont3_sub3_savebt,expand=T,fill=T)
   
@@ -869,6 +1087,31 @@ meta4diagGUI <- function(){
   mrv$sidecont3_input2_subhide31$packStart(mrv$sidecont3_sub3_input,expand=FALSE,fill=FALSE)
   mrv$sidecont3_input2_subhide32$packStart(mrv$sidecont3_sub3_buttonbox,expand=FALSE,fill=FALSE)
   
+  ####################
+  # Beta
+  ####################
+  mrv$sidecont3_a_label <- sidebarLabel("a: ",1)
+  mrv$sidecont3_b_label <- sidebarLabel("b: ",1)
+  mrv$sidecont3_a_entry <- sidebarEntry("1", 10, 0)
+  mrv$sidecont3_b_entry <- sidebarEntry("5", 10, 0)
+  sidecont3_Beta_list <- list(mrv$sidecont3_a_label, mrv$sidecont3_a_entry, mrv$sidecont3_b_label, mrv$sidecont3_b_entry)
+  
+  mrv$sidecont3_input3 <- sidebarTable(3, 3, sidecont3_Beta_list)
+  
+  mrv$sidecont3_input3_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont3_input3_figurebt <- sidebarPlotButton()
+  mrv$sidecont3_input3_savebt <- sidebarAcceptButton()
+  mrv$sidecont3_input3_buttonbox$packStart(mrv$sidecont3_input3_figurebt,expand=T,fill=T)
+  mrv$sidecont3_input3_buttonbox$packStart(mrv$sidecont3_input3_savebt,expand=T,fill=T)
+  
+  ####################
+  # Table
+  ####################
+  mrv$sidecont3_input4_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont3_input4_figurebt <- sidebarLoadPriorButton()
+  mrv$sidecont3_input4_savebt <- sidebarAcceptButton()
+  mrv$sidecont3_input4_buttonbox$packStart(mrv$sidecont3_input4_figurebt,expand=T,fill=T)
+  mrv$sidecont3_input4_buttonbox$packStart(mrv$sidecont3_input4_savebt,expand=T,fill=T)
   
   ########### combine all the functional part in part 3
   mrv$sidecont3_hide11$packStart(mrv$sidecont3_input1,expand=FALSE,fill=FALSE)
@@ -880,30 +1123,30 @@ meta4diagGUI <- function(){
   mrv$sidecont3_hide2$packStart(mrv$sidecont3_input2_subhide22,expand=FALSE,fill=FALSE)
   mrv$sidecont3_hide2$packStart(mrv$sidecont3_input2_subhide31,expand=FALSE,fill=FALSE)
   mrv$sidecont3_hide2$packStart(mrv$sidecont3_input2_subhide32,expand=FALSE,fill=FALSE)
-  ######### all signals for sidebar part 3
-  gSignalConnect(mrv$sidecont3_combo, "changed", function(button, ...) {
-    rhodensity = gtkComboBoxGetActiveText(button)
-    if(rhodensity=="Gaussian"){
-      mrv$sidecont3_hide2$hide()
-      mrv$sidecont3_hide11$show()
-      mrv$sidecont3_hide12$show()   
-    } else {
-      mrv$sidecont3_hide11$hide()
-      mrv$sidecont3_hide12$hide()
-      mrv$sidecont3_hide2$show()
-    }
-  })
+  mrv$sidecont3_hide31$packStart(mrv$sidecont3_input3,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_hide32$packStart(mrv$sidecont3_input3_buttonbox,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_hide4$packStart(mrv$sidecont3_input4_buttonbox,expand=FALSE,fill=FALSE)
   
-  gSignalConnect(mrv$sidecont3_a_entry, "changed", function(entry){
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide11,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide12,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide2,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide31,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide32,expand=FALSE,fill=FALSE)
+  mrv$sidecont3_main$packStart(mrv$sidecont3_hide4,expand=FALSE,fill=FALSE)
+  mrv$sidecont3$add(mrv$sidecont3_main)
+  ######### all signals for sidebar part 3
+  # normal
+  gSignalConnect(mrv$sidecont3_m_entry, "changed", function(entry){
     mrv$sidecont3_hide12$show()
     mrv$sidecont3_hide2$hide()
     .checkNumEntry(entry)
   })
-  gSignalConnect(mrv$sidecont3_b_entry, "changed", function(entry){
+  gSignalConnect(mrv$sidecont3_v_entry, "changed", function(entry){
     mrv$sidecont3_hide12$show()
     mrv$sidecont3_hide2$hide()
     .checkNumEntry(entry)
   })
+  # PC
   gSignalConnect(mrv$sidecont3_ref_entry, "changed", function(entry){
     if(mrv$rho.strategy=="Double-side"){
       mrv$sidecont3_input2_subhide32$show()
@@ -972,7 +1215,6 @@ meta4diagGUI <- function(){
     mrv$sidecont3_input2_subhide12$hide()
     .checkNumEntry(entry)
   })
-  
   sapply(mrv$sidecont3_radiogp, gSignalConnect, "toggled",
          f = function(button, ...){
            if(button['active']){
@@ -1001,40 +1243,61 @@ meta4diagGUI <- function(){
              }
            } 
          })
-  
-  gSignalConnect(mrv$sidecont3_input1_figurebt, "clicked", function(button){
-    .manipulate(parent=list(mrv$sidecont3_a_entry,mrv$sidecont3_b_entry),
-                .priorRhoNormalPlot(mean,variance),
-                mean = .slider(parent=mrv$sidecont3_a_entry,min=-4,max=4,step=0.5),
-                variance = .slider(parent=mrv$sidecont3_b_entry,min=0.000001,max=10,step=0.1))
+  # Beta
+  gSignalConnect(mrv$sidecont3_a_entry, "changed", function(entry){
+    mrv$sidecont3_hide32$show()
+    mrv$sidecont3_hide2$hide()
+    .checkNumEntry(entry)
+  })
+  gSignalConnect(mrv$sidecont3_b_entry, "changed", function(entry){
+    mrv$sidecont3_hide32$show()
+    mrv$sidecont3_hide2$hide()
+    .checkNumEntry(entry)
   })
   
+  # normal
+  gSignalConnect(mrv$sidecont3_input1_figurebt, "clicked", function(button){
+    .manipulate(parent=list(mrv$sidecont3_m_entry,mrv$sidecont3_v_entry),
+                .priorRhoNormalPlot(mean,variance),
+                mean = .slider(parent=mrv$sidecont3_m_entry,min=-4,max=4,step=0.5),
+                variance = .slider(parent=mrv$sidecont3_v_entry,min=0.000001,max=10,step=0.1))
+  })
+  
+  gSignalConnect(mrv$sidecont3_input1_savebt, "clicked", function(button) {
+    rho.mean = as.numeric(gtkEntryGetText(mrv$sidecont3_m_entry))
+    rho.variance = as.numeric(gtkEntryGetText(mrv$sidecont3_v_entry))
+    mrv$cor.prior = "normal"
+    mrv$cor.par = c(rho.mean,rho.variance)
+    mrv$sidecont3_hide11$show()
+    mrv$sidecont3_hide12$hide()
+  })
+  # PC
   gSignalConnect(mrv$sidecont3_sub1_figurebt, "clicked", function(button){
     .manipulate(parent=list(mrv$sidecont3_sub1_U1_entry,
                             mrv$sidecont3_sub1_A1_entry),
                 .priorExpRhoS1(rho.ref=as.numeric(mrv$sidecont3_ref_entry$getText()),
                                left.portion = as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry)),
-                               U_min,alpha1),
+                               U_min,a1),
                 U_min = .slider(parent=mrv$sidecont3_sub1_U1_entry,
                                 min=-0.99999,
                                 max=as.numeric(mrv$sidecont3_ref_entry$getText())-0.05,
                                 step=0.001),
-                alpha1 = .slider(parent=mrv$sidecont3_sub1_A1_entry,
+                a1 = .slider(parent=mrv$sidecont3_sub1_A1_entry,
                                  min=0.001,max=as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry))-0.000001,
                                  step=0.001))
   })
-  
+ 
   gSignalConnect(mrv$sidecont3_sub2_figurebt, "clicked", function(button){
     .manipulate(parent=list(mrv$sidecont3_sub2_U2_entry,
                             mrv$sidecont3_sub2_A2_entry),
                 .priorExpRhoS2(rho.ref=as.numeric(mrv$sidecont3_ref_entry$getText()),
                                left.portion = as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry)),
-                               U_max,alpha2),
+                               U_max,a2),
                 U_max = .slider(parent=mrv$sidecont3_sub2_U2_entry,
                                 min=as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry))+0.05,
                                 max=0.999999,
                                 step=0.001),
-                alpha2 = .slider(parent=mrv$sidecont3_sub2_A2_entry,
+                a2 = .slider(parent=mrv$sidecont3_sub2_A2_entry,
                                  min=0.001,max=1-as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry))-0.000001,
                                  step=0.001))
   })
@@ -1044,27 +1307,17 @@ meta4diagGUI <- function(){
     .manipulate(parent=list(mrv$sidecont3_sub3_U1_entry,mrv$sidecont3_sub3_A1_entry,
                             mrv$sidecont3_sub3_U2_entry,mrv$sidecont3_sub3_A2_entry),
                 .priorExpRhoS3(rho.ref=as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry)),
-                               U_min,alpha1,U_max,alpha2),
+                               U_min,a1,U_max,a2),
                 U_min = .slider(parent=mrv$sidecont3_sub3_U1_entry,
                                 min=-0.99999,
                                 max=as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry))-0.1,
                                 step=0.001),
-                alpha1 = .slider(parent=mrv$sidecont3_sub3_A1_entry,min=0.005,max=0.3,step=0.005),
+                a1 = .slider(parent=mrv$sidecont3_sub3_A1_entry,min=0.005,max=0.3,step=0.005),
                 U_max = .slider(parent=mrv$sidecont3_sub3_U2_entry,
                                 min=as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry))+0.1,
                                 max=0.999999,
                                 step=0.001),
-                alpha2 = .slider(parent=mrv$sidecont3_sub3_A2_entry,min=0.005,max=0.3,step=0.005))
-  })
-  
-  
-  gSignalConnect(mrv$sidecont3_input1_savebt, "clicked", function(button) {
-    rho.mean = as.numeric(gtkEntryGetText(mrv$sidecont3_a_entry))
-    rho.variance = as.numeric(gtkEntryGetText(mrv$sidecont3_b_entry))
-    mrv$cor.prior = "normal"
-    mrv$cor.par = c(rho.mean,rho.variance)
-    mrv$sidecont3_hide11$show()
-    mrv$sidecont3_hide12$hide()
+                a2 = .slider(parent=mrv$sidecont3_sub3_A2_entry,min=0.005,max=0.3,step=0.005))
   })
   
   gSignalConnect(mrv$sidecont3_sub1_savebt, "clicked", function(button) {
@@ -1100,19 +1353,546 @@ meta4diagGUI <- function(){
     mrv$sidecont3_input2_subhide31$show()
     mrv$sidecont3_input2_subhide32$hide()
   })
+  # Beta
+  gSignalConnect(mrv$sidecont3_input3_figurebt, "clicked", function(button){
+    .manipulate(parent=list(mrv$sidecont3_a_entry,mrv$sidecont3_b_entry),
+                .priorRhoBetaPlot(a,b),
+                a = .slider(parent=mrv$sidecont3_a_entry,min=0,max=20,step=0.5),
+                b = .slider(parent=mrv$sidecont3_b_entry,min=0,max=20,step=0.5))
+  })
   
-  mrv$sidecont3_main$packStart(mrv$sidecont3_hide11,expand=FALSE,fill=FALSE)
-  mrv$sidecont3_main$packStart(mrv$sidecont3_hide12,expand=FALSE,fill=FALSE)
-  mrv$sidecont3_main$packStart(mrv$sidecont3_hide2,expand=FALSE,fill=FALSE)
-  mrv$sidecont3$add(mrv$sidecont3_main)
+  gSignalConnect(mrv$sidecont3_input3_savebt, "clicked", function(button) {
+    rho.a = as.numeric(gtkEntryGetText(mrv$sidecont3_a_entry))
+    rho.b = as.numeric(gtkEntryGetText(mrv$sidecont3_b_entry))
+    mrv$cor.prior = "beta"
+    mrv$cor.par = c(rho.a,rho.b)
+    mrv$sidecont3_hide31$show()
+    mrv$sidecont3_hide32$hide()
+  })
+  
+  # Table
+  gSignalConnect(mrv$sidecont3_input4_figurebt, "clicked", function(button,...) {
+    cordensity = gtkComboBoxGetActiveText(mrv$sidecont3_combo)
+    if(cordensity=="Table(cor)"){
+      .open_prior_Rho(window = mrv$main_window)
+    }
+  })
+  
+  gSignalConnect(mrv$sidecont3_input4_savebt, "clicked", function(button) {
+    mrv$cor.prior = "Table"
+    mrv$cor.par = mrv$priorfile
+    mrv$sidecont3_hide4$hide()
+  })
+  
+  
+  ##################################################################
+  ###                 component 4 - wishart parameters
+  ##################################################################
+  mrv$sidecont4 <- gtkFrame("Inv-Wishart Parameter")
+  mrv$sidecont4["border-width"]=10
+  mrv$sidecont4$hide()
+  
+  mrv$sidecont4_main <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont4_main["border-width"]=10
+
+  mrv$sidecont4_nu_label <- sidebarLabel("d.o.f: ",1)
+  mrv$sidecont4_R11_label <- sidebarLabel("R11: ",1)
+  mrv$sidecont4_R22_label <- sidebarLabel("R22: ",1)
+  mrv$sidecont4_R12_label <- sidebarLabel("R12: ",1)
+  mrv$sidecont4_nu_entry <- sidebarEntry("4", 10, 0)
+  mrv$sidecont4_R11_entry <- sidebarEntry("1", 10, 0)
+  mrv$sidecont4_R22_entry <- sidebarEntry("1", 10, 0)
+  mrv$sidecont4_R12_entry <- sidebarEntry("0", 10, 0)
+  sidecont4_list <- list(mrv$sidecont4_nu_label, mrv$sidecont4_nu_entry, mrv$sidecont4_R11_label, mrv$sidecont4_R11_entry,
+                         mrv$sidecont4_R22_label, mrv$sidecont4_R22_entry, mrv$sidecont4_R12_label, mrv$sidecont4_R12_entry)
+  
+  mrv$sidecont4_input <- sidebarTable(3, 3, sidecont4_list)
+  
+  mrv$sidecont4_input_buttonbox <- gtkHBox(homogeneous=TRUE,spacing=10)
+  mrv$sidecont4_input_figurebt <- sidebarPlotButton()
+  mrv$sidecont4_input_savebt <- sidebarAcceptButton()
+  mrv$sidecont4_input_buttonbox$packStart(mrv$sidecont4_input_figurebt,expand=T,fill=T)
+  mrv$sidecont4_input_buttonbox$packStart(mrv$sidecont4_input_savebt,expand=T,fill=T)
+  
+  mrv$sidecont4_hide1 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont4_hide1$show()
+  mrv$sidecont4_hide2 <- gtkVBox(homogeneous=FALSE,spacing=10)
+  mrv$sidecont4_hide2$show()
+  
+  mrv$sidecont4_hide1$packStart(mrv$sidecont4_input,expand=FALSE,fill=FALSE)
+  mrv$sidecont4_hide2$packStart(mrv$sidecont4_input_buttonbox,expand=FALSE,fill=FALSE)
+  
+  mrv$sidecont4_main$packStart(mrv$sidecont4_hide1,expand=FALSE,fill=FALSE)
+  mrv$sidecont4_main$packStart(mrv$sidecont4_hide2,expand=FALSE,fill=FALSE)
+  mrv$sidecont4$add(mrv$sidecont4_main)
+  
+  gSignalConnect(mrv$sidecont4_nu_entry, "changed", function(entry){
+    mrv$sidecont4_hide2$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont4_R11_entry, "changed", function(entry){
+    mrv$sidecont4_hide2$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont4_R22_entry, "changed", function(entry){
+    mrv$sidecont4_hide2$show()
+    .checkNumEntry(entry)
+  })
+  
+  gSignalConnect(mrv$sidecont4_R12_entry, "changed", function(entry){
+    mrv$sidecont4_hide2$show()
+    .checkNumEntry(entry)
+  })
+  
+  # Inv-gamma
+  gSignalConnect(mrv$sidecont4_input_figurebt, "clicked", function(button) {
+    .manipulate(parent=list(mrv$sidecont4_nu_entry,mrv$sidecont4_R11_entry,mrv$sidecont4_R22_entry,mrv$sidecont4_R12_entry),
+                .priorInvWishart(nu,R11,R22,R12,xlim),
+                nu = .slider(parent=mrv$sidecont4_nu_entry,label="nu",min=4,max=20,step=1),
+                R11 = .slider(parent=mrv$sidecont4_R11_entry,label="R11",min=0,max=10,step=0.1),
+                R22 = .slider(parent=mrv$sidecont4_R22_entry,label="R22",min=0,max=10,step=0.1),
+                R12 = .slider(parent=mrv$sidecont4_R12_entry,label="R12",min=0,max=10,step=0.1),
+                xlim = .slider(parent=hide_parent,label="xlim",min=1,max=20,step=1))
+  })
+  
+  piw.nu = as.numeric(gtkEntryGetText(mrv$sidecont4_nu_entry))
+  piw.R11 = as.numeric(gtkEntryGetText(mrv$sidecont4_R11_entry))
+  piw.R22 = as.numeric(gtkEntryGetText(mrv$sidecont4_R22_entry))
+  piw.R12 = as.numeric(gtkEntryGetText(mrv$sidecont4_R12_entry))
+  mrv$wishart.par = c(piw.nu, piw.R11, piw.R22, piw.R12)
+  
+  gSignalConnect(mrv$sidecont4_input_savebt, "clicked", function(button) {
+    piw.nu = as.numeric(gtkEntryGetText(mrv$sidecont4_nu_entry))
+    piw.R11 = as.numeric(gtkEntryGetText(mrv$sidecont4_R11_entry))
+    piw.R22 = as.numeric(gtkEntryGetText(mrv$sidecont4_R22_entry))
+    piw.R12 = as.numeric(gtkEntryGetText(mrv$sidecont4_R12_entry))
+    mrv$wishart.par = c(piw.nu, piw.R11, piw.R22, piw.R12)
+    mrv$var.prior = "Invwishart"
+    mrv$var2.prior = "Invwishart"
+    mrv$cor.prior = "Invwishart"
+    mrv$sidecont4_hide1$show()
+    mrv$sidecont4_hide2$hide()
+  })
+  
+  #####################################################
   ##### pack all parts of priors together to side prior
+  #####################################################
   mrv$sideprior$packStart(mrv$sidecont1,expand=FALSE,fill=FALSE)
   mrv$sideprior$packStart(mrv$sidecont2,expand=FALSE,fill=FALSE)
   mrv$sideprior$packStart(mrv$sidecont3,expand=FALSE,fill=FALSE)
+  mrv$sideprior$packStart(mrv$sidecont4,expand=FALSE,fill=FALSE)
   
-  ########################################## 
-  #####     sidebar model
-  ########################################## 
+  
+  #####################################################
+  #####        All hiden signal
+  #####################################################
+  #### first component -  variance 1
+  gSignalConnect(mrv$sidecont1_combo, "changed", function(button, ...) {
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(is.null(tau2density)){
+      mrv$var2.prior = NULL
+    }else{
+      if(tau2density=="Inv-gamma(var)"){mrv$var2.prior = "Invgamma"}
+      if(tau2density=="PC(std)"){mrv$var2.prior = "PC"}
+      if(tau2density=="Half-Cauchy(std)"){mrv$var2.prior = "HCauchy"}
+      if(tau2density=="Truncated-normal(std)"){mrv$var2.prior = "Tnormal"}
+      if(tau2density=="Uniform(std)"){mrv$var2.prior = "Unif"}
+      if(tau2density=="Table(var)"){mrv$var2.prior = "Table"}
+    }
+    
+    
+    cordensity = gtkComboBoxGetActiveText(mrv$sidecont3_combo)
+    if(is.null(cordensity)){
+      mrv$cor.prior = NULL
+    }else{
+      if(cordensity=="Gaussian(Fisher-z)"){mrv$cor.prior = "normal"}
+      if(cordensity=="PC(cor)"){mrv$cor.prior = "PC"}
+      if(cordensity=="Beta(transf.cor)"){mrv$cor.prior = "beta"}
+      if(cordensity=="Table(cor)"){mrv$cor.prior = "Table"}
+    }
+    
+    tau1density = gtkComboBoxGetActiveText(button)
+    if(tau1density=="Inv-gamma(var)"){
+      mrv$var.prior = "Invgamma"
+      mrv$sidecont1_hide11$show()
+      mrv$sidecont1_hide12$show() 
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide() 
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau1density=="PC(std)"){
+      mrv$var.prior = "PC"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$show()
+      mrv$sidecont1_hide22$show()
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau1density=="Half-Cauchy(std)"){
+      mrv$var.prior = "HCauchy"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide()
+      mrv$sidecont1_hide31$show()
+      mrv$sidecont1_hide32$show() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau1density=="Truncated-normal(std)"){
+      mrv$var.prior = "Tnormal"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide()
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$show()
+      mrv$sidecont1_hide42$show()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau1density=="Uniform(std)"){
+      mrv$var.prior = "Unif"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide()
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$show()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau1density=="Table(var)"){
+      mrv$var.prior = "Table"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide()
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$show()
+      mrv$sidecont2$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else{
+      mrv$cor.prior = "Invwishart"
+      mrv$var.prior = "Invwishart"
+      mrv$var2.prior = "Invwishart"
+      mrv$sidecont1_hide11$hide()
+      mrv$sidecont1_hide12$hide()
+      mrv$sidecont1_hide21$hide()
+      mrv$sidecont1_hide22$hide()
+      mrv$sidecont1_hide31$hide()
+      mrv$sidecont1_hide32$hide() 
+      mrv$sidecont1_hide41$hide()
+      mrv$sidecont1_hide42$hide()
+      mrv$sidecont1_hide5$hide()
+      mrv$sidecont1_hide6$hide()
+      mrv$sidecont2$hide()
+      mrv$sidecont3$hide()
+      mrv$sidecont4$show()
+      mrv$sidecont4_hide1$show()
+      mrv$sidecont4_hide2$show()
+    }
+  })
+  #### second component -  variance 2
+  gSignalConnect(mrv$sidecont2_combo, "changed", function(button, ...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(is.null(tau1density)){
+      mrv$var.prior = NULL
+    }else{
+      if(tau1density=="Inv-gamma(var)"){mrv$var.prior = "Invgamma"}
+      if(tau1density=="PC(std)"){mrv$var.prior = "PC"}
+      if(tau1density=="Half-Cauchy(std)"){mrv$var.prior = "HCauchy"}
+      if(tau1density=="Truncated-normal(std)"){mrv$var.prior = "Tnormal"}
+      if(tau1density=="Uniform(std)"){mrv$var.prior = "Unif"}
+      if(tau1density=="Table(var)"){mrv$var.prior = "Table"}
+    }
+    
+    
+    cordensity = gtkComboBoxGetActiveText(mrv$sidecont3_combo)
+    if(is.null(cordensity)){
+      mrv$cor.prior = NULL
+    }else{
+      if(cordensity=="Gaussian(Fisher-z)"){mrv$cor.prior = "normal"}
+      if(cordensity=="PC(cor)"){mrv$cor.prior = "PC"}
+      if(cordensity=="Beta(transf.cor)"){mrv$cor.prior = "beta"}
+      if(cordensity=="Table(cor)"){mrv$cor.prior = "Table"}
+    }
+    
+    tau2density = gtkComboBoxGetActiveText(button)
+    if(tau2density=="Inv-gamma(var)"){
+      mrv$var2.prior = "Invgamma"
+      mrv$sidecont2_hide11$show()
+      mrv$sidecont2_hide12$show() 
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide() 
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau2density=="PC(std)"){
+      mrv$var2.prior = "PC"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide()
+      mrv$sidecont2_hide21$show()
+      mrv$sidecont2_hide22$show()
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau2density=="Half-Cauchy(std)"){
+      mrv$var2.prior = "HCauchy"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide()
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide()
+      mrv$sidecont2_hide31$show()
+      mrv$sidecont2_hide32$show() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau2density=="Truncated-normal(std)"){
+      mrv$var2.prior = "Tnormal"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide()
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide()
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$show()
+      mrv$sidecont2_hide42$show()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau2density=="Uniform(std)"){
+      mrv$var2.prior = "Unif"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide()
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide()
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$show()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(tau2density=="Table(var)"){
+      mrv$var2.prior = "Table"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide()
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide()
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$show()
+      mrv$sidecont1$show()
+      mrv$sidecont3$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else{
+      mrv$cor.prior = "Invwishart"
+      mrv$var.prior = "Invwishart"
+      mrv$var2.prior = "Invwishart"
+      mrv$sidecont2_hide11$hide()
+      mrv$sidecont2_hide12$hide() 
+      mrv$sidecont2_hide21$hide()
+      mrv$sidecont2_hide22$hide() 
+      mrv$sidecont2_hide31$hide()
+      mrv$sidecont2_hide32$hide() 
+      mrv$sidecont2_hide41$hide()
+      mrv$sidecont2_hide42$hide()
+      mrv$sidecont2_hide5$hide()
+      mrv$sidecont2_hide6$hide()
+      mrv$sidecont1$hide()
+      mrv$sidecont3$hide()
+      mrv$sidecont4$show()
+      mrv$sidecont4_hide1$show()
+      mrv$sidecont4_hide2$show()
+    }
+  })
+  #### third component -  correlation
+  gSignalConnect(mrv$sidecont3_combo, "changed", function(button, ...) {
+    tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
+    if(is.null(tau1density)){
+      mrv$var.prior = NULL
+    }else{
+      if(tau1density=="Inv-gamma(var)"){mrv$var.prior = "Invgamma"}
+      if(tau1density=="PC(std)"){mrv$var.prior = "PC"}
+      if(tau1density=="Half-Cauchy(std)"){mrv$var.prior = "HCauchy"}
+      if(tau1density=="Truncated-normal(std)"){mrv$var.prior = "Tnormal"}
+      if(tau1density=="Uniform(std)"){mrv$var.prior = "Unif"}
+      if(tau1density=="Table(var)"){mrv$var.prior = "Table"}
+    }
+    
+    
+    tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
+    if(is.null(tau2density)){
+      mrv$var2.prior = NULL
+    }else{
+      if(tau2density=="Inv-gamma(var)"){mrv$var2.prior = "Invgamma"}
+      if(tau2density=="PC(std)"){mrv$var2.prior = "PC"}
+      if(tau2density=="Half-Cauchy(std)"){mrv$var2.prior = "HCauchy"}
+      if(tau2density=="Truncated-normal(std)"){mrv$var2.prior = "Tnormal"}
+      if(tau2density=="Uniform(std)"){mrv$var2.prior = "Unif"}
+      if(tau2density=="Table(var)"){mrv$var2.prior = "Table"}
+    }
+    
+    
+    rhodensity = gtkComboBoxGetActiveText(button)
+    if(rhodensity=="Gaussian(Fisher-z)"){
+      mrv$cor.prior = "normal"
+      mrv$sidecont3_hide11$show()
+      mrv$sidecont3_hide12$show()  
+      mrv$sidecont3_hide2$hide()
+      mrv$sidecont3_hide31$hide()
+      mrv$sidecont3_hide32$hide()
+      mrv$sidecont3_hide4$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont2$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(rhodensity=="PC(cor)"){
+      mrv$cor.prior = "PC"
+      mrv$sidecont3_hide11$hide()
+      mrv$sidecont3_hide12$hide()
+      mrv$sidecont3_hide2$show()
+      mrv$sidecont3_hide31$hide()
+      mrv$sidecont3_hide32$hide()
+      mrv$sidecont3_hide4$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont2$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(rhodensity=="Beta(transf.cor)"){
+      mrv$cor.prior = "beta"
+      mrv$sidecont3_hide11$hide()
+      mrv$sidecont3_hide12$hide()
+      mrv$sidecont3_hide2$hide()
+      mrv$sidecont3_hide31$show()
+      mrv$sidecont3_hide32$show()
+      mrv$sidecont3_hide4$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont2$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else if(rhodensity=="Table(cor)"){
+      mrv$cor.prior = "Table"
+      mrv$sidecont3_hide11$hide()
+      mrv$sidecont3_hide12$hide()
+      mrv$sidecont3_hide2$hide()
+      mrv$sidecont3_hide31$hide()
+      mrv$sidecont3_hide32$hide()
+      mrv$sidecont3_hide4$show()
+      mrv$sidecont1$show()
+      mrv$sidecont2$show()
+      mrv$sidecont4$hide()
+      mrv$sidecont4_hide1$hide()
+      mrv$sidecont4_hide2$hide()
+    }else{
+      mrv$cor.prior = "Invwishart"
+      mrv$var.prior = "Invwishart"
+      mrv$var2.prior = "Invwishart"
+      mrv$sidecont3_hide11$hide()
+      mrv$sidecont3_hide12$hide()  
+      mrv$sidecont3_hide2$hide()
+      mrv$sidecont3_hide31$hide()
+      mrv$sidecont3_hide32$hide()
+      mrv$sidecont3_hide4$hide()
+      mrv$sidecont1$show()
+      mrv$sidecont2$show()
+      mrv$sidecont1$hide()
+      mrv$sidecont2$hide()
+      mrv$sidecont4$show()
+      mrv$sidecont4_hide1$show()
+      mrv$sidecont4_hide2$show()
+    }
+  })
+  ##################################################################
+  ##################################################################
+  ######
+  ######                   sidebar model
+  ######
+  ##################################################################
+  ################################################################## 
   mrv$sidemodel <- gtkVBox(homogeneous=FALSE)
   mrv$sidemodel_title <- gtkImage(filename=mrv$sidebar_icon[[2]])    #### maybe change move file to folder
   mrv$sidemodel$packStart(mrv$sidemodel_title,expand=FALSE,fill=FALSE)
@@ -1296,9 +2076,13 @@ meta4diagGUI <- function(){
   #mrv$sidemodel$packStart(mrv$sidemcont4,expand=FALSE,fill=FALSE)
   mrv$sidemodel$packStart(mrv$sidemcont5,expand=FALSE,fill=FALSE)
   
-  ##########################################
-  ###### sidebar data 
-  ##########################################
+  ##################################################################
+  ##################################################################
+  ######
+  ######                   sidebar data
+  ######
+  ##################################################################
+  ##################################################################
   mrv$sidedata <- gtkVBox(homogeneous=FALSE)
   
   mrv$sidedata_window <- sidebarScrolledWindow(mrv$sidedata)
@@ -1316,9 +2100,13 @@ meta4diagGUI <- function(){
     mrv$sidedata$packStart(mrv$sidedcont,expand=FALSE,fill=FALSE)
   }
   
-  ##############################################
-  ######  sidebar SROC 
-  ##############################################
+  ##################################################################
+  ##################################################################
+  ######
+  ######                   sidebar SROC
+  ######
+  ##################################################################
+  ##################################################################
   mrv$sideplot <- gtkVBox(homogeneous=FALSE)
   mrv$sideplot_title <- gtkImage(filename=mrv$sidebar_icon[[4]])    #### maybe change move file to folder
   mrv$sideplot$packStart(mrv$sideplot_title,expand=FALSE,fill=FALSE)
@@ -1828,13 +2616,19 @@ meta4diagGUI <- function(){
   mrv$sidefocont1_radiogp$lrp <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "LR+")
   mrv$sidefocont1_radiogp$lrn <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "LR-")
   mrv$sidefocont1_radiogp$dor <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "DOR")
+  mrv$sidefocont1_radiogp$llrp <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "LLR+")
+  mrv$sidefocont1_radiogp$llrn <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "LLR-")
+  mrv$sidefocont1_radiogp$ldor <- gtkRadioButton(mrv$sidefocont1_radiogp, label = "LDOR")
   mrv$sidefocont1_l_radio$packStart(mrv$sidefocont1_radiogp$sens)
   mrv$sidefocont1_l_radio$packStart(mrv$sidefocont1_radiogp$fpr)
   mrv$sidefocont1_l_radio$packStart(mrv$sidefocont1_radiogp$lrp)
+  mrv$sidefocont1_l_radio$packStart(mrv$sidefocont1_radiogp$llrp)
   mrv$sidefocont1_l_radio$packStart(mrv$sidefocont1_radiogp$dor)
   mrv$sidefocont1_r_radio$packStart(mrv$sidefocont1_radiogp$spec)
   mrv$sidefocont1_r_radio$packStart(mrv$sidefocont1_radiogp$fnr)
   mrv$sidefocont1_r_radio$packStart(mrv$sidefocont1_radiogp$lrn)
+  mrv$sidefocont1_r_radio$packStart(mrv$sidefocont1_radiogp$llrn)
+  mrv$sidefocont1_r_radio$packStart(mrv$sidefocont1_radiogp$ldor)
   mrv$sidefocont1_r_radio$packStart(gtkLabel(""))
   mrv$sidefocont1_l_radio[[1]]$setActive(TRUE) 
   sapply(mrv$sidefocont1_radiogp,'[',"active")
@@ -1844,6 +2638,10 @@ meta4diagGUI <- function(){
          f = function(button, ...){
            if(button['active']){
              mrv$accuracy=button$getLabel()
+             if(mrv$accuracy=="LR+"){mrv$accuracy="LRpos"}
+             if(mrv$accuracy=="LR-"){mrv$accuracy="LRneg"}
+             if(mrv$accuracy=="LLR+"){mrv$accuracy="LLRpos"}
+             if(mrv$accuracy=="LLR-"){mrv$accuracy="LLRneg"}
            } 
          })
   
@@ -2202,67 +3000,67 @@ meta4diagGUI <- function(){
   #########################################################
   ########### Install package
   #########################################################
-#   if("INLA" %in% rownames(installed.packages()) == FALSE){
-#     INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
-#                                                                                          "Do you want to install INLA?","\n",
-#                                                                                          "After installation, we will load the library for you!",
-#                                                                                          "\n","You are welcome!",
-#                                                                                          "\n","\n","This window will disappear after loading!",sep=""))
-#     INLA_dialog["title"] <- "INLA installation..."
-#     INLA_choices <- c("Stable version", "Testing version")
-#     INLA_radio_buttons <- NULL
-#     INLA_vbox <- gtkVBox(FALSE,0)
-#     for(choice in INLA_choices){
-#       INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
-#       INLA_vbox$add(INLA_choices_button)
-#       INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
-#     }
-#     INLA_frame <- gtkFrame("Install amazing INLA package")
-#     INLA_frame$add(INLA_vbox)
-#     INLA_dialog[["vbox"]]$add(INLA_frame)
-#     INLA_radio_buttons[[1]]$setActive(TRUE) 
-#     # sapply(INLA_radio_buttons,'[',"active")
-#     sapply(INLA_radio_buttons, gSignalConnect, "toggled",
-#            f = function(button, ...){
-#              if(button['active']){
-#                INLA_version = button$getLabel()
-#                # print(INLA_version)
-#                if(INLA_version=="Stable version"){
-#                  mrv$repos="http://www.math.ntnu.no/inla/R/stable"
-#                } else{
-#                  mrv$repos="http://www.math.ntnu.no/inla/R/testing"
-#                }
-#              } 
-#            })
-#     gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-#       if(response == GtkResponseType["no"]){
-#         INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
-#         INLA_no_dialog$run()
-#         INLA_no_dialog$destroy()
-#       }else{
-#         install.packages("INLA", repos=mrv$repos)
-#         library("INLA")
-#         INLA_dialog$destroy()
-#       }
-#     })
-#   }
-#   # checke if INLA is loaded
-#   if (!(sum(search()=="package:INLA"))==1){
-#     INLA_dialog <- gtkMessageDialog(NULL,"destroy-eith-parent","question","yes-no",paste("R Package \"INLA\" is not loaded.","\n", "We suggest to load it.","\n",
-#                                                                                          "Do you want to load INLA?",
-#                                                                                          "\n","\n","This window will disappear after loading!",sep=""))
-#     INLA_dialog["title"] <- "INLA loading..."
-#     gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-#       if(response == GtkResponseType["no"]){
-#         INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be loaded!!!")
-#         INLA_no_dialog$run()
-#         INLA_no_dialog$destroy()
-#       }else{
-#         library("INLA")
-#         INLA_dialog$destroy()
-#       }
-#     })
-#   }
-  
-  
+  if(requireNamespace("INLA", quietly = TRUE)){
+      if("INLA" %in% rownames(installed.packages()) == FALSE){
+        INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
+                                                                                             "Do you want to install INLA?","\n",
+                                                                                             "After installation, we will load the library for you!",
+                                                                                             "\n","You are welcome!",
+                                                                                             "\n","\n","This window will disappear after loading!",sep=""))
+        INLA_dialog["title"] <- "INLA installation..."
+        INLA_choices <- c("Stable version", "Testing version")
+        INLA_radio_buttons <- NULL
+        INLA_vbox <- gtkVBox(FALSE,0)
+        for(choice in INLA_choices){
+          INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
+          INLA_vbox$add(INLA_choices_button)
+          INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
+        }
+        INLA_frame <- gtkFrame("Install amazing INLA package")
+        INLA_frame$add(INLA_vbox)
+        INLA_dialog[["vbox"]]$add(INLA_frame)
+        INLA_radio_buttons[[1]]$setActive(TRUE) 
+        # sapply(INLA_radio_buttons,'[',"active")
+        sapply(INLA_radio_buttons, gSignalConnect, "toggled",
+               f = function(button, ...){
+                 if(button['active']){
+                   INLA_version = button$getLabel()
+                   # print(INLA_version)
+                   if(INLA_version=="Stable version"){
+                     mrv$repos="http://www.math.ntnu.no/inla/R/stable"
+                   } else{
+                     mrv$repos="http://www.math.ntnu.no/inla/R/testing"
+                   }
+                 } 
+               })
+        gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
+          if(response == GtkResponseType["no"]){
+            INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
+            INLA_no_dialog$run()
+            INLA_no_dialog$destroy()
+          }else{
+            install.packages("INLA", repos=mrv$repos)
+            library("INLA")
+            INLA_dialog$destroy()
+          }
+        })
+      }
+      # checke if INLA is loaded
+      if (!(sum(search()=="package:INLA"))==1){
+        INLA_dialog <- gtkMessageDialog(NULL,"destroy-eith-parent","question","yes-no",paste("R Package \"INLA\" is not loaded.","\n", "We suggest to load it.","\n",
+                                                                                             "Do you want to load INLA?",
+                                                                                             "\n","\n","This window will disappear after loading!",sep=""))
+        INLA_dialog["title"] <- "INLA loading..."
+        gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
+          if(response == GtkResponseType["no"]){
+            INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be loaded!!!")
+            INLA_no_dialog$run()
+            INLA_no_dialog$destroy()
+          }else{
+            library("INLA")
+            INLA_dialog$destroy()
+          }
+        })
+      }
+  }  
 }

@@ -10,11 +10,11 @@ Takes a \code{meta4diag} object produced by \code{meta4diag()} and makes the sta
 \usage{
 SROC(x,...)
 \method{SROC}{meta4diag}(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red",
-              dataShow="o", data.col="#FF0000FF", data.cex="scaled", data.pch=1, 
+              dataShow="o", data.col="#FF0000FF", data.cex="bubble", data.pch=1, 
               lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
               crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
               prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-              dataFit = T, add=FALSE, save=F, main, xlim, ylim,...)
+              dataFit = T, add=FALSE, save=F, main="", xlim, ylim,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -112,7 +112,7 @@ Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the
   A numeric value, giving the y coordinates ranges.
 }
  \item{\dots}{
-  further arguments passed to or from other methods.
+  Further arguments passed to or from other methods.
 }
 }
 
@@ -127,13 +127,18 @@ The function \code{SROC()} gives the user flexibility to control the plots.
   Jingyi Guo and Andrea Riebler 
 }
 
+\references{
+  Chappell F, Raab G, Wardlaw J (2009). "When are Summary ROC Curves Appropriate for Diagnostic Meta-analyses?" Statistics in Medicine, 28(21), 2653-2668. 
+}
+
 \seealso{
   \code{meta4diag}
 }
 \examples{
-\dontrun{
-data(Catheter)
-res <- meta4diag(data = Catheter)
-SROC(res, est.type="mean")
+if(requireNamespace("INLA", quietly = TRUE)){
+  require("INLA", quietly = TRUE)
+  data(Catheter)
+  res <- meta4diag(data = Catheter)
+  SROC(res, est.type="mean")
 }
 }

@@ -1,17 +1,10 @@
 <ui>
   <menubar name="menubar">
     <menu name="FileMenu" action="File">
-      <menuitem name="FileNew" action="New"/>
-      <menu action="Submenu">
       <menuitem name="FileOpen" action="Open" />
-      </menu>
       <menuitem name="FileSave" action="Save"/>
       <separator />
       <menuitem name="FileQuit" action="Quit"/>
-    </menu>
-    <menu name="EditMenu" action="Edit">
-      <menuitem name="EditUndo" action="Undo" />
-      <menuitem name="EditRedo" action="Redo" />
     </menu>
     <menu name="HelpMenu" action="Help">
       <menuitem name="UseTooltips" action="Tips"/>
@@ -20,9 +13,9 @@
   </menubar>
   <toolbar name="toolbar">
     <toolitem action="Execute"/>
-    <toolitem action="New"/>
     <toolitem action="Open"/>
     <toolitem action="Save"/>
+    <toolitem action="Stop"/>
     <separator />
     <toolitem action="Quit"/>
   </toolbar>

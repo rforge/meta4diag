@@ -1,6 +1,6 @@
 meta4diag: A free user-friendly graphical interface for diagnostic meta-analysis with INLA.
-Version 1.1.0 Copyright (c) 2015 R-INLA Group.
-Update Ons 22 Apr 08:19:00 CEST 2015.
+Version 1.0.15 Copyright (c) 2015 R-INLA Group.
+Update Tue 30 Apr 09:57:00 CEST 2015.
  
                         
 1. Press 'Open' button to load a data set.
@@ -8,4 +8,4 @@ Update Ons 22 Apr 08:19:00 CEST 2015.
 3. After loading a dataset, the data status can be found in the left panel. Choose the covariates and modality if available.
 4. Choose the Model arguments of interest in the left panel.
 5. Press 'Execute' button to run the model.
-6. After successful running, user could change the graphic arguments if it is of interesting.
+6. After successful running, user could change the graphic arguments. Do not forget to push the 'Update' button on the bottom right.
