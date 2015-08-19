@@ -1,12 +1,13 @@
 Package: meta4diag
 Type: Package
 Title: Meta-analysis for diagnostic test studies
-Version: 1.0.15
-Date: 2015-06-28
+Version: 1.0.16
+Date: 2015-08-19
 Author: Jingyi Guo <jingyi.guo@math.ntnu.no> and Andrea Riebler <andrea.riebler@math.ntnu.no>
 Maintainer: Jingyi Guo <jingyi.guo@math.ntnu.no> and Andrea Riebler <andrea.riebler@math.ntnu.no>
 Description: This package contains functions which allow to perform Bayesian inference analysis for bivariate meta-analysis of diagnostic test studies using integrated nested Laplace approximation. A purpose built graphic user interface is available. The installation of R package INLA is compulsory for successful usage of this package.
 License: GPL
 Depends: R (>= 2.10), RGtk2, cairoDevice, methods, grid
 Suggests: INLA
+Additional_repositories http://www.math.ntnu.no/inla/R/testing
 
