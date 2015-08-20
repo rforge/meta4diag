@@ -1,6 +1,6 @@
 Package: meta4diag
 Type: Package
-Title: Meta-analysis for diagnostic test studies
+Title: Meta-analysis for Diagnostic Test Studies
 Version: 1.0.16
 Date: 2015-08-19
 Author: Jingyi Guo <jingyi.guo@math.ntnu.no> and Andrea Riebler <andrea.riebler@math.ntnu.no>
