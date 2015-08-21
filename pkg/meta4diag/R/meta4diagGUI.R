@@ -11,8 +11,8 @@ meta4diagGUI <- function(){
   #if (.Platform$OS.type == "windows"){
   #}else{}
   
-  mrv$VERSION <- "1.0.2"
-  mrv$DATE <- "2015-06-22"
+  mrv$VERSION <- "1.0.18"
+  mrv$DATE <- "2015-08-20"
   mrv$COPYRIGHT <- "Copyright (C) 2015 INLA Group."
 
 
@@ -26,7 +26,8 @@ meta4diagGUI <- function(){
     system.file(paste("image/sidebar_",x,"_title.gif",sep=""),package="meta4diag")
   })
   
-  
+  ####### trick the globle variable
+  #shape = rate = xlim = u = variance = nu = R11 = R22 = R12 = U_min = a1 = U_max = a2 = a = b = NULL
   ####### Line Width Combo
   makePixbufForLineWidth <- function(Width){
     filename <- tempfile()
@@ -236,7 +237,24 @@ meta4diagGUI <- function(){
   }
   
   ########## gtk functions
-  
+  .save_cb <- function(widget, window) {
+    dialog <- gtkFileChooserDialog("Enter a name for the file", window,
+                                   "save", "gtk-cancel", GtkResponseType["cancel"], "gtk-save",
+                                   GtkResponseType["accept"])
+    if (dialog$run() == GtkResponseType["accept"]){
+      filename = dialog$getFilename()
+      a = mrv$est
+      if(!is.null(a)){
+        save(a, file=paste(filename,".Rdata",sep=""))
+      }else{
+        errordialog <- gtkMessageDialog(window,"destroy-with-parent","warning","ok",
+                                        "Please save after loading data and running model!")
+        if (errordialog$run() == GtkResponseType["ok"]){}
+        errordialog$destroy()
+      }
+    }
+    dialog$destroy()
+  }
   
   ##################################################################################
   #############           START
@@ -537,6 +555,9 @@ meta4diagGUI <- function(){
   
   # Inv-gamma
   gSignalConnect(mrv$sidecont1_input1_figurebt, "clicked", function(button) {
+    shape = as.numeric(gtkEntryGetText(mrv$sidecont1_a_entry))
+    rate = as.numeric(gtkEntryGetText(mrv$sidecont1_b_entry))
+    xlim = 8
     .manipulate(parent=list(mrv$sidecont1_a_entry,mrv$sidecont1_b_entry),
                 .priorInvgamma(a = shape, b = rate, xmax = xlim),
                 shape = .slider(parent=mrv$sidecont1_a_entry,min=0.000001,max=4,step=0.001),
@@ -557,6 +578,9 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont1_input2_figurebt, "clicked", function(button,...) {
     tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
     if(tau1density=="PC(std)"){
+      u = as.numeric(gtkEntryGetText(mrv$sidecont1_u_entry))
+      a = as.numeric(gtkEntryGetText(mrv$sidecont1_alpha_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont1_u_entry,mrv$sidecont1_alpha_entry),
                   .priorSigmaPC(u = u, alpha = a, xmax = xlim),
                   u = .slider(parent=mrv$sidecont1_u_entry,min=0.000001,max=10,step=0.01),
@@ -578,6 +602,8 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont1_input3_figurebt, "clicked", function(button,...) {
     tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
     if(tau1density=="Half-Cauchy(std)"){
+      gamma = as.numeric(gtkEntryGetText(mrv$sidecont1_gamma_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont1_gamma_entry),
                   .priorHalfCauchy(gamma=gamma, xmax = xlim),
                   gamma = .slider(parent=mrv$sidecont1_gamma_entry,min=0.000001,max=10,step=0.01),
@@ -597,6 +623,9 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont1_input4_figurebt, "clicked", function(button,...) {
     tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
     if(tau1density=="Truncated-normal(std)"){
+      mean = as.numeric(gtkEntryGetText(mrv$sidecont1_m_entry))
+      variance = as.numeric(gtkEntryGetText(mrv$sidecont1_v_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont1_m_entry, mrv$sidecont1_v_entry),
                   .priorSigmaTnorm(m=mean, v=variance, xmax = xlim),
                   mean = .slider(parent=mrv$sidecont1_m_entry,min=0.000001,max=10,step=0.01),
@@ -618,6 +647,7 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont1_input5_figurebt, "clicked", function(button,...) {
     tau1density = gtkComboBoxGetActiveText(mrv$sidecont1_combo)
     if(tau1density=="Uniform(std)"){
+      xlim = 8
       .manipulate(parent=list(hide_parent),
                   .priorUniformSig(xmax = xlim),
                   xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
@@ -809,6 +839,9 @@ meta4diagGUI <- function(){
   
   # Inv-gamma
   gSignalConnect(mrv$sidecont2_input1_figurebt, "clicked", function(button) {
+    shape = as.numeric(gtkEntryGetText(mrv$sidecont2_a_entry))
+    rate = as.numeric(gtkEntryGetText(mrv$sidecont2_b_entry))
+    xlim = 8
     .manipulate(parent=list(mrv$sidecont2_a_entry,mrv$sidecont2_b_entry),
                 .priorInvgamma(a = shape,b = rate,xmax = xlim),
                 shape = .slider(parent=mrv$sidecont2_a_entry,min=0.000001,max=4,step=0.001),
@@ -829,6 +862,9 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont2_input2_figurebt, "clicked", function(button,...) {
     tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
     if(tau2density=="PC(std)"){
+      u = as.numeric(gtkEntryGetText(mrv$sidecont2_u_entry))
+      a = as.numeric(gtkEntryGetText(mrv$sidecont2_alpha_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont2_u_entry,mrv$sidecont2_alpha_entry),
                   .priorSigmaPC(u, a, xlim),
                   u = .slider(parent=mrv$sidecont2_u_entry,min=0.000001,max=10,step=0.01),
@@ -850,6 +886,8 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont2_input3_figurebt, "clicked", function(button,...) {
     tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
     if(tau2density=="Half-Cauchy(std)"){
+      gamma = as.numeric(gtkEntryGetText(mrv$sidecont2_gamma_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont2_gamma_entry),
                   .priorHalfCauchy(gamma=gamma, xmax = xlim),
                   gamma = .slider(parent=mrv$sidecont2_gamma_entry,min=0.000001,max=10,step=0.01),
@@ -869,6 +907,9 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont2_input4_figurebt, "clicked", function(button,...) {
     tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
     if(tau2density=="Truncated-normal(std)"){
+      mean = as.numeric(gtkEntryGetText(mrv$sidecont2_m_entry))
+      variance = as.numeric(gtkEntryGetText(mrv$sidecont2_v_entry))
+      xlim = 8
       .manipulate(parent=list(mrv$sidecont2_m_entry, mrv$sidecont2_v_entry),
                   .priorSigmaTnorm(m=mean, v=variance, xmax = xlim),
                   mean = .slider(parent=mrv$sidecont2_m_entry,min=0.000001,max=10,step=0.01),
@@ -890,6 +931,7 @@ meta4diagGUI <- function(){
   gSignalConnect(mrv$sidecont2_input5_figurebt, "clicked", function(button,...) {
     tau2density = gtkComboBoxGetActiveText(mrv$sidecont2_combo)
     if(tau2density=="Uniform(std)"){
+      xlim = 8
       .manipulate(parent=list(hide_parent),
                   .priorUniformSig(xmax = xlim),
                   xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
@@ -1215,6 +1257,7 @@ meta4diagGUI <- function(){
     mrv$sidecont3_input2_subhide12$hide()
     .checkNumEntry(entry)
   })
+  mrv$rho.strategy = "Left-extrem"
   sapply(mrv$sidecont3_radiogp, gSignalConnect, "toggled",
          f = function(button, ...){
            if(button['active']){
@@ -1257,6 +1300,8 @@ meta4diagGUI <- function(){
   
   # normal
   gSignalConnect(mrv$sidecont3_input1_figurebt, "clicked", function(button){
+    mean = as.numeric(gtkEntryGetText(mrv$sidecont3_m_entry))
+    variance = as.numeric(gtkEntryGetText(mrv$sidecont3_v_entry))
     .manipulate(parent=list(mrv$sidecont3_m_entry,mrv$sidecont3_v_entry),
                 .priorRhoNormalPlot(mean,variance),
                 mean = .slider(parent=mrv$sidecont3_m_entry,min=-4,max=4,step=0.5),
@@ -1273,21 +1318,26 @@ meta4diagGUI <- function(){
   })
   # PC
   gSignalConnect(mrv$sidecont3_sub1_figurebt, "clicked", function(button){
+    U_min = as.numeric(gtkEntryGetText(mrv$sidecont3_sub1_U1_entry))
+    a1 = as.numeric(gtkEntryGetText(mrv$sidecont3_sub1_A1_entry))
+
     .manipulate(parent=list(mrv$sidecont3_sub1_U1_entry,
                             mrv$sidecont3_sub1_A1_entry),
                 .priorExpRhoS1(rho.ref=as.numeric(mrv$sidecont3_ref_entry$getText()),
                                left.portion = as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry)),
-                               U_min,a1),
+                               U_min, a1),
                 U_min = .slider(parent=mrv$sidecont3_sub1_U1_entry,
-                                min=-0.99999,
-                                max=as.numeric(mrv$sidecont3_ref_entry$getText())-0.05,
-                                step=0.001),
+                        min=-0.99999,
+                        max=as.numeric(mrv$sidecont3_ref_entry$getText())-0.05,
+                        step=0.001, label = "U_min"), 
                 a1 = .slider(parent=mrv$sidecont3_sub1_A1_entry,
-                                 min=0.001,max=as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry))-0.000001,
-                                 step=0.001))
+                        min=0.001,max=as.numeric(gtkEntryGetText(mrv$sidecont3_per_entry))-0.000001,
+                        step=0.001, label = "a1"))
   })
  
   gSignalConnect(mrv$sidecont3_sub2_figurebt, "clicked", function(button){
+    U_max = as.numeric(gtkEntryGetText(mrv$sidecont3_sub2_U2_entry))
+    a2 = as.numeric(gtkEntryGetText(mrv$sidecont3_sub2_A2_entry))
     .manipulate(parent=list(mrv$sidecont3_sub2_U2_entry,
                             mrv$sidecont3_sub2_A2_entry),
                 .priorExpRhoS2(rho.ref=as.numeric(mrv$sidecont3_ref_entry$getText()),
@@ -1304,6 +1354,10 @@ meta4diagGUI <- function(){
   
   gSignalConnect(mrv$sidecont3_sub3_figurebt, "clicked", function(button) {
     rho.ref = as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry))
+    U_min = as.numeric(gtkEntryGetText(mrv$sidecont3_sub3_U1_entry))
+    a1 = as.numeric(gtkEntryGetText(mrv$sidecont3_sub3_A1_entry))
+    U_max = as.numeric(gtkEntryGetText(mrv$sidecont3_sub3_U2_entry))
+    a2 = as.numeric(gtkEntryGetText(mrv$sidecont3_sub3_A2_entry))
     .manipulate(parent=list(mrv$sidecont3_sub3_U1_entry,mrv$sidecont3_sub3_A1_entry,
                             mrv$sidecont3_sub3_U2_entry,mrv$sidecont3_sub3_A2_entry),
                 .priorExpRhoS3(rho.ref=as.numeric(gtkEntryGetText(mrv$sidecont3_ref_entry)),
@@ -1355,6 +1409,8 @@ meta4diagGUI <- function(){
   })
   # Beta
   gSignalConnect(mrv$sidecont3_input3_figurebt, "clicked", function(button){
+    a = as.numeric(gtkEntryGetText(mrv$sidecont3_a_entry))
+    b = as.numeric(gtkEntryGetText(mrv$sidecont3_b_entry))
     .manipulate(parent=list(mrv$sidecont3_a_entry,mrv$sidecont3_b_entry),
                 .priorRhoBetaPlot(a,b),
                 a = .slider(parent=mrv$sidecont3_a_entry,min=0,max=20,step=0.5),
@@ -1448,6 +1504,11 @@ meta4diagGUI <- function(){
   
   # Inv-gamma
   gSignalConnect(mrv$sidecont4_input_figurebt, "clicked", function(button) {
+    nu = as.numeric(gtkEntryGetText(mrv$sidecont4_nu_entry))
+    R11 = as.numeric(gtkEntryGetText(mrv$sidecont4_R11_entry))
+    R22 = as.numeric(gtkEntryGetText(mrv$sidecont4_R22_entry))
+    R12 = as.numeric(gtkEntryGetText(mrv$sidecont4_R12_entry))
+    xlim = 8
     .manipulate(parent=list(mrv$sidecont4_nu_entry,mrv$sidecont4_R11_entry,mrv$sidecont4_R22_entry,mrv$sidecont4_R12_entry),
                 .priorInvWishart(nu,R11,R22,R12,xlim),
                 nu = .slider(parent=mrv$sidecont4_nu_entry,label="nu",min=4,max=20,step=1),
@@ -3001,66 +3062,62 @@ meta4diagGUI <- function(){
   ########### Install package
   #########################################################
   if(requireNamespace("INLA", quietly = TRUE)){
-      if("INLA" %in% rownames(installed.packages()) == FALSE){
-        INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
-                                                                                             "Do you want to install INLA?","\n",
-                                                                                             "After installation, we will load the library for you!",
-                                                                                             "\n","You are welcome!",
-                                                                                             "\n","\n","This window will disappear after loading!",sep=""))
-        INLA_dialog["title"] <- "INLA installation..."
-        INLA_choices <- c("Stable version", "Testing version")
-        INLA_radio_buttons <- NULL
-        INLA_vbox <- gtkVBox(FALSE,0)
-        for(choice in INLA_choices){
-          INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
-          INLA_vbox$add(INLA_choices_button)
-          INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
+    if("INLA" %in% rownames(installed.packages()) == FALSE){
+      INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","question","yes-no",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
+                                                                                           "Do you want to install INLA?","\n",
+                                                                                           "After installation, please load INLA!",
+                                                                                           "\n","Thank you!",sep=""))
+      INLA_dialog["title"] <- "INLA installation..."
+      INLA_choices <- c("Stable version", "Testing version")
+      INLA_radio_buttons <- NULL
+      INLA_vbox <- gtkVBox(FALSE,0)
+      for(choice in INLA_choices){
+        INLA_choices_button <- gtkRadioButton(INLA_radio_buttons, choice)
+        INLA_vbox$add(INLA_choices_button)
+        INLA_radio_buttons <- c(INLA_radio_buttons, INLA_choices_button)
+      }
+      INLA_frame <- gtkFrame("Install amazing INLA package")
+      INLA_frame$add(INLA_vbox)
+      INLA_dialog[["vbox"]]$add(INLA_frame)
+      INLA_radio_buttons[[1]]$setActive(TRUE) 
+      # sapply(INLA_radio_buttons,'[',"active")
+      sapply(INLA_radio_buttons, gSignalConnect, "toggled",
+             f = function(button, ...){
+               if(button['active']){
+                 INLA_version = button$getLabel()
+                 # print(INLA_version)
+                 if(INLA_version=="Stable version"){
+                   mrv$repos="http://www.math.ntnu.no/inla/R/stable"
+                 } else{
+                   mrv$repos="http://www.math.ntnu.no/inla/R/testing"
+                 }
+               } 
+             })
+      gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
+        if(response == GtkResponseType["no"]){
+          INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
+          INLA_no_dialog$run()
+          INLA_no_dialog$destroy()
+        }else{
+          install.packages("INLA", repos=mrv$repos)
+          INLA_dialog$destroy()
         }
-        INLA_frame <- gtkFrame("Install amazing INLA package")
-        INLA_frame$add(INLA_vbox)
-        INLA_dialog[["vbox"]]$add(INLA_frame)
-        INLA_radio_buttons[[1]]$setActive(TRUE) 
-        # sapply(INLA_radio_buttons,'[',"active")
-        sapply(INLA_radio_buttons, gSignalConnect, "toggled",
-               f = function(button, ...){
-                 if(button['active']){
-                   INLA_version = button$getLabel()
-                   # print(INLA_version)
-                   if(INLA_version=="Stable version"){
-                     mrv$repos="http://www.math.ntnu.no/inla/R/stable"
-                   } else{
-                     mrv$repos="http://www.math.ntnu.no/inla/R/testing"
-                   }
-                 } 
-               })
-        gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-          if(response == GtkResponseType["no"]){
-            INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be installed!!!")
-            INLA_no_dialog$run()
-            INLA_no_dialog$destroy()
-          }else{
-            install.packages("INLA", repos=mrv$repos)
-            library("INLA")
-            INLA_dialog$destroy()
-          }
-        })
+      })
+    }
+    if (!(sum(search()=="package:INLA"))==1){
+      INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","warning","ok",paste("R Package \"INLA\" is not loaded.","\n",
+                                                                                           "You have to load it to make sure meta4diag works.","\n",
+                                                                                           "Thank you!",sep=""))
+      INLA_dialog["title"] <- "INLA loading..."
+      if (INLA_dialog$run()==GtkResponseType["ok"]){
+        INLA_dialog$destroy()
       }
-      # checke if INLA is loaded
-      if (!(sum(search()=="package:INLA"))==1){
-        INLA_dialog <- gtkMessageDialog(NULL,"destroy-eith-parent","question","yes-no",paste("R Package \"INLA\" is not loaded.","\n", "We suggest to load it.","\n",
-                                                                                             "Do you want to load INLA?",
-                                                                                             "\n","\n","This window will disappear after loading!",sep=""))
-        INLA_dialog["title"] <- "INLA loading..."
-        gSignalConnect(INLA_dialog,"response",f=function(dialog,response,user.data){
-          if(response == GtkResponseType["no"]){
-            INLA_no_dialog <- gtkMessageDialog(INLA_dialog,"destroy-with-parent","error","close","Wrong Choice! INLA must be loaded!!!")
-            INLA_no_dialog$run()
-            INLA_no_dialog$destroy()
-          }else{
-            library("INLA")
-            INLA_dialog$destroy()
-          }
-        })
-      }
-  }  
+    }
+  }else{
+    INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","destroy-with-parent","warning","ok",paste("R Package \"INLA\" is not installed.","\n", "We suggest to install it.","\n",
+                                                                                         "After installation, please load INLA","\n",sep=""))
+    if (INLA_dialog$run()==GtkResponseType["ok"]){
+      INLA_dialog$destroy()
+    }
+  }
 }

@@ -398,8 +398,9 @@
       }
     }
     mrv$priorfile = df
+    xlim = 8
     .manipulate(parent=list(hide_parent),
-                .priorTableSigma(xmax = xlim),
+                .priorTableSigma(xmax = xlim,mrv=mrv),
                 xlim = .slider(parent=hide_parent,min=1,max=20,step=1))
   }
   dialog$destroy()
@@ -477,8 +478,9 @@
       }
     }
     mrv$priorfile = df
+    xlim = 1
     .manipulate(parent=list(hide_parent),
-                .priorTableRho(xmax = xlim),
+                .priorTableRho(xmax = xlim, mrv=mrv),
                 xlim = .slider(parent=hide_parent,min=-1,max=1,step=1))
   }
   dialog$destroy()
@@ -958,35 +960,14 @@
 .aboutgui <- function(widget,window){
   dialog <- gtkMessageDialog(window,"destroy-with-parent","warning","ok",
                              "About meta4diag: \n
-Version: 1.0.15 \n
-Update date: 30 Jun 2015 \n")
+Version: 1.0.17 \n
+Update date: 21 Aug 2015 \n")
   if (dialog$run() == GtkResponseType["ok"]){
   }
   dialog$destroy()
 }
 
-.save_cb <- function(widget, window) {
-  dialog <- gtkFileChooserDialog("Enter a name for the file", window,
-                                 "save", "gtk-cancel", GtkResponseType["cancel"], "gtk-save",
-                                 GtkResponseType["accept"])
-  if (dialog$run() == GtkResponseType["accept"]){
-    filename = dialog$getFilename()
-    total_page_num = mrv$notebook$getNPages()
-    if(total_page_num > 2){
-      a = mrv$est
-      save(a, file=paste(filename,".Rdata",sep=""))
-    }else if(total_page_num==2){
-      a = mrv$datafile
-      save(a, file=paste(filename,".Rdata",sep=""))
-    }else{
-      errordialog <- gtkMessageDialog(window,"destroy-with-parent","warning","ok",
-                                 "Please save after loading data and running model!")
-      if (errordialog$run() == GtkResponseType["ok"]){}
-      errordialog$destroy()
-    }
-  }
-  dialog$destroy()
-}
+
 
 .quit_cb <- function(widget, window) window$destroy()
 
@@ -1082,6 +1063,16 @@ Update date: 30 Jun 2015 \n")
 ##########    main execute function
 ###########################################################
 .executeFile <- function(widget, window){
+  if (!(sum(search()=="package:INLA"))==1){
+    INLA_dialog <- gtkMessageDialog(NULL,"destroy-with-parent","warning","ok",paste("R Package \"INLA\" is not loaded.","\n",
+                                                                                    "You have to load it to make sure meta4diag works.","\n",
+                                                                                    "Thank you!",sep=""))
+    INLA_dialog["title"] <- "Please Load INLA!!!"
+    if (INLA_dialog$run()==GtkResponseType["ok"]){
+      INLA_dialog$destroy()
+    }
+  }else{
+  
   total_page_num = mrv$notebook$getNPages()
   if(total_page_num > 2){
     mrv$notebook$setCurrentPage(1)
@@ -2061,5 +2052,6 @@ Update date: 30 Jun 2015 \n")
         mrv$forest_plot$setSizeRequest(1.5*forestSize$width,forestSize$height)
       })
     }
+  }
   }
 }

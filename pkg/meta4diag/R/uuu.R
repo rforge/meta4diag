@@ -74,7 +74,7 @@
   plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
 }
 
-.priorTableSigma = function(xmax){
+.priorTableSigma = function(xmax,mrv){
   x = mrv$priorfile$x
   if(any(x<=0)){
     var1dialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
@@ -88,7 +88,7 @@
   plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
 }
 
-.priorTableRho = function(xmax){
+.priorTableRho = function(xmax,mrv){
   x = mrv$priorfile$x
   if(any(x< -1 | x>1)){
     rhodialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",

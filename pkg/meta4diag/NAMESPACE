@@ -28,6 +28,17 @@ S3method(print,meta4diag)
 S3method(plot,meta4diag)
 S3method(summary,meta4diag)
 
+importFrom("grDevices", "cairo_ps", "col2rgb", "contourLines",
+            "dev.off", "jpeg", "palette", "pdf", "png", "postscript",
+            "rgb", "setEPS")
+importFrom("graphics", "abline", "arrows", "axis", "contour", "layout",
+            "lines", "mtext", "par", "plot", "plot.new", "plot.window",
+            "points", "polygon", "strwidth", "symbols", "text")
+importFrom("stats", "as.formula", "dbeta", "dgamma", "dnorm", "fitted",
+            "lm", "pnorm", "qf", "qnorm", "quantile", "sd", "splinefun")
+importFrom("utils", "install.packages", "installed.packages",
+            "read.csv", "read.table", "tail")
+
 import(RGtk2)
 import(cairoDevice)
 import(grid)

@@ -47,8 +47,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
         
         lc1.ind  = c(agrep("mu", varnames, max.distance=0), agrep("alpha", varnames, max.distance=0))
         lc2.ind  = c(agrep("nu", varnames, max.distance=0), agrep("beta", varnames, max.distance=0))
-        lc1text = paste("inla.make.lincombs(",paste(varnames[lc1.ind], "=", data[mu.ind,varnames[lc1.ind]],sep="", collapse = ", "),")",sep="")
-        lc2text = paste("inla.make.lincombs(",paste(varnames[lc2.ind], "=", data[nu.ind,varnames[lc2.ind]],sep="", collapse = ", "),")",sep="")
+        lc1text = paste("INLA::inla.make.lincombs(",paste(varnames[lc1.ind], "=", data[mu.ind,varnames[lc1.ind]],sep="", collapse = ", "),")",sep="")
+        lc2text = paste("INLA::inla.make.lincombs(",paste(varnames[lc2.ind], "=", data[nu.ind,varnames[lc2.ind]],sep="", collapse = ", "),")",sep="")
         lc1 = eval(parse(text=lc1text))
         names(lc1) = paste("mean(",link,".",names.fitted[1],".",1:(0.5*N),")",sep="")
         lc2 = eval(parse(text=lc2text))
@@ -102,6 +102,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
     
     quantiles = c(quantiles, 0.025, 0.5, 0.975)
     quantiles = sort(unique(quantiles))
+    
+    Ntrials = data$Ntrials
     
     if(!outpriors$wishart.flag){
       prec1 = outpriors$prec1
@@ -166,8 +168,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
     return(model)
   }else{
     stop("INLA need to be installed and loaded!\n
-         Please use the following commants to install and load INLA,\n
-         install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
-         library(INLA) \n")
+       Please use the following commants to install and load INLA,\n
+       install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
+       library(INLA) \n")
   }
 }
