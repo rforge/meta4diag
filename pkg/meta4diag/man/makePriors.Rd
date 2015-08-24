@@ -173,6 +173,7 @@ Simpson DP, Martins TG, Riebler A, Fuglstad GA, Rue H, Sorbye SH (2014) Penalise
 }
 
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
 require("INLA", quietly = TRUE)
 makePriors(var.prior = "PC", cor.prior = "PC", var.par = c(3, 0.05), 
@@ -184,5 +185,6 @@ makePriors(var.prior = "PC", cor.prior = "PC", var.par = c(3, 0.05),
 makePriors(var.prior = "invgamma", cor.prior = "normal", 
   var.par = c(0.25, 0.025), cor.par = c(0, 5))
 makePriors(var.prior = "invwishart", wishart.par=c(4,1,2,0.1))
+}
 }
 }

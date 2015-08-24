@@ -36,10 +36,12 @@ posterior mean and standard deviations of the hyperparameters.
 \keyword{summary}
 \seealso{\code{\link{plot}},\code{\link{meta4diag}}}
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter)
   summary(res)
+  }
 }
 }

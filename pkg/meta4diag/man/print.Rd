@@ -29,10 +29,12 @@ The basic model setting and dataset information are printed.
 \seealso{\code{\link{plot}}}
 
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter)
   print(res)
+}
 }
 }

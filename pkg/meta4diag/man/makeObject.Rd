@@ -77,6 +77,7 @@ value (maximum 1) the more seriously.}
   \code{makeData, makePriors, runModel, meta4diag}
 }
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
@@ -84,5 +85,6 @@ if(requireNamespace("INLA", quietly = TRUE)){
   outpriors = makePriors()
   model = runModel(outdata=outdata, outpriors=outpriors, link="logit")
   res = makeObject(outdata, outpriors, model, nsample=2000)
+}
 }
 }

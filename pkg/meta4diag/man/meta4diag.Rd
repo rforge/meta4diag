@@ -259,6 +259,7 @@ Simpson DP, Martins TG, Riebler A, Fuglstad GA, Rue H, Sorbye SH (2014) Penalise
   \code{makeData, makePrior, runModel, forest, SROC, crosshair.}
 }
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
@@ -266,5 +267,6 @@ if(requireNamespace("INLA", quietly = TRUE)){
     var.par = c(0.25, 0.025), cor.par = c(0, 5), init = c(0.01, 0.01, 0), 
     link = "logit", quantiles = c(0.025, 0.5, 0.975), verbose = FALSE, covariates = NULL, 
     nsample = FALSE)
+}
 }
 }

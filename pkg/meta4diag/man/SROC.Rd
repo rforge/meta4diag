@@ -135,10 +135,12 @@ The function \code{SROC()} gives the user flexibility to control the plots.
   \code{meta4diag}
 }
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter)
   SROC(res, est.type="mean")
+}
 }
 }

@@ -58,10 +58,12 @@ crosshair(x,...)
   \code{meta4diag}
 }
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter)
   crosshair(res, est.type="mean")
+}
 }
 }

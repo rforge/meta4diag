@@ -43,11 +43,13 @@
 }
 
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter, nsample=2000)
   fitted(res, accuracy.type="sens")
   fitted(res, accuracy.type="DOR")
+}
 }
 }

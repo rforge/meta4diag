@@ -38,6 +38,7 @@ makeData(data = NULL, model.type = 1, modality = NULL, covariates = NULL)
 }
 
 \examples{
+\dontrun{
 data(Catheter)
 
 a = makeData(data=Catheter,model.type=1,modality="type")
@@ -45,4 +46,5 @@ b = makeData(data=Catheter,model.type=1,modality=2)
 c = makeData(data=Catheter,model.type=1,covariates="prevalence")
 d = makeData(data=Catheter,model.type=1,covariates=3)
 e = makeData(data=Catheter,model.type=1,modality="type",covariates="prevalence")
+}
 }

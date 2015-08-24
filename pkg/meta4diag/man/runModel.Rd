@@ -44,6 +44,7 @@ runModel(outdata, outpriors, link = "logit",
   \code{makeData, makePriors, makeObject, meta4diag, inla}
 }
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)) {
    require("INLA", quietly = TRUE)
    data(Catheter)
@@ -53,5 +54,6 @@ if(requireNamespace("INLA", quietly = TRUE)) {
                           var.par = c(0.25, 0.025), cor.par = c(0, 5))
    runModel(outdata, outpriors, link = "logit", 
             quantiles = c(0.025, 0.5, 0.975), verbose = FALSE)
+}
 }
 }

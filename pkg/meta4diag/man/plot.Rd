@@ -48,10 +48,12 @@ Posterior marginal distribution possibly with underlying prior distribution is p
 \keyword{plot}
 \seealso{\code{\link{meta4diag}}}
 \examples{
+\dontrun{
 if(requireNamespace("INLA", quietly = TRUE)){
   require("INLA", quietly = TRUE)
   data(Catheter)
   res <- meta4diag(data = Catheter)
   plot(res, var.type="var1")
+}
 }
 }
