@@ -12,12 +12,12 @@ Takes a \code{meta4diag} object produced by the function \code{meta4diag()} and 
 }
 \usage{
 \method{forest}{meta4diag}(x, accuracy.type="sens", est.type="mean", p.cex="scaled", p.pch=15, p.col="black",
-    nameShow="right", dataShow="center", ciShow="left", text.cex=1,
+    nameShow="right", dataShow="center", estShow="left", text.cex=1,
     shade.col="gray", arrow.col="black", arrow.lty=1, arrow.lwd=1,
-    cut=c(0,1), intervals=c(0.025,0.975),
+    cut=TRUE, intervals=c(0.025,0.975),
     main="Forest plot", main.cex=1.5, axis.cex=1,...)
 \method{forest.grid}{meta4diag}(x, accuracy.type = "sens", est.type = "mean", 
-nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
+nameShow = T, dataShow = F, estShow = T, graphwidth = 1, main, xlab = "",...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -45,7 +45,7 @@ nameShow = T, dataShow = F, ciShow = T, graphwidth = 1, main, xlab = "",...)
   \item{dataShow}{
   Boolean indicating whether the original data is shown or not. Can also be a string indicating the position to show the original data. Options are "left", "center" and "right".
 }
-  \item{ciShow}{
+  \item{estShow}{
   Boolean indicating whether the credible intervals are shown or not. Can also be a string indicating the position to show the values of credible intervals. Options are "left", "center" and "right".
 }
   \item{text.cex}{

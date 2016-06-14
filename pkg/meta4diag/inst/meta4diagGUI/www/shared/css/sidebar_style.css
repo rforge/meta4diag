@@ -1,0 +1,325 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.sidebar-title {
+	height:30px; 
+	width:100%;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.sidebar-title a {
+	color: #555;
+	text-align:center;
+	text-decoration:underline;
+}
+
+.sidebar-contain {
+	width:100%;
+	border:none;
+}
+
+.sidebar-each-block {
+	width:90%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	margin-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left:10px;
+	padding-right:10px;
+	border: 1px solid #ddd;
+	border-radius: 5px 5px 5px 5px;
+}
+
+.sidebar-radio {
+	text-align:center;
+}
+.sidebar-table {
+	width:100%;
+	padding-bottom:0px;
+	margin-bottom:0px;
+}
+.sidebar-table_half_half {
+	width:100%;
+}
+.sidebar-table_half_half tr td label {
+	text-decoration:none;
+	font-size:13px;
+	font-weight:400;
+}
+.sidebar-table_half_half tr td:nth-child(odd) {  
+	width:50%;
+}
+.sidebar-table_half_half tr td:nth-child(even) {  
+	width:50%;
+}
+
+.sidebar-table_three_seven {
+	width:100%;
+}
+.sidebar-table_three_seven tr td label {
+	text-decoration:none;
+	font-size:13px;
+	font-weight:400;
+}
+.sidebar-table_three_seven tr td:nth-child(odd) {  
+	width:30%;
+}
+.sidebar-table_three_seven tr td:nth-child(even) {  
+	width:70%;
+}
+
+.sidebar-table_four_six {
+	width:100%;	
+}
+.sidebar-table_four_six tr td label {
+	text-decoration:none;
+	font-size:13px;
+	font-weight:400;
+}
+.sidebar-table_four_six tr td:nth-child(odd) {  
+	width:40%;
+}
+.sidebar-table_four_six tr td:nth-child(even) {  
+	width:60%;
+}
+
+.sidebar-explain {
+  border-radius: 0 0 0 0;
+  margin:0;
+  padding:0;
+  width:100%;
+  position:relative;
+  border:thin;
+  border-style:solid;
+  border-color:#000000;
+  font-size:10px;
+  text-decoration: none;
+  color:#000;
+  word-wrap: break-word;
+  white-space:normal;
+}
+
+.sidebar-prior-name {
+	width: 100%;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.sidebar-prior-name-label {
+	text-decoration: none;
+	font-weight:400;
+}
+
+.sidebar-numberinput {
+	border: 2px solid #849fbb;
+}
+
+option.imagebacked {
+	background-color:transparent;
+	background-repeat:no-repeat;
+	padding: 2px 0 2px 20px;
+	vertical-align: middle;
+background-position:1px 2px;
+}
+
+
+/*!
+ * define form and legend 
+ */
+fieldset { 
+  padding:0 10px 10px;
+  padding-top:10px;
+  border:1px solid green;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px; 
+  font-size:10px;
+  text-decoration: none;
+  color:#000;
+  word-wrap: break-word;
+  white-space:normal;
+}
+
+legend {
+  padding: 0.2em 0.5em;
+  border:1px solid green;
+  color:green;
+  font-size:12px;
+  text-align:left;
+}
+
+
+input[type="radio"] {
+	border: 1px solid #849fbb;
+    background-color: #e6e6e6;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    height: 14px;
+	width: 14px;
+    margin-right: 14px;
+    position: relative;
+    -webkit-appearance: none;
+	vertical-align:middle;
+}
+input[type="radio"]:hover {
+    background-color: #ccc;
+}
+
+input[type="radio"]:checked {
+	background: #2aa1c0; /* #57cb85  green*/
+  	border: 1px solid #0e647d;
+}
+
+input[type="radio"]:checked:hover {
+	background: #0e647d;
+}
+
+input[type="radio"]:checked:after {
+	left: 3px;
+  	top: 3px;
+  	height: 6px;
+  	width: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+    content: '';
+    display: block;
+    position:absolute;  
+}
+
+input[type="checkbox"] {
+	border: 2px solid #849fbb;
+    background-color: #e6e6e6;
+    cursor: pointer;
+    display: inline-block;
+    height: 14px;
+	width: 14px;
+    margin-right: 14px;
+    position: relative;
+    -webkit-appearance: none;
+}
+input[type="checkbox"]:hover {
+    background-color: #ccc;
+}
+
+input[type="checkbox"]:checked {
+	background: #2aa1c0; /* #57cb85  green*/
+  	border: 2px solid #0e647d;
+}
+
+input[type="checkbox"]:checked:hover {
+	background: #0e647d;
+}
+
+input[type="checkbox"]:checked:after {
+	content: "\f00c";
+  	display: none;
+    display: block;
+	position:absolute; 
+	left: 3px;
+  	top: 1px;
+  	width: 5px;
+  	height: 8px;
+  	border: solid #fff;
+  	border-width: 0 2px 2px 0;
+  	transform: rotate(45deg);
+}
+
+.sidebar-current-prior{
+	border:1px solid #ddd;
+	border-radius:5px;
+	background:white;
+	width:100%;
+	height:30px;
+	padding-bottom:5px;
+	padding-top:5px;
+	padding-left:10px;
+}
+
+.sidebar-datainput{
+	width:100%;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+.fraction {
+    display: inline-block;
+    vertical-align: middle; 
+    margin: 0 0.2em 0.4ex;
+    text-align: center;
+}
+.fraction > span {
+    display: block;
+    padding-top: 0.15em;
+}
+.fraction span.fdn {border-top: thin solid black;}
+.fraction span.bar {display: none;}
+
+.mathmatrix {
+	position:relative;
+}
+.mathmatrix:before, .mathmatrix:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    border: 1px solid #000;
+    width: 6px;
+    height: 100%;
+}
+.mathmatrix:before {
+    left: -6px;
+    border-right: 0;
+}
+.mathmatrix:after {
+    right: -6px;
+    border-left: 0;
+}

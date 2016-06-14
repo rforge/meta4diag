@@ -4,6 +4,12 @@ makePriors <- function(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
                        init = c(0.01, 0.01, -0.1)){
   
   if(requireNamespace("INLA", quietly = TRUE)){
+    if (!(sum(search()=="package:INLA"))==1){
+      stop("INLA need to be loaded! \n
+Please use the following command to load INLA,\n
+library(INLA) \n")
+    }
+    
     options(warn=-1)
     var.prior = tolower(var.prior)
     var2.prior = tolower(var2.prior)
@@ -460,7 +466,7 @@ makePriors <- function(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
     return(priors)
   }else{
     stop("INLA need to be installed and loaded!\n
-         Please use the following commants to install and load INLA,\n
+         Please use the following command to install and load INLA,\n
          install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
          library(INLA) \n")
   }

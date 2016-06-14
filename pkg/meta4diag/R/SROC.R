@@ -5,7 +5,8 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
                           lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
                           crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
                           prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-                          dataFit = T, add=FALSE, save=F, main="", xlim, ylim,...){
+                          dataFit = T, add=FALSE, save=F, main="", xlim, ylim, 
+                          xlab="1-Specificity",ylab="Sensitivity",...){
   if(class(x)!="meta4diag"){stop("Wrong input given!")}
   if(is.character(data.cex)){
     data.cex = tolower(data.cex)
@@ -16,24 +17,24 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
   est.type = tolower(est.type)
   if(est.type=="median"){est.type = "0.5quant"}
   N = x$data$fp + x$data$tn + x$data$fn + x$data$tp
-  if(dataShow=="o"){
-    if(x$misc$model.type==1){
+  
+  if(x$misc$model.type==1){
       data.xx = x$data$tn/(x$data$fp + x$data$tn)
       data.yy = x$data$tp/(x$data$fn + x$data$tp)
-    }
-    if(x$misc$model.type==2){
-      data.xx = x$data$fp/(x$data$fp + x$data$tn)
-      data.yy = x$data$tp/(x$data$fn + x$data$tp)
-    }
-    if(x$misc$model.type==3){
-      data.xx = x$data$tn/(x$data$fp + x$data$tn)
-      data.yy = x$data$fn/(x$data$fn + x$data$tp)
-    }
-    if(x$misc$model.type==4){
-      data.xx = x$data$fp/(x$data$fp + x$data$tn)
-      data.yy = x$data$fn/(x$data$fn + x$data$tp)
-    }
   }
+  if(x$misc$model.type==2){
+      data.xx = x$data$fp/(x$data$fp + x$data$tn)
+      data.yy = x$data$tp/(x$data$fn + x$data$tp)
+  }
+  if(x$misc$model.type==3){
+      data.xx = x$data$tn/(x$data$fp + x$data$tn)
+      data.yy = x$data$fn/(x$data$fn + x$data$tp)
+  }
+  if(x$misc$model.type==4){
+      data.xx = x$data$fp/(x$data$fp + x$data$tn)
+      data.yy = x$data$fn/(x$data$fn + x$data$tp)
+  }
+
   fitname = x$names.fitted
   if(dataShow=="f"){
     data.yy = x[[paste("summary.fitted.(", fitname[1],")",sep="")]][,est.type]
@@ -343,7 +344,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     xrange = N
     info = xrange
     info = info/max(info)
-    info = info*2
+    info = info*5
   }
   
   if(add){
@@ -393,9 +394,9 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
 
     par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 2.1))
     plot(-10,-10,xlim=xlim,ylim=ylim,main=main,asp=1,
-         xaxs = "i",family="sans",xaxt="n",yaxt="n",bty="o", xlab="1-Specificity", ylab="Sensitivity")
-    axis(1, at = x.at, labels = x.labels)
-    axis(2, at = y.at, labels = y.labels)
+         xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab=xlab,ylab=ylab, ...)
+    axis(1, at = x.at, labels = x.labels,...)
+    axis(2, at = y.at, labels = y.labels,...)
     if(dataShow=="o" || dataShow=="f"){
       if(data.cex=="bubble"){
         data.col = col2rgb(data.col,alpha=F)

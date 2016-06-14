@@ -5,72 +5,84 @@ meta4diag = function(data=NULL, model.type = 1,
                      init = c(0.01,0.01,0), link="logit", quantiles=c(0.025,0.5,0.975),
                      modality=NULL, covariates = NULL,
                      verbose = FALSE, nsample=FALSE){
-  
-  var.prior = tolower(var.prior)
-  var2.prior = tolower(var2.prior)
-  cor.prior = tolower(cor.prior)
-   
-  ################ check data
-  if(!is.data.frame(data)){
-    stop("Data MUST be a data frame!!!")
-  }
-  ################ check model.type
-  if(length(model.type)!=1){
-    stop("Argument \"model.type\" can ONLY be ONE integer of c(1,2,3,4)!!!")
-  }
-  if(!is.numeric(model.type)){
-    stop("Argument \"model.type\" can ONLY be ONE integer of c(1,2,3,4)!!!")
-  }else{ # model.type is numerical
-    if(!(model.type %in% c(1,2,3,4))){
+  if(requireNamespace("INLA", quietly = TRUE)){
+    if (!(sum(search()=="package:INLA"))==1){
+      stop("INLA need to be loaded! \n
+           Please use the following command to load INLA,\n
+           library(INLA) \n")
+    }
+    
+    var.prior = tolower(var.prior)
+    var2.prior = tolower(var2.prior)
+    cor.prior = tolower(cor.prior)
+    
+    ################ check data
+    if(!is.data.frame(data)){
+      stop("Data MUST be a data frame!!!")
+    }
+    ################ check model.type
+    if(length(model.type)!=1){
       stop("Argument \"model.type\" can ONLY be ONE integer of c(1,2,3,4)!!!")
     }
-  }
-  
-  I = dim(data)[1]
-  ################
-  variables.names = colnames(data)
-  if(!("studynames" %in% variables.names)){
-    data$studynames = paste("study[",c(1:I),"]",sep="")
-  }
-  
-  ################ check link
-  if(!is.character(link)){
-    stop("Argument \"link\" can ONLY be character. The options are \"logit\", \"probit\" and \"cloglog\"!!!")
-  }
-  if(length(link)!=1){
-    stop("Argument \"link\" can ONLY be character. The options are \"logit\", \"probit\" and \"cloglog\"!!!")
-  }
-  ################ check verbose
-  if(!is.logical(verbose)){
-    stop("Argument \"verbose\" can ONLY be logic, either \"TRUE\" or \"FALSE\"!!!")
-  }
-  
-  if(any(c(var.prior, var2.prior, cor.prior)=="invwishart")){
-    var.prior = var2.prior = cor.prior = "invwishart"
-  }else{
-    if(missing(var2.par)){
-      if(var2.prior==var.prior){
-        var2.par = var.par
-      }else{
-        stop("Please give the parameters of the prior for second variance component!")
+    if(!is.numeric(model.type)){
+      stop("Argument \"model.type\" can ONLY be ONE integer of c(1,2,3,4)!!!")
+    }else{ # model.type is numerical
+      if(!(model.type %in% c(1,2,3,4))){
+        stop("Argument \"model.type\" can ONLY be ONE integer of c(1,2,3,4)!!!")
       }
     }
+    
+    I = dim(data)[1]
+    ################
+    variables.names = colnames(data)
+    if(!("studynames" %in% variables.names)){
+      data$studynames = paste("study[",c(1:I),"]",sep="")
+    }
+    
+    ################ check link
+    if(!is.character(link)){
+      stop("Argument \"link\" can ONLY be character. The options are \"logit\", \"probit\" and \"cloglog\"!!!")
+    }
+    if(length(link)!=1){
+      stop("Argument \"link\" can ONLY be character. The options are \"logit\", \"probit\" and \"cloglog\"!!!")
+    }
+    ################ check verbose
+    if(!is.logical(verbose)){
+      stop("Argument \"verbose\" can ONLY be logic, either \"TRUE\" or \"FALSE\"!!!")
+    }
+    
+    if(any(c(var.prior, var2.prior, cor.prior)=="invwishart")){
+      var.prior = var2.prior = cor.prior = "invwishart"
+    }else{
+      if(missing(var2.par)){
+        if(var2.prior==var.prior){
+          var2.par = var.par
+        }else{
+          stop("Please give the parameters of the prior for second variance component!")
+        }
+      }
+    }
+    
+    ################ Make prior, and in the makePrior function, check var.prior, var.par, cor.prior, cor.par and init
+    outpriors = makePriors(var.prior=var.prior, var2.prior=var2.prior, cor.prior=cor.prior, 
+                           var.par=var.par, var2.par=var2.par, cor.par=cor.par, init=init)
+    
+    ################ Make data, and in the makedata function, check covariates and compare
+    outdata = makeData(data = data, model.type = model.type, modality = modality, covariates = covariates)
+    
+    ################ Run model in INLA
+    model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose)
+    
+    ##########################  construct the result
+    res = makeObject(outdata, outpriors, model, nsample=nsample)
+    
+    return(res)
+  }else{
+    stop("INLA need to be installed and loaded!\n
+Please use the following command to install and load INLA,\n
+install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
+library(INLA) \n")
   }
-
-  ################ Make prior, and in the makePrior function, check var.prior, var.par, cor.prior, cor.par and init
-  outpriors = makePriors(var.prior=var.prior, var2.prior=var2.prior, cor.prior=cor.prior, 
-                         var.par=var.par, var2.par=var2.par, cor.par=cor.par, init=init)
-  
-  ################ Make data, and in the makedata function, check covariates and compare
-  outdata = makeData(data = data, model.type = model.type, modality = modality, covariates = covariates)
-  
-  ################ Run model in INLA
-  model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose)
-  
-  ##########################  construct the result
-  res = makeObject(outdata, outpriors, model, nsample=nsample)
-  
-  return(res)
 }
 
 

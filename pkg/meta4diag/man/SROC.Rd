@@ -14,7 +14,8 @@ SROC(x,...)
               lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
               crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
               prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-              dataFit = T, add=FALSE, save=F, main="", xlim, ylim,...)
+              dataFit = T, add=FALSE, save=F, main="", xlim, ylim,
+              xlab="1-Specificity",ylab="Sensitivity",...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -46,15 +47,15 @@ SROC(x,...)
   A string or a numerical value indicating the symbol of the plotted dataset points.
 }
   \item{sroc.type}{
-  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1},
+  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1}, the SROC line is plotted as "Regression Line 1" according to Arends et al.(2008),
   \deqn{y = \mu + \rho\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \rho\sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
-  When \code{sroc.type=2},
+  When \code{sroc.type=2}, the SROC line is plotted as "The major Axis Line",
   \deqn{y = \frac{\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2}}{2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2})/(2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=3},
+  When \code{sroc.type=3}, the SROC line is plotted as "Moses and Littenberg's Line",
   \deqn{y = \frac{\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}{\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})/(\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=4},
+  When \code{sroc.type=4}, the SROC line is plotted as "Regression Line 2",
   \deqn{y = \mu + \frac{1}{\rho}\sqrt(\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2})(x-\nu)}{y = \mu + 1/\rho\sqrt(\sigma_{\mu}^2/\sigma_{\nu}^2)(x-\nu)}
-  When \code{sroc.type=5},
+  When \code{sroc.type=5}, the SROC line is plotted as "Rutter and Gatsonis SROC",
   \deqn{y = \mu + \sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
 }
   \item{lineShow}{
@@ -111,6 +112,12 @@ Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the
   \item{ylim}{
   A numeric value, giving the y coordinates ranges.
 }
+  \item{xlab}{
+  A label for the x axis, defaults to a description of x.
+}
+  \item{ylab}{
+  A label for the y axis, defaults to a description of y.
+}
  \item{\dots}{
   Further arguments passed to or from other methods.
 }
@@ -129,6 +136,8 @@ The function \code{SROC()} gives the user flexibility to control the plots.
 
 \references{
   Chappell F, Raab G, Wardlaw J (2009). "When are Summary ROC Curves Appropriate for Diagnostic Meta-analyses?" Statistics in Medicine, 28(21), 2653-2668. 
+  
+  Arends et al.(2008) "Bivariate random effects meta-analysis of ROC curves." Medical Decision Making, 28(5), 621-638.
 }
 
 \seealso{

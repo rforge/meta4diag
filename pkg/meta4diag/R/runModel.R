@@ -1,5 +1,10 @@
 runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5, 0.975), verbose=FALSE){
   if(requireNamespace("INLA", quietly = TRUE)){
+    if (!(sum(search()=="package:INLA"))==1){
+      stop("INLA need to be loaded! \n
+Please use the following command to load INLA,\n
+library(INLA) \n")
+    }
     model.type = outdata$model.type
     N = dim(outdata$internaldata)[1]
     varnames = names(outdata$internaldata)
@@ -115,8 +120,7 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
       
       model = INLA::inla(fm, family="binomial", data=data, Ntrials=Ntrials, quantiles=quantiles,
                          verbose=verbose, lincomb = lc,  
-                         control.inla=list(strategy="gaussian", 
-                                           lincomb.derived.correlation.matrix = TRUE),
+                         control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),
                          control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE,config=TRUE))
@@ -134,8 +138,7 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
       
       model = INLA::inla(fm, family="binomial", data=data, Ntrials=Ntrials, quantiles=quantiles,
                          verbose=verbose, lincomb = lc,  
-                         control.inla=list(strategy="gaussian", 
-                                           lincomb.derived.correlation.matrix = TRUE),
+                         control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),
                          control.compute = list(dic = TRUE, waic = TRUE, cpo=TRUE, mlik = TRUE,config=TRUE))
@@ -168,8 +171,8 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
     return(model)
   }else{
     stop("INLA need to be installed and loaded!\n
-       Please use the following commants to install and load INLA,\n
-       install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
-       library(INLA) \n")
+Please use the following command to install and load INLA,\n
+install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
+library(INLA) \n")
   }
 }

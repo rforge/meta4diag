@@ -1,21 +1,21 @@
 forest <- function(x, ...) UseMethod("forest")
 
 forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="scaled", p.pch=15, p.col="black",
-                            nameShow="right", dataShow="center", ciShow="left", text.cex=1,
+                            nameShow="right", dataShow="center", estShow="left", text.cex=1,
                             shade.col="gray", arrow.col="black", arrow.lty=1, arrow.lwd=1,
-                            cut=c(0,1), intervals=c(0.025,0.975),
+                            cut=TRUE, intervals=c(0.025,0.975),
                             main="Forest plot", main.cex=1.5, axis.cex=1,...){
   
   op <- par(no.readonly = TRUE)
   if(length(accuracy.type)!=1){stop("Argument \"accuracy.type\" could only be one character string.")}
   if(!is.character(accuracy.type)){stop("Argument \"accuracy.type\" could only be one character string.")}
   accuracy.type = tolower(accuracy.type)
-  suitable.set = c("sens", "TPR", "spec", "TNR", "FPR", "FNR", "LRpos", "LRneg", "RD", "LLRpos", "LLRneg", "LDOR", "DOR")
+  suitable.set = c("sens", "TPR", "spec", "TNR", "FPR", "FNR", "LRpos", "LRneg", "Youden","RD", "LLRpos", "LLRneg", "LDOR", "DOR")
   if(!(accuracy.type %in% tolower(suitable.set))){
     stop(paste("Please give the correct accuracy.type type, which could be ",paste(suitable.set, collapse=", "),".",sep=""))
   }
   if(!x$misc$sample.flag){
-    if(accuracy.type %in% tolower(c("LRpos", "LRneg", "RD", "LLRpos", "LLRneg", "LDOR", "DOR"))){
+    if(accuracy.type %in% tolower(c("LRpos", "LRneg", "Youden", "RD", "LLRpos", "LLRneg", "LDOR", "DOR"))){
       stop("The statistics is not the default return. Please let \"nsample=TRUE\" in the \"meta4diag()\" function.")
     }
   }
@@ -36,12 +36,12 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   if(!all(intervals %in% x$misc$quantiles)){
     stop(paste("Argument \"intervals\" has to the values of quantiles. The options are ",paste(x$misc$quantiles,collapse=", "),sep=""))
   }
-  if(intervals[1]>=0.5){
-    stop("The first element of argument \"intervals\" has to be smaller than 0.5.")
+  if(intervals[1]>=intervals[2]){
+    stop("The first element of argument \"intervals\" has to be smaller than the second element.")
   }
-  if(intervals[2]<=0.5){
-    stop("The first element of argument \"intervals\" has to be larger than 0.5.")
-  }
+#   if(intervals[2]<=0.5){
+#     stop("The first element of argument \"intervals\" has to be larger than 0.5.")
+#   }
   
   intervals = paste(intervals,"quant",sep="")
   ####### check nameShow
@@ -86,32 +86,33 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     }else{dataFlag = FALSE}
   }
   
-  ####### check ciShow
-  if(!is.logical(ciShow)){
-    if(!is.character(ciShow)){
+  ####### check estShow
+  if(!is.logical(estShow)){
+    if(!is.character(estShow)){
       ciFlag = FALSE
-      stop("Argument \"ciShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
+      stop("Argument \"estShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
     }else{
-      if(tolower(ciShow) %in% c("left","right","center")){
-        ciShow = tolower(ciShow)
+      if(tolower(estShow) %in% c("left","right","center")){
+        estShow = tolower(estShow)
         ciFlag = TRUE
       }else{
         ciFlag = FALSE
-        stop("Argument \"ciShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
+        stop("Argument \"estShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
       }
     }
   }else{
-    if(ciShow){
-      ciShow = "right"
+    if(estShow){
+      estShow = "right"
       ciFlag = TRUE
     }else{ciFlag = FALSE}
   }
+  ######## check point is scaled or not
   if(tolower(p.cex)!="scaled"){
     if(!is.numeric(p.cex)){
       stop("Argument \"p.cex\" could only be scaled or fixed to a positive numerical value.")
     }
   }
-  
+  ######## check cut
   if(!is.logical(cut)){
     if(!is.numeric(cut)){
       stop("cut has to be TRUE, FALSE or a numerical vector with length 2!")
@@ -122,6 +123,9 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     }
   }
 
+  
+  
+  #------------------- start here checking width of everything
   ###### data
   datalab1 = format(x$data$tp, width=max(nchar(as.character(x$data$tp),type="width")))
   datalab2 = format(x$data$fp, width=max(nchar(as.character(x$data$fp),,type="width")))
@@ -162,8 +166,8 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     fitname = "Log Diagnostic odds ratio (LDOR)"
     fit = x[["summary.fitted.LDOR"]]
   }
-  if(accuracy.type=="rd"){
-    fitname = "Risk difference (RD)"
+  if(accuracy.type=="youden" || accuracy.type=="rd"){
+    fitname = "Youden Index (Youden)"
     fit = x[["summary.fitted.RD"]]
   }
   if(accuracy.type=="llrpos"){
@@ -228,7 +232,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
       if(accuracy.type=="lrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LRneg)",]))}
       if(accuracy.type=="dor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(DOR)",]))}
       if(accuracy.type=="ldor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LDOR)",]))}
-      if(accuracy.type=="rd"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(RD)",]))}
+      if(accuracy.type=="youden"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(RD)",]))}
       if(accuracy.type=="llrpos"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LLRpos)",]))}
       if(accuracy.type=="llrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LLRneg)",]))}
       
@@ -245,7 +249,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
       if(accuracy.type=="lrneg"){sfit = x[["summary.summarized.statistics"]]["mean(LRneg)",]}
       if(accuracy.type=="dor"){sfit = x[["summary.summarized.statistics"]]["mean(DOR)",]}
       if(accuracy.type=="ldor"){sfit = x[["summary.summarized.statistics"]]["mean(LDOR)",]}
-      if(accuracy.type=="rd"){sfit = x[["summary.summarized.statistics"]]["mean(RD)",]}
+      if(accuracy.type=="youden"){sfit = x[["summary.summarized.statistics"]]["mean(RD)",]}
       if(accuracy.type=="llrpos"){sfit = x[["summary.summarized.statistics"]]["mean(LLRpos)",]}
       if(accuracy.type=="llrneg"){sfit = x[["summary.summarized.statistics"]]["mean(LLRneg)",]}
       
@@ -291,21 +295,21 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   
   studynames = rownames(fit)
   ###### caculate width
-  strwidth_names_main = strwidth(studynames,units="in",cex=text.cex,font=1,family="sans")
-  strwidth_names_title = strwidth("Study",units="in",cex=text.cex,font=2,family="sans")
-  strwidth_names_sum = strwidth("Summary",units="in",cex=text.cex,font=2,family="sans")
+  strwidth_names_main = strwidth(studynames,units="in",cex=text.cex,font=1,family="serif")
+  strwidth_names_title = strwidth("Study",units="in",cex=text.cex,font=2,family="serif")
+  strwidth_names_sum = strwidth("Summary",units="in",cex=text.cex,font=2,family="serif")
   
   name_width = max(strwidth_names_main,strwidth_names_title,strwidth_names_sum)
   
-  strwidth_data_main1 = strwidth(datalab1,units="in",cex=text.cex,font=1,family="sans")
-  strwidth_data_main2 = strwidth(datalab2,units="in",cex=text.cex,font=1,family="sans")
-  strwidth_data_main3 = strwidth(datalab3,units="in",cex=text.cex,font=1,family="sans")
-  strwidth_data_main4 = strwidth(datalab4,units="in",cex=text.cex,font=1,family="sans")
+  strwidth_data_main1 = strwidth(datalab1,units="in",cex=text.cex,font=1,family="serif")
+  strwidth_data_main2 = strwidth(datalab2,units="in",cex=text.cex,font=1,family="serif")
+  strwidth_data_main3 = strwidth(datalab3,units="in",cex=text.cex,font=1,family="serif")
+  strwidth_data_main4 = strwidth(datalab4,units="in",cex=text.cex,font=1,family="serif")
   
-  strwidth_data_title1 = strwidth("TP",units="in",cex=text.cex,font=2,family="sans")
-  strwidth_data_title2 = strwidth("FP",units="in",cex=text.cex,font=2,family="sans")
-  strwidth_data_title3 = strwidth("TN",units="in",cex=text.cex,font=2,family="sans")
-  strwidth_data_title4 = strwidth("FN",units="in",cex=text.cex,font=2,family="sans")
+  strwidth_data_title1 = strwidth("TP",units="in",cex=text.cex,font=2,family="serif")
+  strwidth_data_title2 = strwidth("FP",units="in",cex=text.cex,font=2,family="serif")
+  strwidth_data_title3 = strwidth("TN",units="in",cex=text.cex,font=2,family="serif")
+  strwidth_data_title4 = strwidth("FN",units="in",cex=text.cex,font=2,family="serif")
   
   data1_width = max(strwidth_data_main1,strwidth_data_title1)
   data2_width = max(strwidth_data_main2,strwidth_data_title2)
@@ -315,7 +319,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   if(accuracy.type %in% c("dor","lrneg","lrpos")){
     family = "mono"
   }else{
-    family = "sans"
+    family = "serif"
   }
   
   if(accuracy.type %in% c("dor","lrneg","lrpos")){
@@ -330,7 +334,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     }
   }
   
-  strwidth_ci_title = strwidth("Estimate",units="in",cex=text.cex,font=2,family="sans")
+  strwidth_ci_title = strwidth("Estimate",units="in",cex=text.cex,font=2,family="serif")
   
   if(!x$misc$covariates.flag){
     ci_width = max(strwidth_ci_main,strwidth_ci_title,strwidth_ci_sum)
@@ -394,58 +398,58 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   }
   
   
-  par(mar=c(4.5, 0, 3.5, 0),xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+  par(mar=c(4.5,0,3.5,0),xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
   
   
   if(nameFlag){
     plot.new()
-    strwidth_names_main = strwidth(studynames,units="user",cex=text.cex,font=1,family="sans")
-    strwidth_names_title = strwidth("Study",units="user",cex=text.cex,font=2,family="sans")
-    strwidth_names_sum = strwidth("Summary",units="user",cex=text.cex,font=2,family="sans")
+    strwidth_names_main = strwidth(studynames,units="user",cex=text.cex,font=1,family="serif")
+    strwidth_names_title = strwidth("Study",units="user",cex=text.cex,font=2,family="serif")
+    strwidth_names_sum = strwidth("Summary",units="user",cex=text.cex,font=2,family="serif")
     
     name_width = max(strwidth_names_main,strwidth_names_title,strwidth_names_sum)
     
     name_adj = switch(nameShow,left=0,right=1,center=0.5)
     xlim = switch(nameShow,left=c(0,name_width),right=c(-name_width,0),center=c(-0.5,0.5)*name_width)
     if(x$misc$covariates.flag){
-      plot.window(xlim=xlim,ylim=c(0,nr+1),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-      text(rep(0,nr),c(nr:1), studynames, adj=c(name_adj,0.5),family="sans",font=1,cex=text.cex)
-      text(0,nr+1, "Study", adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
+      plot.window(xlim=xlim,ylim=c(0,nr+1),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+      text(rep(0,nr),c(nr:1), studynames, adj=c(name_adj,0.5),family="serif",font=1,cex=text.cex)
+      text(0,nr+1, "Study", adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
     }else{
       if(x$misc$modality.flag){
         nlines = nr + 2*(mod.level-1) + 1
         cuml = 0
-        plot.window(xlim=xlim,ylim=c(0,nlines),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+        plot.window(xlim=xlim,ylim=c(0,nlines),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
-          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), studynames[ind[[i]]], adj=c(name_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), studynames[ind[[i]]], adj=c(name_adj,0.5),family="serif",font=1,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "Summary", adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
+          text(0,nlines-cuml, "Summary", adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
           cuml = cuml + 1
           if(i<mod.level){
-            text(0,nlines-cuml, paste("Study ",level.name[i+1],sep=""), adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
+            text(0,nlines-cuml, paste("Study ",level.name[i+1],sep=""), adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
           } 
         }
-        text(0,nlines, paste("Study ",level.name[1],sep=""), adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
+        text(0,nlines, paste("Study ",level.name[1],sep=""), adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
       }else{
-        plot.window(xlim=xlim,ylim=c(0,nr+1),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-        text(rep(0,nr),c(nr:1), studynames, adj=c(name_adj,0.5),family="sans",font=1,cex=text.cex)
-        text(0,0,"Summary", adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
-        text(0,nr+1, "Study", adj=c(name_adj,0.5),family="sans",font=2,cex=text.cex)
+        plot.window(xlim=xlim,ylim=c(0,nr+1),mar=c(4.5, 1.5, 3.5, 1.5),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+        text(rep(0,nr),c(nr:1), studynames, adj=c(name_adj,0.5),family="serif",font=1,cex=text.cex)
+        text(0,0,"Summary", adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
+        text(0,nr+1, "Study", adj=c(name_adj,0.5),family="serif",font=2,cex=text.cex)
       }
     }
   }
   if(dataFlag){
     plot.new()
     
-    strwidth_data_main1 = strwidth(datalab1,units="user",cex=text.cex,font=1,family="sans")
-    strwidth_data_main2 = strwidth(datalab2,units="user",cex=text.cex,font=1,family="sans")
-    strwidth_data_main3 = strwidth(datalab3,units="user",cex=text.cex,font=1,family="sans")
-    strwidth_data_main4 = strwidth(datalab4,units="user",cex=text.cex,font=1,family="sans")
-    strwidth_data_title1 = strwidth(" TP ",units="user",cex=text.cex,font=2,family="sans")
-    strwidth_data_title2 = strwidth(" FP ",units="user",cex=text.cex,font=2,family="sans")
-    strwidth_data_title3 = strwidth(" TN ",units="user",cex=text.cex,font=2,family="sans")
-    strwidth_data_title4 = strwidth(" FN ",units="user",cex=text.cex,font=2,family="sans")
+    strwidth_data_main1 = strwidth(datalab1,units="user",cex=text.cex,font=1,family="serif")
+    strwidth_data_main2 = strwidth(datalab2,units="user",cex=text.cex,font=1,family="serif")
+    strwidth_data_main3 = strwidth(datalab3,units="user",cex=text.cex,font=1,family="serif")
+    strwidth_data_main4 = strwidth(datalab4,units="user",cex=text.cex,font=1,family="serif")
+    strwidth_data_title1 = strwidth(" TP ",units="user",cex=text.cex,font=2,family="serif")
+    strwidth_data_title2 = strwidth(" FP ",units="user",cex=text.cex,font=2,family="serif")
+    strwidth_data_title3 = strwidth(" TN ",units="user",cex=text.cex,font=2,family="serif")
+    strwidth_data_title4 = strwidth(" FN ",units="user",cex=text.cex,font=2,family="serif")
     
     data1_width = max(strwidth_data_main1,strwidth_data_title1)
     data2_width = max(strwidth_data_main2,strwidth_data_title2)
@@ -459,84 +463,84 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     xlim4 = switch(dataShow,left=c(0,data4_width),right=c(-data4_width,0),center=data4_width*c(-0.5,0.5))
     
     if(x$misc$covariates.flag){
-      plot.window(xlim=xlim1,ylim=c(0,nr+1),oma=c(0,0.01,0,0.01),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-      text(rep(0,nr),c(nr:1), datalab1, adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
-      text(0,nr+1,"TP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-      plot(-10,-10,xlim=xlim2,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-      text(rep(0,nr),c(nr:1), datalab2, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-      text(0,nr+1,"FP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-      plot(-10,-10,xlim=xlim3,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-      text(rep(0,nr),c(nr:1), datalab3, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-      text(0,nr+1,"TN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-      plot(-10,-10,xlim=xlim4,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-      text(rep(0,nr),c(nr:1), datalab4, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-      text(0,nr+1,"FN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+      plot.window(xlim=xlim1,ylim=c(0,nr+1),oma=c(0,0.01,0,0.01),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+      text(rep(0,nr),c(nr:1), datalab1, adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
+      text(0,nr+1,"TP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+      plot(-10,-10,xlim=xlim2,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+      text(rep(0,nr),c(nr:1), datalab2, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+      text(0,nr+1,"FP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+      plot(-10,-10,xlim=xlim3,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+      text(rep(0,nr),c(nr:1), datalab3, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+      text(0,nr+1,"TN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+      plot(-10,-10,xlim=xlim4,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+      text(rep(0,nr),c(nr:1), datalab4, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+      text(0,nr+1,"FN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
     }else{
       if(x$misc$modality.flag){
         nlines = nr + 2*(mod.level-1) + 1
         cuml = 0
-        plot.window(xlim=xlim1,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+        plot.window(xlim=xlim1,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
-          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab1[ind[[i]]], adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab1[ind[[i]]], adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=2,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=2,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
         }
-        text(0,nlines,"TP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+        text(0,nlines,"TP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
         
         plot.new()
-        plot.window(xlim=xlim2,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+        plot.window(xlim=xlim2,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
         cuml = 0
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
-          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab2[ind[[i]]], adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab2[ind[[i]]], adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=2,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=2,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
         }
-        text(0,nlines,"FP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+        text(0,nlines,"FP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
         
         plot.new()
-        plot.window(xlim=xlim3,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+        plot.window(xlim=xlim3,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
         cuml = 0
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
-          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab3[ind[[i]]], adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab3[ind[[i]]], adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=2,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=2,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
         }
-        text(0,nlines,"TN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+        text(0,nlines,"TN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
         
         plot.new()
-        plot.window(xlim=xlim4,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
+        plot.window(xlim=xlim4,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
         cuml = 0
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
-          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab4[ind[[i]]], adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), datalab4[ind[[i]]], adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=2,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=2,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
         }
-        text(0,nlines,"FN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+        text(0,nlines,"FN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
       }else{
-        plot.window(xlim=xlim1,ylim=c(0,nr+1),oma=c(0,0.01,0,0.01),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-        text(rep(0,nr),c(nr:1), datalab1, adj=c(data_adj,0.5),family="sans",font=1,cex=text.cex)
-        text(0,nr+1,"TP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-        plot(-10,-10,xlim=xlim2,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-        text(rep(0,nr),c(nr:1), datalab2, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-        text(0,nr+1,"FP", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-        plot(-10,-10,xlim=xlim3,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-        text(rep(0,nr),c(nr:1), datalab3, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-        text(0,nr+1,"TN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
-        plot(-10,-10,xlim=xlim4,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",yaxt="n",bty="n")
-        text(rep(0,nr),c(nr:1), datalab4, adj=c(data_adj,0.5),family="sans",cex=text.cex)
-        text(0,nr+1,"FN", adj=c(data_adj,0.5),family="sans",font=2, cex=text.cex)
+        plot.window(xlim=xlim1,ylim=c(0,nr+1),oma=c(0,0.01,0,0.01),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+        text(rep(0,nr),c(nr:1), datalab1, adj=c(data_adj,0.5),family="serif",font=1,cex=text.cex)
+        text(0,nr+1,"TP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+        plot(-10,-10,xlim=xlim2,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+        text(rep(0,nr),c(nr:1), datalab2, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+        text(0,nr+1,"FP", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+        plot(-10,-10,xlim=xlim3,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+        text(rep(0,nr),c(nr:1), datalab3, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+        text(0,nr+1,"TN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
+        plot(-10,-10,xlim=xlim4,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",yaxt="n",bty="n")
+        text(rep(0,nr),c(nr:1), datalab4, adj=c(data_adj,0.5),family="serif",cex=text.cex)
+        text(0,nr+1,"FN", adj=c(data_adj,0.5),family="serif",font=2, cex=text.cex)
       }
     }
   }
@@ -547,7 +551,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     xlim = c(max(xmin-0.1,0),min(xmax+0.1,1))
   }
   if(x$misc$covariates.flag){
-    plot(-10,-10,xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="s",yaxt="n",bty="n")
+    plot(-10,-10,xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="s",yaxt="n",bty="n")
     arrows(lb.fit,c(nr:1),ub.fit,c(nr:1),col=arrow.col,angle = 90,length=0.03, code=3, lwd=arrow.lwd, lty=arrow.lty)
     points(est.fit,c(nr:1),pch=p.pch,cex=info,col=p.col)
     if(any(exlb)){
@@ -564,7 +568,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     if(x$misc$modality.flag){
       nlines = nr + 2*(mod.level-1) + 1
       cuml = 0
-      plot(-10,-10,xlim=xlim,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="s",yaxt="n",bty="n")
+      plot(-10,-10,xlim=xlim,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="s",yaxt="n",bty="n")
       for(i in 1:mod.level){
         cuml = cuml + level.length[i]
         polygon(sfit[i,c(intervals[1],intervals[2],intervals[2],intervals[1])],c(nlines-cuml-1,nlines-cuml-1,nlines-cuml+level.length[i]-1,nlines-cuml+level.length[i]-1),col=shade.col,angle=45,density=10,border = NA)
@@ -587,11 +591,11 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
         arrows(lb.sfit[i],nlines-cuml,ub.sfit[i],nlines-cuml,col=arrow.col,angle = 90,length=0.03, code=3, lwd=arrow.lwd, lty=arrow.lty)
         polygon(c(0.5*(est.sfit[i]+lb.sfit[i]),est.sfit[i],0.5*(est.sfit[i]+ub.sfit[i]),est.sfit[i]),c(nlines-cuml,nlines-cuml-0.3,nlines-cuml,nlines-cuml+0.3),col=p.col,border = NA)
         cuml = cuml + 1
-        text(0,nlines-cuml, "", family="sans",font=1,cex=text.cex)
+        text(0,nlines-cuml, "", family="serif",font=1,cex=text.cex)
       }
       axis(1,at=round(c(xmin,xmax),2),labels=round(c(xmin,xmax),2),cex.axis=axis.cex,...)
     }else{
-      plot(-10,-10,xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="s",yaxt="n",bty="n")
+      plot(-10,-10,xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="s",yaxt="n",bty="n")
       polygon(sfit[c(intervals[1],intervals[2],intervals[2],intervals[1])],c(-1,-1,nr+1,nr+1),col=shade.col,angle=45,density=10,border = NA)
       arrows(lb.fit,c(nr:1),ub.fit,c(nr:1),col=arrow.col,angle = 90,length=0.03, code=3, lwd=arrow.lwd, lty=arrow.lty)
       arrows(lb.sfit,0,ub.sfit,0,col=arrow.col,angle = 90,length=0.03, code=3, lwd=arrow.lwd, lty=arrow.lty)
@@ -617,7 +621,7 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     if(!x$misc$covariates.flag){
       strwidth_ci_sum = strwidth(ci.sfit,units="user",cex=text.cex,font=2,family=family)
     }
-    strwidth_ci_title = strwidth("Estimate",units="user",cex=text.cex,font=2,family="sans")
+    strwidth_ci_title = strwidth("Estimate",units="user",cex=text.cex,font=2,family="serif")
     if(!x$misc$covariates.flag){
       ci_width = max(strwidth_ci_main,strwidth_ci_title,strwidth_ci_sum)
     }else{
@@ -625,31 +629,31 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
     }
     
     
-    ci_adj = switch(ciShow,left=0,right=1,center=0.5)
-    xlim = switch(ciShow,left=c(0,ci_width),right=c(-ci_width,0),center=ci_width*c(-0.5,0.5))
+    ci_adj = switch(estShow,left=0,right=1,center=0.5)
+    xlim = switch(estShow,left=c(0,ci_width),right=c(-ci_width,0),center=ci_width*c(-0.5,0.5))
     if(x$misc$covariates.flag){
-      plot.window(xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",xaxs="i",yaxt="n",bty="n")
+      plot.window(xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",xaxs="i",yaxt="n",bty="n")
       text(rep(0,nr),c(nr:1),ci.fit,adj=c(ci_adj,0.5),family=family,font=1,cex=text.cex)
-      text(0,nr+1,"Estimates",adj=c(ci_adj,0.5),family="sans",font=2,cex=text.cex)
+      text(0,nr+1,"Estimates",adj=c(ci_adj,0.5),family="serif",font=2,cex=text.cex)
     }else{
       if(x$misc$modality.flag){
         nlines = nr + 2*(mod.level-1) + 1
         cuml = 0
-        plot.window(xlim=xlim,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",xaxs="i",yaxt="n",bty="n")
+        plot.window(xlim=xlim,ylim=c(0,nlines),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",xaxs="i",yaxt="n",bty="n")
         for(i in 1:mod.level){
           cuml = cuml + level.length[i]
           text(rep(0,level.length[i]),(nlines-cuml+level.length[i]-1):(nlines-cuml), ci.fit[ind[[i]]], adj=c(ci_adj,0.5),family=family,font=1,cex=text.cex)
           cuml = cuml + 1
           text(0,nlines-cuml, ci.sfit[i], adj=c(ci_adj,0.5),family=family,font=2,cex=text.cex)
           cuml = cuml + 1
-          text(0,nlines-cuml, "", adj=c(name_adj,0.5),family="sans",font=1,cex=text.cex)
+          text(0,nlines-cuml, "", adj=c(name_adj,0.5),family="serif",font=1,cex=text.cex)
         }
-        text(0,nlines,"Estimates",adj=c(ci_adj,0.5),family="sans",font=2,cex=text.cex)
+        text(0,nlines,"Estimates",adj=c(ci_adj,0.5),family="serif",font=2,cex=text.cex)
       }else{
-        plot.window(xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="sans",xaxt="n",xaxs="i",yaxt="n",bty="n")
+        plot.window(xlim=xlim,ylim=c(0,nr+1),xlab="",ylab="",xaxs="i",family="serif",xaxt="n",xaxs="i",yaxt="n",bty="n")
         text(rep(0,nr),c(nr:1),ci.fit,adj=c(ci_adj,0.5),family=family,font=1,cex=text.cex)
         text(0,0,ci.sfit,adj=c(ci_adj,0.5),family=family,font=2,cex=text.cex)
-        text(0,nr+1,"Estimates",adj=c(ci_adj,0.5),family="sans",font=2,cex=text.cex)
+        text(0,nr+1,"Estimates",adj=c(ci_adj,0.5),family="serif",font=2,cex=text.cex)
       }
     }
   }

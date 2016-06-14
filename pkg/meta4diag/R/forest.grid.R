@@ -1,6 +1,6 @@
 forest.grid <- function(x, ...) UseMethod("forest.grid")
 
-forest.grid.meta4diag = function(x, accuracy.type="sens", est.type="mean", nameShow=T, dataShow=F, ciShow=T, graphwidth=1, main, xlab="",...){
+forest.grid.meta4diag = function(x, accuracy.type="sens", est.type="mean", nameShow=T, dataShow=F, estShow=T, graphwidth=1, main, xlab="",...){
   
   if(length(accuracy.type)!=1){stop("Argument \"accuracy.type\" could only be one character string.")}
   if(!is.character(accuracy.type)){stop("Argument \"accuracy.type\" could only be one character string.")}
@@ -59,23 +59,23 @@ forest.grid.meta4diag = function(x, accuracy.type="sens", est.type="mean", nameS
     }else{dataFlag = FALSE}
   }
   
-  ####### check ciShow
-  if(!is.logical(ciShow)){
-    if(!is.character(ciShow)){
+  ####### check estShow
+  if(!is.logical(estShow)){
+    if(!is.character(estShow)){
       ciFlag = FALSE
-      stop("Argument \"ciShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
+      stop("Argument \"estShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
     }else{
-      if(tolower(ciShow) %in% c("left","right","center")){
-        ciShow = tolower(ciShow)
+      if(tolower(estShow) %in% c("left","right","center")){
+        estShow = tolower(estShow)
         ciFlag = TRUE
       }else{
         ciFlag = FALSE
-        stop("Argument \"ciShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
+        stop("Argument \"estShow\" could only be FALSE, TRUE, \"left\", \"right\" or \"center\".")
       }
     }
   }else{
-    if(ciShow){
-      ciShow = "left"
+    if(estShow){
+      estShow = "left"
       ciFlag = TRUE
     }else{ciFlag = FALSE}
   }
@@ -230,8 +230,8 @@ forest.grid.meta4diag = function(x, accuracy.type="sens", est.type="mean", nameS
   }
   
   if(ciFlag){
-    cix = switch(ciShow, left=0, right=1, center=0.5)
-    cijust = switch(ciShow, left="left", right="right", center="center")
+    cix = switch(estShow, left=0, right=1, center=0.5)
+    cijust = switch(estShow, left="left", right="right", center="center")
     ecilabel = lapply(ci, function(ci_i) textGrob(ci_i, x=cix,just=cijust, gp=gpar(fontface="plain", col="black")))
     scilabel = list(textGrob(sci, x=cix,just=cijust, gp=gpar(fontface="bold", col="black")))
     tcilabel = list(textGrob("Estimate", x=cix,just=cijust, gp=gpar(fontface="bold", col="black")))

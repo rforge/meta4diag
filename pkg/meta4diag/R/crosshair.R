@@ -54,7 +54,7 @@ crosshair.meta4diag = function(x, est.type="mean", add=FALSE, save=F, xlim, ylim
     if(missing(ylab)){ylab=fitname[1]}
     par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 2.1))
     plot(est.B, est.A, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, type="p",
-         xaxs = "r",family="sans",xaxt="s",yaxt="s",bty="o",...)
+         xaxs = "r",family="Helvetica",xaxt="s",yaxt="s",bty="o",...)
     arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, ...)
     arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, ...)
   }

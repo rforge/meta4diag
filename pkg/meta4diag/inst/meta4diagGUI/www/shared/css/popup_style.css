@@ -1,0 +1,119 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.overlay {
+	width:100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  margin: 10px auto 30px;
+  padding: 10px 10px 30px;
+  background: #fff;
+  border-radius: 5px;
+  width: 80%;
+  height:100%;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.popup h4 {
+  margin-top: 0;
+  color: #333;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+.popup .close {
+  position: absolute;
+  top: 0px;
+  right: 20px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+.popup .close:hover {
+  color: #06D85F;
+}
+
+.popup .content {
+  max-height: 80%;
+  overflow: auto;
+}
+
+@media screen and (max-width: 700px) {
+  .box {
+    width: 100%;
+  }
+  .popup {
+    width: 100%;
+  }
+}
+
+.popup-table{
+	width:100%;
+	height:80%;
+}
+
+.popup-table tr td:nth-child(odd) {  
+	width:35%;
+}
+.popup-table tr td:nth-child(even) {  
+	width:65%;
+}
+
+.popup-param-control{
+	width:100%;
+	padding:10px;
+	border:1px solid #ddd;
+	border-radius:10px;
+	margin: 0 auto;
+}
+
+.popup-param-control table{
+	width:100%;
+}
+
+.popup-param-control table tr td:nth-child(odd) {
+	width:30%;
+}
+.popup-param-control table tr td:nth-child(even) {
+	width:70%;
+}
+
+.pop-up-cor-param-cotrol{
+	width:100%;
+	padding:10px;
+	border:1px solid #ddd;
+	border-radius:10px;
+	margin: 0 auto;
+}
+
+.pop-up-cor-param-cotrol table{
+	width:100%;
+}
+.pop-up-cor-param-cotrol table tr td:nth-child(odd) {
+	width:15%;
+	text-align:right;
+	padding-right:10px;
+	padding-top:10px;
+}
+.pop-up-cor-param-cotrol table tr td:nth-child(even) {
+	width:35%;
+	padding-top:10px;
+}

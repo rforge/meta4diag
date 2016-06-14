@@ -1,5 +1,11 @@
 makeObject <- function(outdata, outpriors, model, nsample=FALSE){
   if(requireNamespace("INLA", quietly = TRUE)){
+    if (!(sum(search()=="package:INLA"))==1){
+      stop("INLA need to be loaded! \n
+Please use the following command to load INLA,\n
+library(INLA) \n")
+    }
+    
     quantiles = sort(unique(c(model$quantiles,0.025,0.5,0.975)))
     effect.length = length(quantiles) + 2
     est = list()
@@ -86,13 +92,13 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
         
         est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
-            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
+                                                            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
         colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
         rownames(est$correlation.linear.comb) = studynames
         
         est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
-            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
+                                                                     function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
         colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
         rownames(est$covariance.linear.comb) = studynames
@@ -106,13 +112,13 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         est$covariance.matrix.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix
         
         est$correlation.linear.comb = do.call(rbind, lapply(1:length(um), 
-                     function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(um)]))
+                                                            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(um)]))
         colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
         rownames(est$correlation.linear.comb) = um
         
         est$covariance.linear.comb = do.call(rbind, lapply(1:length(um), 
-                     function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(um)]))
+                                                           function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(um)]))
         colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
         rownames(est$covariance.linear.comb) = um
@@ -126,13 +132,13 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
         names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
         
         est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
-            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
+                                                            function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
         colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
         rownames(est$correlation.linear.comb) = studynames
         
         est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
-            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
+                                                                     function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
         colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
         est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
         rownames(est$covariance.linear.comb) = studynames
@@ -349,10 +355,16 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
       message("Argument \"nsample\" should be TRUE, FALSE or a integer, we set it to FALSE!")
     }
     if(est$misc$sample.flag){
+      ##################
+      ## samples
+      ##################
       options(warn=-1)
       samples = INLA::inla.posterior.sample(n = nsample, model)
       options(warn=0)
       predictors.samples = do.call(cbind,lapply(c(1:nsample), function(x) samples[[x]]$latent[1:dim(outdata$internaldata)[1]]))
+      ##############################
+      ## fixed and hyperpar samples
+      ##############################
       fixed.samples = do.call(cbind,lapply(c(1:nsample), function(x){
         length.latent = length(samples[[x]]$latent)
         a = samples[[x]]$latent[(length.latent-dim(model$summary.fixed)[1]+1):length.latent]
@@ -360,10 +372,36 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
       }))
       fixed.names = rownames(model$summary.fixed)
       rownames(fixed.samples) = fixed.names
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
+      hyperpar.samples = do.call(cbind,lapply(c(1:nsample), function(x){
+        a = samples[[x]]$hyperpar
+        return(a)
+      }))
+      hyperpar.samples[1,] = 1/sqrt(hyperpar.samples[1,])
+      hyperpar.samples[2,] = 1/sqrt(hyperpar.samples[2,])
+      hyperpar.names = c("sig_phi", "sig_psi", "rho")
+      rownames(hyperpar.samples) = hyperpar.names
+      ##################
+      ## calcaulate AUC
+      ##################
+      AUC_function = function(mu, nu, sig1, sig2, rho){
+        y = integrate(function(x) .invlogit(mu-rho*nu*sig1/sig2 + rho*sig1/sig2*.logit(1-x)), lower=0, upper=1)
+        return(y)
+      }
+      AUC_est = do.call(cbind, lapply(c(1:nsample), function(x) {
+        AUC_function(fixed.samples[1,x], fixed.samples[2,x], hyperpar.samples[1,x], hyperpar.samples[2,x], hyperpar.samples[3,x])
+      }))
+      AUC_samples = unlist(AUC_est[1,])
+      AUC_summary = .summary.samples(AUC_samples, level=quantiles)
+      ############# save AUC
+      
+      est$AUC = AUC_summary
+      ##################
+      ## 
+      ##################
+      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){ #  no covariate
         ind.fitted1  = agrep("mu", fixed.names, max.distance=0)
         ind.fitted2  = agrep("nu", fixed.names, max.distance=0)
-        if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
+        if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){# and no modality
           mean.logit.fitted1.samples = fixed.samples[ind.fitted1,]
           mean.logit.fitted2.samples = fixed.samples[ind.fitted2,]
           
@@ -614,6 +652,7 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     est$cpo = model[["cpo"]]
     est$dic = model[["dic"]]
     
+    
     ############# save inla result
     est$inla.result = model
     ############# save general setting
@@ -649,8 +688,8 @@ makeObject <- function(outdata, outpriors, model, nsample=FALSE){
     return(est)
   }else{
     stop("INLA need to be installed and loaded!\n
-         Please use the following commants to install and load INLA,\n
-         install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
-         library(INLA) \n")
+Please use the following command to install and load INLA,\n
+install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\")
+library(INLA) \n")
   }
 }

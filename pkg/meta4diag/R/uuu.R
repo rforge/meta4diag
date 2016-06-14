@@ -32,11 +32,11 @@
 ####
 ################################################################
 ################################################################
-.priorInvgamma <- function(a,b,xmax){
+.priorInvgamma <- function(a,b,xmax,...){
   x = seq(0,100,len=1000)
   tau = 1/x
   y = dgamma(tau,shape=a,rate=b)*x^(-2)
-  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax),...)
 }
 
 .priorSigmaPC <- function(u,alpha,xmax){
@@ -74,33 +74,33 @@
   plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
 }
 
-.priorTableSigma = function(xmax,mrv){
-  x = mrv$priorfile$x
-  if(any(x<=0)){
-    var1dialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
-                                    "Please check the input prior, variance should be in [0, infinity]!")
-    if (var1dialog$run()==GtkResponseType["ok"]){
-      stop("")
-    }
-    var1dialog$destroy()
-  }
-  y = mrv$priorfile$y
-  plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
-}
-
-.priorTableRho = function(xmax,mrv){
-  x = mrv$priorfile$x
-  if(any(x< -1 | x>1)){
-    rhodialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
-                                  "Please check the input prior, correlation should be in [-1, 1]!")
-    if (rhodialog$run()==GtkResponseType["ok"]){
-      stop("")
-    }
-    rhodialog$destroy()
-  }
-  y = mrv$priorfile$y
-  plot(x,y,xlab=expression(rho),ylab=expression(pi(rho)),type="l",xlim=c(-1,xmax))
-}
+# .priorTableSigma = function(xmax,mrv){
+#   x = mrv$priorfile$x
+#   if(any(x<=0)){
+#     var1dialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
+#                                     "Please check the input prior, variance should be in [0, infinity]!")
+#     if (var1dialog$run()==GtkResponseType["ok"]){
+#       stop("")
+#     }
+#     var1dialog$destroy()
+#   }
+#   y = mrv$priorfile$y
+#   plot(x,y,xlab=expression(sigma^2),ylab=expression(pi(sigma^2)),type="l",xlim=c(0,xmax))
+# }
+# 
+# .priorTableRho = function(xmax,mrv){
+#   x = mrv$priorfile$x
+#   if(any(x< -1 | x>1)){
+#     rhodialog <-gtkMessageDialog(mrv$main_window,"destroy-with-parent","warning","ok",
+#                                   "Please check the input prior, correlation should be in [-1, 1]!")
+#     if (rhodialog$run()==GtkResponseType["ok"]){
+#       stop("")
+#     }
+#     rhodialog$destroy()
+#   }
+#   y = mrv$priorfile$y
+#   plot(x,y,xlab=expression(rho),ylab=expression(pi(rho)),type="l",xlim=c(-1,xmax))
+# }
 
 .priorInvWishart = function(nu,R11,R22,R12,xmax){
   R = matrix(c(R11,R12,R12,R22),2,2)
@@ -220,16 +220,16 @@
   plot(drho$x,drho$y,xlab=expression(rho),ylab=expression(pi(rho)),type="l",ylim=c(0,drho$y[10000]+0.65))
 }
 
-.checkNumEntry <- function(entry){
-  text <- entry$getText()
-  if (nzchar(gsub("[0-9.-]", "", text))) {
-    entry$setIconFromStock("primary", "gtk-no")
-    entry$setIconTooltipText("primary","Only numbers are allowed")
-  } else { 
-    entry$setIconFromStock("primary", NULL)
-    entry$setIconTooltipText("secondary", NULL)
-  }
-}
+# .checkNumEntry <- function(entry){
+#   text <- entry$getText()
+#   if (nzchar(gsub("[0-9.-]", "", text))) {
+#     entry$setIconFromStock("primary", "gtk-no")
+#     entry$setIconTooltipText("primary","Only numbers are allowed")
+#   } else { 
+#     entry$setIconFromStock("primary", NULL)
+#     entry$setIconTooltipText("secondary", NULL)
+#   }
+# }
 
 # #########################
 # .makeResult <- function(x){

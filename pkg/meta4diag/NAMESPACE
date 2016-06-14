@@ -38,8 +38,10 @@ importFrom("stats", "as.formula", "dbeta", "dgamma", "dnorm", "fitted",
             "lm", "pnorm", "qf", "qnorm", "quantile", "sd", "splinefun")
 importFrom("utils", "install.packages", "installed.packages",
             "read.csv", "read.table", "tail")
+importFrom("stats", "integrate")
 
-import(RGtk2)
-import(cairoDevice)
+import(shiny)
+import(shinyBS)
+import(sp)
 import(grid)
 import(methods)

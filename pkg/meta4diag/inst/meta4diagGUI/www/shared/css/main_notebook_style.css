@@ -1,0 +1,112 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.box {
+  width: 100%;
+  margin: 20 auto;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border: 2px solid #fff;
+  border-radius: 20px/50px;
+  background-clip: padding-box;
+  text-align: center;
+}
+
+.button {
+  font-size: 1em;
+  padding: 5px;
+  color: #555;
+  background-color:transparent;
+  border: 2px solid #3a4ed5;
+  text-decoration: none;
+  border-radius: 20px/50px;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+}
+
+.button:hover {
+  background: #1A4792;
+  color: #fff;
+  text-decoration:none;
+}
+
+
+.main-NoteBook{
+	width: 100%;
+	background-color:#f0f0f0;
+	list-style-type:none;
+	border: none;
+	margin:0;
+	padding:0;
+	float: none;
+  	list-style: none;
+	position: relative;
+	text-align:center;
+	vertical-align:middle;
+}
+
+.main-NoteBook ul {
+	width:100%;
+	background-color: #f0f0f0;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid white;
+	border-left:none;
+	border-right:none;
+}
+
+.main-NoteBook ul li {
+	border-radius: 0px 0 0 0px;
+	border-right: 1px solid #ddd;
+	border-bottom:1px solid #ddd;
+	border-left:none;
+	border-top:none;
+	margin: 0px;
+	padding: 0px;
+	text-align:center;
+	width: 100px;
+	height: 30px;
+	float: left;
+    display: block;
+}
+
+.main-NoteBook ul li a {
+  	border-radius: 0px 0 0 0px;
+  	border-right: 1px solid #ddd;
+	border-bottom:none;
+	border-left:none;
+	border-top:none;
+  	width:inherit;
+  	height:inherit;
+  	margin: 0 auto;
+  	display:block;
+  	color:#A6A5A5;
+  	text-align:center;
+  	padding-bottom:2px;
+  	margin-bottom:3px;
+  	align-content:center;
+}
+
+.main-NoteBook ul li a:hover {
+	border: none;
+  	background-color:#555;
+  	color: white;
+}
+.main-NoteBook ul li.active a,
+.main-NoteBook ul li.active a:hover,
+.main-NoteBook ul li.active a:focus {
+	background-color: white;
+	color: #3C3C3C;
+	border-bottom-color: white;
+}
+
+.main-NoteBook-container{
+	padding: 10px;
+}
+
+
+.plot-tables{
+	margin-bottom:0;
+}
+.plot-tables td{
+	vertical-align:bottom;
+}

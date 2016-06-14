@@ -1,27 +1,34 @@
 plot.meta4diag = function(x, var.type="var1", add=FALSE, overlay.prior = TRUE, save = FALSE, width=5, height=5, ...){
+
   if(is.logical(save)){
     if(save){
       mainDir <- getwd()
-      subDir <- "meta4diag_Plot"
+      subDir <- "meta4diagPlot"
       if (file.exists(subDir)){
         file.name = paste(subDir,"/",var.type,".pdf",sep="")
       } else {
         dir.create(file.path(mainDir, subDir))
         file.name = paste(subDir,"/",var.type,".pdf",sep="")
       }
-      save.flag = TRUE
-    }else{save.flag = FALSE}
-  } else if(is.character(save)){
-    name_temp = unlist(strsplit(basename(save), "[.]"))
-    fileform = name_temp[length(name_temp)]
-    if(fileform %in% c("pdf","eps","jpg","png")){
-      save.flag = TRUE
-      file.name = paste(subDir,"/",save,sep="")
-    }else{
-      save.flag = FALSE
-      stop("Please give the correct file name!")
     }
-  } else{stop("Argument \"save\" could be FALSE, TRUE or a file name.")}
+  }else{
+    if(is.character(save)){
+      mainDir <- getwd()
+      subDir <- "meta4diagPlot"
+      if (!file.exists(subDir)){
+        dir.create(file.path(mainDir, subDir))
+      }
+      name_temp = unlist(strsplit(basename(save), "[.]"))
+      fileform = name_temp[length(name_temp)]
+      if(fileform %in% c("pdf","eps","jpg","png")){
+        file.name = paste(subDir,"/",save,sep="")
+      }else{
+        stop("Please give the correct file name!")
+      }
+    }else{
+      stop("Argument \"save\" could be FALSE, TRUE or a file name.")
+    }
+  }
   
   fixed.name = rownames(x$summary.fixed)
   hyper.name = c("var1", "var2", "rho")
@@ -44,12 +51,16 @@ plot.meta4diag = function(x, var.type="var1", add=FALSE, overlay.prior = TRUE, s
   if(add){
     lines(marginals.plot, ...)
   }else{
-    if(save.flag){
+    if(is.logical(save)){
+      if(save){
+        pdf(file.name, width=width, height=height)
+      }
+    }else{
       if(fileform=="eps"){
         setEPS()
-        postscript(file.name, width=width, height=height,...)
+        postscript(file.name, width=width, height=height)
       }else if(fileform=="pdf"){
-        pdf(file.name, width=width, height=height,...)
+        pdf(file.name, width=width, height=height)
       }else if(fileform=="jpg"){
         jpeg(filename = file.name,
              width = width, height = height, units = "in")
@@ -58,25 +69,26 @@ plot.meta4diag = function(x, var.type="var1", add=FALSE, overlay.prior = TRUE, s
             width = width, height = height, units = "in")
       }
     }
+    
     par(mar=c(5.1, 4.1, 4.1, 2.1))
-    plot(marginals.plot, type="l", xlab=xlabnames[ind], ylab="",xaxs = "r",family="sans",xaxt="s",yaxt="s",bty="o",...)
+    plot(marginals.plot, type="l", xlab=xlabnames[ind], ylab="",xaxs = "r",xaxt="s",yaxt="s",bty="o",...)
     if(!x$misc$wishart.flag){
       if(overlay.prior){
         nom = length(fullnames)
         if(ind<=(nom-3)){
-          lines(fixed.prior,lty=2,col="darkgray",...)
+          lines(fixed.prior,lty=2,col="darkgray")
         }else if(ind==(nom-2)){
-          lines(x$priors.density[[1]],lty=2,col="darkgray",...)
+          lines(x$priors.density[[1]],lty=2,col="darkgray")
         }else if(ind==(nom-1)){
-          lines(x$priors.density[[2]],lty=2,col="darkgray",...)
+          lines(x$priors.density[[2]],lty=2,col="darkgray")
         }else if(ind==nom){
-          lines(x$priors.density[[3]],lty=2,col="darkgray",...)
+          lines(x$priors.density[[3]],lty=2,col="darkgray")
         }else{
           stop("Wrong var.type!")
         }
       }
     }
-    if(save.flag){
+    if(save==TRUE || is.character(save)==TRUE){
       dev.off()
     }
   }
