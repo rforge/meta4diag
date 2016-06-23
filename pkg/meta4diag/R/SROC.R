@@ -97,7 +97,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       mod.level = x$misc$modality.level
       if(length(cr.lty)!=mod.level){cr.lty = rep(cr.lty[1],mod.level)}
       if(length(cr.lwd)!=mod.level){cr.lwd = rep(cr.lwd[1],mod.level)}
-      if(length(cr.col)!=mod.level){cr.col = rep(cr.col[1],mod.level)}
+      if(length(cr.col)!=mod.level){sp.col = rep(cr.col[1],mod.level)}
       if(length(pr.lty)!=mod.level){pr.lty = rep(pr.lty[1],mod.level)}
       if(length(pr.lwd)!=mod.level){pr.lwd = rep(pr.lwd[1],mod.level)}
       if(length(pr.col)!=mod.level){pr.col = rep(pr.col[1],mod.level)}
@@ -392,7 +392,6 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     
   }else{
 
-    par(mfrow=c(1,1),mar=c(5.1, 4.1, 4.1, 2.1))
     plot(-10,-10,xlim=xlim,ylim=ylim,main=main,asp=1,
          xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab=xlab,ylab=ylab, ...)
     axis(1, at = x.at, labels = x.labels,...)

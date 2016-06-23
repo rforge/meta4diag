@@ -281,8 +281,8 @@ shinyServer(function(input, output, session) {
     updateSliderInput(session, "corpc2_slider_p3", value = input$corPC2alpha)
   })
   observe({
-    updateNumericInput(session, "corPC2u", max = input$corPC2rho0-0.000001)
-    updateNumericInput(session, "corPC2alpha", max = input$corPC2omega-0.000001)
+    updateNumericInput(session, "corPC2u", min = input$corPC2rho0+0.000001)
+    updateNumericInput(session, "corPC2alpha", max = 1-input$corPC2omega-0.000001)
     
     updateSliderInput(session, "corpc2_slider_p2", min = input$corpc2_slider_rho0+0.000001)
     updateSliderInput(session, "corpc2_slider_p3", max = 1-input$corpc2_slider_p1-0.000001)
@@ -602,22 +602,43 @@ shinyServer(function(input, output, session) {
     var1PriorName = input$var1PriorName
     if(var1PriorName=="var1pc"){
       var.prior = "PC"
-      var.par = c(input$var1PCu, input$var1PCalpha)
+      u = input$var1PCu
+      alpha = input$var1PCalpha
+      if(u < 0.0001){u = 0.0001}
+      if(alpha < 0.00005){alpha = 0.00005}
+      if(alpha > 0.99995){alpha = 0.99995}
+      var.par = c(u, alpha)
     }else if(var1PriorName=="var1ig"){
       var.prior = "invgamma"
-      var.par = c(input$var1IGa, input$var1IGb)
+      a = input$var1IGa
+      b = input$var1IGb
+      if(a < 0.005){a = 0.005}
+      if(b < 0.005){b = 0.005}
+      var.par = c(a, b)
     }else if(var1PriorName=="var1hc"){
       var.prior = "hcauchy"
-      var.par = c(input$var1HCa)
+      a = input$var1HCa
+      if(a < 0.0005){a=0.0005}
+      var.par = c(a)
     }else if(var1PriorName=="var1tn"){
       var.prior = "tnormal"
-      var.par = c(input$var1TNa, input$var1TNb)
+      a = input$var1TNa
+      b = input$var1TNb
+      if(b < 0.005){b=0.005}
+      var.par = c(a, b)
     }else if(var1PriorName=="var1unif"){
       var.prior = "unif"
       var.par = c()
     }else{
       var.prior = "invwishart"
-      var.par = c(input$var1IWnu, input$var1IWa, input$var1IWb, input$var1IWc)
+      nu = input$var1IWnu
+      a = input$var1IWa
+      b = input$var1IWb
+      c = input$var1IWc
+      if(nu < 3){nu = 3}
+      if(a < 0.01){a=0.01}
+      if(b < 0.01){b=0.01}
+      var.par = c(nu, a, b, c)
     }
     value$var.prior = var.prior
     value$var.par = var.par
@@ -630,16 +651,31 @@ shinyServer(function(input, output, session) {
     var2PriorName = input$var2PriorName
     if(var2PriorName=="var2pc"){
       var2.prior = "PC"
-      var2.par = c(input$var2PCu, input$var2PCalpha)
+      var.prior = "PC"
+      u = input$var2PCu
+      alpha = input$var2PCalpha
+      if(u < 0.0001){u = 0.0001}
+      if(alpha < 0.005){alpha = 0.005}
+      if(alpha > 0.995){alpha = 0.995}
+      var2.par = c(u, alpha)
     }else if(var2PriorName=="var2ig"){
       var2.prior = "invgamma"
-      var2.par = c(input$var2IGa, input$var2IGb)
+      a = input$var2IGa
+      b = input$var2IGb
+      if(a < 0.005){a = 0.005}
+      if(b < 0.005){b = 0.005}
+      var2.par = c(a, b)
     }else if(var2PriorName=="var2hc"){
       var2.prior = "hcauchy"
-      var2.par = c(input$var2HCa)
+      a = input$var2HCa
+      if(a < 0.0005){a=0.0005}
+      var2.par = c(a)
     }else if(var2PriorName=="var2tn"){
       var2.prior = "tnormal"
-      var2.par = c(input$var2TNa, input$var2TNb)
+      a = input$var2TNa
+      b = input$var2TNb
+      if(b < 0.005){b=0.005}
+      var2.par = c(a, b)
     }else{
       var2.prior = "unif"
       var2.par = c()
@@ -661,12 +697,28 @@ shinyServer(function(input, output, session) {
         omega = input$corPC1omega
         u = input$corPC1u
         alpha = input$corPC1alpha
+        if(rho0 < -0.95){rho0 = -0.95}
+        if(rho0 > 0.95){rho0 = 0.95}
+        if(omega < 0.01){omega = 0.01}
+        if(omega > 0.99){omega = 0.99}
+        if(u < -0.99){u = -0.99}
+        if(u > rho0){u = rho0-0.000001}
+        if(alpha < 0.001){alpha = 0.001}
+        if(alpha > omega){alpha = omega - 0.001}
         cor.par = c(1, rho0, omega, u, alpha, NA, NA)
       }else if(strategy=="strategy2"){
         rho0 = input$corPC2rho0
         omega = input$corPC2omega
         u = input$corPC2u
         alpha = input$corPC2alpha
+        if(rho0 < -0.95){rho0 = -0.95}
+        if(rho0 > 0.95){rho0 = 0.95}
+        if(omega < 0.01){omega = 0.01}
+        if(omega > 0.99){omega = 0.99}
+        if(u > 0.99){u = 0.99}
+        if(u < rho0){u = rho0+0.000001}
+        if(alpha < 0.001){alpha = 0.001}
+        if(alpha > (1-omega)){alpha = 1- omega - 0.001}
         cor.par = c(2, rho0, omega, NA, NA, u, alpha)
       }else{
         rho0 = input$corPC3rho0
@@ -674,14 +726,31 @@ shinyServer(function(input, output, session) {
         alpha1 = input$corPC3alpha1
         u2 = input$corPC3u2
         alpha2 = input$corPC3alpha2
+        if(rho0 < -0.95){rho0 = -0.95}
+        if(rho0 > 0.95){rho0 = 0.95}
+        if(u1 < -0.99){u1 = -0.99}
+        if(u1 > rho0){u1 = rho0-0.000001}
+        if(u2 > 0.99){u2 = 0.99}
+        if(u2 < rho0){u2 = rho0+0.000001}
+        if(alpha1 < 0.001){alpha1 = 0.001}
+        if(alpha1 > 0.99){alpha1 = 0.99}
+        if(alpha2 < 0.001){alpha2 = 0.001}
+        if(alpha2 > (1-alpha1)){alpha2 = 1-alpha1 - 0.0001}
         cor.par = c(3, rho0, NA, u1, alpha1, u2, alpha2)
       }
     }else if(corPriorName=="cor-prior-name-normal"){
       cor.prior = "normal"
-      cor.par = c(input$corNormalmu, input$corNormalvar)
+      mu = input$corNormalmu
+      var = input$corNormalvar
+      if(var < 0.001){var = 0.001}
+      cor.par = c(mu, var)
     }else if(corPriorName=="cor-prior-name-beta"){
       cor.prior = "beta"
-      cor.par = c(input$corBetaa, input$corBetab)
+      a = input$corBetaa
+      b = input$corBetab
+      if(a < 0.01){a = 0.01}
+      if(b < 0.01){b = 0.01}
+      cor.par = c(a, b)
     }else{
       cor.prior = "unif"
       cor.par = c()
@@ -711,7 +780,6 @@ shinyServer(function(input, output, session) {
   ###########################################################
   ###### Construct sidebar Data needed UI
   ###########################################################
-  
   ##------- Sidebar Data Modality ---------#
   output$sidebardatamodality <- renderUI({
     data = inputDataFile()
@@ -778,7 +846,9 @@ shinyServer(function(input, output, session) {
   
   #----------- INLA Version ---------------#
   output$inlaversion  = renderPrint({
-    #     cat(input$datamodality)
+    #   cat(length(input$partialdata))
+    #   cat("\n")
+        # cat(input$modelnos)
     #     cat("\n")
     #     cat(class(input$datamodality))
     #     cat("\n")
@@ -846,8 +916,14 @@ shinyServer(function(input, output, session) {
       }else{
         model = runModel(outdata=inputdata(), outpriors = inputPrior(), link=link, quantiles=quantiles, verbose=FALSE)
       }
-      object = makeObject(outdata=inputdata(), outpriors=inputPrior(), model=model, nsample=input$modelnos)
-      return(object)
+      
+      if(model$ok){
+        object = makeObject(outdata=inputdata(), outpriors=inputPrior(), model=model, nsample=input$modelnos)
+        return(object)
+      }else{
+        return(NULL)
+      }
+      
     }
   })
   
@@ -977,25 +1053,38 @@ shinyServer(function(input, output, session) {
   ###########################################################
   ###### Construct Main Estimates needed UI
   ###########################################################
-  output$estimates <- renderPrint({
-    model = inputmodel()
-    if(is.null(model)){
-      return()
+  estimatesReact <- eventReactive(input$RunINLAButton, {
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
     }else{
-      a = summary(model)
-      return(a)
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        a = summary(model)
+        return(a)
+      }
     }
   })
+  output$estimates <- renderPrint({
+    estimatesReact()
+  })
   output$estimatesOut <- renderUI({
-    data = inputdata()
-    model = inputmodel()
-    if(is.null(data)){
-      h4("Please check if the data is valid!")
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
     }else{
-      if(is.null(model)){
-        h4("Please press RunINLA Button!")
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
       }else{
-        verbatimTextOutput("estimates")
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          verbatimTextOutput("estimates")
+        }
       }
     }
   })
@@ -1029,367 +1118,539 @@ shinyServer(function(input, output, session) {
     marginalsReact()
   })
   output$marginalsOut <- renderUI({
-    plotOutput("marginals", width="80%",height = paste(input$fheightsize,"px",sep=""))
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          plotOutput("marginals", width="80%",height = paste(input$fheightsize,"px",sep=""))
+        }
+      }
+    }
   })
   
-#   ###########################################################
-#   ###### Construct Main SROC needed UI
-#   ###########################################################
-#   output$SROC <- renderPlot({
-#     res = inputmodel()
-#     if(is.null(res)){
-#       return()
-#     }else{
-#       est.type = input$sptype
-#       sp.cex = input$spsize
-#       sp.pch = switch(input$spsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                       "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                       "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                       "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                       "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#       sp.col = paste("#",input$spcolor,sep="")
-#       dataShow = switch(input$dptype, "original"="o", "fitted"="f", "none"="n")
-#       data.col = paste("#",input$dpcolor,sep="")
-#       data.cex = input$dpsizeind
-#       if(data.cex=="fixed"){data.cex=input$dpsize}
-#       data.pch = switch(input$dpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                         "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                         "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                         "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                         "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#       lineShow = switch(input$srocshow, "show"=T, "notshow"=F)
-#       sroc.type = switch(input$srocfunction, "srocf1"=1, "srocf2"=2, "srocf3"=3, "srocf4"=4, "srocf5"=5)
-#       line.lty = switch(input$sroclt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#       line.lwd = input$srocwidth
-#       line.col = paste("#",input$sroccolor,sep="")
-#       crShow = switch(input$crshow, "show"=T, "notshow"=F)
-#       cr.lty = switch(input$crlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#       cr.lwd = input$crwidth
-#       cr.col = paste("#",input$crcolor,sep="")
-#       prShow = switch(input$prshow, "show"=T, "notshow"=F)
-#       pr.lty = switch(input$prlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#       pr.lwd = input$prwidth
-#       pr.col = paste("#",input$prcolor,sep="")
-#       main = as.character(input$SROC_title)
-#       xlab = as.character(input$SROC_xlab)
-#       ylab = as.character(input$SROC_ylab)
-#       cex.main = input$SROC_cex_main
-#       cex.axis = input$SROC_cex_axis
-#       cex.lab = input$SROC_cex_lab
-#       SROC(res, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
-#            dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
-#            lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
-#            crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
-#            prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
-#            dataFit = T, 
-#            main=main, cex.main=cex.main, cex.axis=cex.axis,
-#            xlab=xlab, ylab=ylab, cex.lab=cex.lab)
-#     }
-#   })
-#   output$SROCOut <- renderUI({
-#     data = inputDataFile()
-#     res = inputmodel()
-#     if(is.null(data)){
-#       h4("Please check data!")
-#     }else{
-#       if(is.null(res)){
-#         h4("Please press the RunINLA Button!")
-#       }else{
-#         plotOutput("SROC", height="400px",width = "400px")
-#       }
-#     }
-#   })
-#   output$AUC <- renderPrint({
-#     res = inputmodel()
-#     if(is.null(res)){
-#       return()
-#     }else{
-#       a = res$AUC
-#       return(round(a,2))
-#     }
-#   })
-#   output$AUCOut <- renderUI({
-#     data = inputdata()
-#     res = inputmodel()
-#     if(is.null(data)){
-#     }else{
-#       if(is.null(res)){
-#       }else{
-#         verbatimTextOutput("AUC")
-#       }
-#     }
-#   })
-#   ###########################################################
-#   ###### Construct Main Forest needed UI
-#   ###########################################################
-#   output$Forest <- renderPlot({
-#     res = inputmodel()
-#     if(is.null(res)){
-#       return()
-#     }else{
-#       accuracy.type = input$accutype
-#       est.type = input$esttype
-#       nameShow = input$snshow
-#       if(nameShow=="no"){nameShow = FALSE}
-#       dataShow = input$odshow
-#       if(dataShow=="no"){dataShow = FALSE}
-#       ciShow = input$cishow
-#       if(ciShow=="no"){ciShow = FALSE}
-#       p.pch = switch(input$fpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                      "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                      "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                      "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                      "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#       p.cex = input$fpsizeind
-#       if(p.cex=="fixed"){p.cex = input$fpsize}
-#       p.col = paste("#", input$fpcolor, sep="")
-#       text.cex = input$ftextsize
-#       shade.col = paste("#", input$shadecolor, sep="")
-#       arrow.col = paste("#", input$arrowcolor, sep="")
-#       arrow.lty = switch(input$arrowlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#       arrow.lwd = input$arrowwidth
-#       forest(res, accuracy.type=accuracy.type, est.type=est.type, 
-#              p.cex=p.cex, p.pch=p.pch, p.col=p.col,
-#              nameShow=nameShow, dataShow=dataShow, estShow=ciShow, text.cex=text.cex,
-#              shade.col=shade.col, arrow.col=arrow.col, arrow.lty=arrow.lty, arrow.lwd=arrow.lwd,
-#              intervals=c(0.025,0.975),
-#              main="Forest plot", main.cex=1.5, axis.cex=1)
-#     }
-#   })
-#   output$ForestOut <- renderUI({
-#     data = inputdata()
-#     res = inputmodel()
-#     if(is.null(data)){
-#       h4("Please check data!")
-#     }else{
-#       if(is.null(res)){
-#         h4("Please press the RunINLA Button!")
-#       }else{
-#         plotOutput("Forest", width="100%",height = paste(input$fheightsize,"px",sep=""))
-#       }
-#     }
-#   })
-#   ###########################################################
-#   ###### Construct Main Fitted needed UI
-#   ###########################################################
-#   output$Fitted <- renderPrint({
-#     res = inputmodel()
-#     if(is.null(res)){
-#       return()
-#     }else{
-#       a = fitted(res, accuracy.type = input$fitaccutype)
-#       print(a)
-#     }
-#   })
-#   output$FittedOut <- renderUI({
-#     data = inputdata()
-#     res = inputmodel()
-#     if(is.null(data)){
-#       h4("Please check data!")
-#     }else{
-#       if(is.null(res)){
-#         h4("Please press the RunINLA Button!")
-#       }else{
-#         verbatimTextOutput("Fitted")
-#       }
-#     }
-#   })
-#   
-#   ###########################################################
-#   ###### Construct Save Model
-#   ###########################################################
-#   output$saveModel <- downloadHandler(
-#     filename = function() {
-#       paste('model-', Sys.Date(), '.Rdata', sep='')
-#     },
-#     content = function(file) {
-#       model = inputmodel()
-#       if(is.null(model)){
-#         return(NULL)
-#       }else{
-#         save(model,file=file)
-#       }
-#     }
-#   )
-#   
-#   ###########################################################
-#   ###### Construct Save SROC
-#   ###########################################################
-#   output$SaveSROC <- downloadHandler(
-#     filename = function() {
-#       paste('SROC-', Sys.Date(), '.',input$srocform, sep='')
-#       },
-#     content = function(file) {
-#       fileform = input$srocform
-#       width = input$SROC_width
-#       height = input$SROC_height
-#       model = inputmodel()
-#       if(is.null(model)){
-#         return(NULL)
-#       }else{
-#         if(fileform=="eps"){
-#           setEPS()
-#           postscript(file, width=width, height=height)
-#         }else if(fileform=="pdf"){
-#           pdf(file, width=width, height=height)
-#         }else if(fileform=="jpg"){
-#           jpeg(file, width = width, height = height, units = "in", res=300)
-#         }else{
-#           png(file, width = width, height = height, units = "in", res=300)
-#         }
-#         est.type = input$sptype
-#         sp.cex = input$spsize
-#         sp.pch = switch(input$spsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                         "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                         "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                         "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                         "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#         sp.col = paste("#",input$spcolor,sep="")
-#         dataShow = switch(input$dptype, "original"="o", "fitted"="f", "none"="n")
-#         data.col = paste("#",input$dpcolor,sep="")
-#         data.cex = input$dpsizeind
-#         if(data.cex=="fixed"){data.cex=input$dpsize}
-#         data.pch = switch(input$dpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                           "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                           "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                           "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                           "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#         lineShow = switch(input$srocshow, "show"=T, "notshow"=F)
-#         sroc.type = switch(input$srocfunction, "srocf1"=1, "srocf2"=2, "srocf3"=3, "srocf4"=4, "srocf5"=5)
-#         line.lty = switch(input$sroclt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#         line.lwd = input$srocwidth
-#         line.col = paste("#",input$sroccolor,sep="")
-#         crShow = switch(input$crshow, "show"=T, "notshow"=F)
-#         cr.lty = switch(input$crlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#         cr.lwd = input$crwidth
-#         cr.col = paste("#",input$crcolor,sep="")
-#         prShow = switch(input$prshow, "show"=T, "notshow"=F)
-#         pr.lty = switch(input$prlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#         pr.lwd = input$prwidth
-#         pr.col = paste("#",input$prcolor,sep="")
-#         main = input$SROC_title
-#         xlab = input$SROC_xlab
-#         ylab = input$SROC_ylab
-#         cex.main = input$SROC_cex_main
-#         cex.axis = input$SROC_cex_axis
-#         cex.lab = input$SROC_cex_lab
-#         SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
-#              dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
-#              lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
-#              crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
-#              prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
-#              dataFit = T, 
-#              main=main, cex.main=cex.main, cex.axis=cex.axis,
-#              xlab=xlab, ylab=ylab, cex.lab=cex.lab)
-#         dev.off()
-#       }
-#     }
-#   )
-#   ###########################################################
-#   ###### Construct Save Forest
-#   ###########################################################
-#   output$SaveForest <- downloadHandler(
-#     filename = function() {
-#       paste('Forest-', Sys.Date(), '.',input$forestform, sep='')
-#     },
-#     content = function(file) {
-#       model = inputmodel()
-#       if(is.null(model)){
-#         return(NULL)
-#       }else{
-#         fileform = input$forestform
-#         width = input$Forest_width
-#         height = input$Forest_height
-#         if(fileform=="eps"){
-#           setEPS()
-#           postscript(file, width=width, height=height)
-#         }else if(fileform=="pdf"){
-#           pdf(file, width=width, height=height)
-#         }else if(fileform=="jpg"){
-#           jpeg(file, width = width, height = height, units = "in", res=300)
-#         }else{
-#           png(file, width = width, height = height, units = "in", res=300)
-#         }
-#         accuracy.type = input$accutype
-#         est.type = input$esttype
-#         nameShow = input$snshow
-#         if(nameShow=="no"){nameShow = FALSE}
-#         dataShow = input$odshow
-#         if(dataShow=="no"){dataShow = FALSE}
-#         ciShow = input$cishow
-#         if(ciShow=="no"){ciShow = FALSE}
-#         p.pch = switch(input$fpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
-#                        "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
-#                        "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
-#                        "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
-#                        "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
-#         p.cex = input$fpsizeind
-#         if(p.cex=="fixed"){p.cex = input$fpsize}
-#         p.col = paste("#", input$fpcolor, sep="")
-#         text.cex = input$ftextsize
-#         shade.col = paste("#", input$shadecolor, sep="")
-#         arrow.col = paste("#", input$arrowcolor, sep="")
-#         arrow.lty = switch(input$arrowlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
-#         arrow.lwd = input$arrowwidth
-#         forest(model, accuracy.type=accuracy.type, est.type=est.type, 
-#                p.cex=p.cex, p.pch=p.pch, p.col=p.col,
-#                nameShow=nameShow, dataShow=dataShow, estShow=ciShow, text.cex=text.cex,
-#                shade.col=shade.col, arrow.col=arrow.col, arrow.lty=arrow.lty, arrow.lwd=arrow.lwd,
-#                intervals=c(0.025,0.975),
-#                main="Forest plot", main.cex=1.5, axis.cex=1)
-#         dev.off()
-#       }
-#     }
-#   )
-#   ###########################################################
-#   ###### Construct Save Estimates
-#   ###########################################################
-#   output$saveEstimates <- downloadHandler(
-#     filename = function() {
-#       paste('Estimates-', Sys.Date(), '.txt', sep='')
-#     },
-#     content = function(file) {
-#       model = inputmodel()
-#       if(is.null(model)){
-#         return(NULL)
-#       }else{
-#         a = summary(model)
-#         sink(file)
-#         print(a)
-#         sink()
-#       }
-#     }
-#   )
-#   ###########################################################
-#   ###### Construct Save Marginals
-#   ###########################################################
-#   output$SaveMarginals <- downloadHandler(
-#     filename = function() {
-#       paste(input$marginalspar,'-', Sys.Date(), '.', input$marginalsform, sep='')
-#     },
-#     content = function(file) {
-#       model = inputmodel()
-#       if(is.null(model)){
-#         return(NULL)
-#       }else{
-#         fileform = input$marginalsform
-#         width = input$marginals_width
-#         height = input$marginals_height
-#         if(fileform=="eps"){
-#           setEPS()
-#           postscript(file, width=width, height=height)
-#         }else if(fileform=="pdf"){
-#           pdf(file, width=width, height=height)
-#         }else if(fileform=="jpg"){
-#           jpeg(file, width = width, height = height, units = "in", res=300)
-#         }else{
-#           png(file, width = width, height = height, units = "in", res=300)
-#         }
-#         plot(model, var.type=input$marginalspar)
-#         dev.off()
-#       }
-#     }
-#   )
+  ###########################################################
+  ###### Construct Main SROC needed UI
+  ###########################################################
+  output$SROC <- renderPlot({
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
+    }else{
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        number.partial = length(input$partialdata)
+        
+        est.type = input$sptype
+        sp.cex = input$spsize
+        sp.pch = switch(input$spsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                        "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                        "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                        "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                        "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+        sp.col = paste("#",input$spcolor,sep="")
+        if(number.partial>1){
+          angles = 360/number.partial
+          given_sp_rgb = col2rgb(sp.col)
+          given_sp_hsl = .rgb_to_hsl(given_sp_rgb[1],given_sp_rgb[2],given_sp_rgb[3])
+          h = given_sp_hsl[1]
+          s = given_sp_hsl[2]
+          l = given_sp_hsl[3]
+          sp_h_list = h + angles*(0:number.partial)
+          sp_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(sp_h_list[x], s, l)))
+          sp.col = sp_col_list
+        }
+        
+        dataShow = switch(input$dptype, "original"="o", "fitted"="f", "none"="n")
+        data.col = paste("#",input$dpcolor,sep="")
+        data.cex = input$dpsizeind
+        if(data.cex=="fixed"){data.cex=input$dpsize}
+        data.pch = switch(input$dpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                          "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                          "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                          "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                          "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+        lineShow = switch(input$srocshow, "show"=T, "notshow"=F)
+        sroc.type = switch(input$srocfunction, "srocf1"=1, "srocf2"=2, "srocf3"=3, "srocf4"=4, "srocf5"=5)
+        line.lty = switch(input$sroclt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+        line.lwd = input$srocwidth
+        line.col = paste("#",input$sroccolor,sep="")
+        if(number.partial>1){
+          angles = 360/number.partial
+          given_line_rgb = col2rgb(line.col)
+          given_line_hsl = .rgb_to_hsl(given_line_rgb[1],given_line_rgb[2],given_line_rgb[3])
+          h = given_line_hsl[1]
+          s = given_line_hsl[2]
+          l = given_line_hsl[3]
+          line_h_list = h + angles*(0:number.partial)
+          line_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(line_h_list[x], s, l)))
+          line.col = line_col_list
+        }
+        crShow = switch(input$crshow, "show"=T, "notshow"=F)
+        cr.lty = switch(input$crlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+        cr.lwd = input$crwidth
+        cr.col = paste("#",input$crcolor,sep="")
+        if(number.partial>1){
+          angles = 360/number.partial
+          given_cr_rgb = col2rgb(cr.col)
+          given_cr_hsl = .rgb_to_hsl(given_cr_rgb[1],given_cr_rgb[2],given_cr_rgb[3])
+          h = given_cr_hsl[1]
+          s = given_cr_hsl[2]
+          l = given_cr_hsl[3]
+          cr_h_list = h + angles*(0:number.partial)
+          cr_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(cr_h_list[x], s, l)))
+          cr.col = cr_col_list
+        }
+        prShow = switch(input$prshow, "show"=T, "notshow"=F)
+        pr.lty = switch(input$prlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+        pr.lwd = input$prwidth
+        pr.col = paste("#",input$prcolor,sep="")
+        if(number.partial>1){
+          angles = 360/number.partial
+          given_pr_rgb = col2rgb(pr.col)
+          given_pr_hsl = .rgb_to_hsl(given_pr_rgb[1],given_pr_rgb[2],given_pr_rgb[3])
+          h = given_pr_hsl[1]
+          s = given_pr_hsl[2]
+          l = given_pr_hsl[3]
+          pr_h_list = h + angles*(0:number.partial)
+          pr_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(pr_h_list[x], s, l)))
+          pr.col = pr_col_list
+        }
+        main = as.character(input$SROC_title)
+        xlab = as.character(input$SROC_xlab)
+        ylab = as.character(input$SROC_ylab)
+        cex.main = input$SROC_cex_main
+        cex.axis = input$SROC_cex_axis
+        cex.lab = input$SROC_cex_lab
+        SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+             dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+             lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+             crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+             prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+             dataFit = T, 
+             main=main, cex.main=cex.main, cex.axis=cex.axis,
+             xlab=xlab, ylab=ylab, cex.lab=cex.lab)
+      }
+    }
+  })
+  output$SROCOut <- renderUI({
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          plotOutput("SROC", height="400px", width = "400px")
+        }
+      }
+    }
+  })
+  
+  ###########################################################
+  ###### Construct AUC needed UI
+  ###########################################################
+  AUCReact <- eventReactive(input$RunINLAButton, {
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
+    }else{
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        a = model$AUC
+        return(round(a,2))
+      }
+    }
+  })
+  output$AUC <- renderPrint({
+    AUCReact()
+  })
+  output$AUCOut <- renderUI({
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          verbatimTextOutput("AUC")
+        }
+      }
+    }
+  })
+  ###########################################################
+  ###### Construct Main Forest needed UI
+  ###########################################################
+  output$Forest <- renderPlot({
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
+    }else{
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        accuracy.type = input$accutype
+        est.type = input$esttype
+        nameShow = input$snshow
+        if(nameShow=="no"){nameShow = FALSE}
+        dataShow = input$odshow
+        if(dataShow=="no"){dataShow = FALSE}
+        ciShow = input$cishow
+        if(ciShow=="no"){ciShow = FALSE}
+        p.pch = switch(input$fpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                       "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                       "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                       "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                       "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+        p.cex = input$fpsizeind
+        if(p.cex=="fixed"){p.cex = input$fpsize}
+        p.col = paste("#", input$fpcolor, sep="")
+        text.cex = input$ftextsize
+        shade.col = paste("#", input$shadecolor, sep="")
+        arrow.col = paste("#", input$arrowcolor, sep="")
+        arrow.lty = switch(input$arrowlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+        arrow.lwd = input$arrowwidth
+        forest(model, accuracy.type=accuracy.type, est.type=est.type, 
+               p.cex=p.cex, p.pch=p.pch, p.col=p.col,
+               nameShow=nameShow, dataShow=dataShow, estShow=ciShow, text.cex=text.cex,
+               shade.col=shade.col, arrow.col=arrow.col, arrow.lty=arrow.lty, arrow.lwd=arrow.lwd,
+               intervals=c(0.025,0.975),
+               main="Forest plot", main.cex=1.5, axis.cex=1)
+      }
+    }
+  })
+  output$ForestOut <- renderUI({
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          plotOutput("Forest", width="100%",height = paste(input$fheightsize,"px",sep=""))
+        }
+      }
+      }
+  })
+  
+  ###########################################################
+  ###### Construct Main Fitted needed UI
+  ###########################################################
+  output$Fitted <- renderPrint({
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
+    }else{
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        a = fitted(model, accuracy.type = input$fitaccutype)
+        print(a)
+      }
+    }
+  })
+  output$FittedOut <- renderUI({
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+            The information will be shown in the R Console.")
+        }else{
+          verbatimTextOutput("Fitted")
+        }
+      }
+      }
+  })
+  
+  ###########################################################
+  ###### Construct Save Model
+  ###########################################################
+  output$saveModel <- downloadHandler(
+    filename = function() {
+      paste('model-', Sys.Date(), '.Rdata', sep='')
+    },
+    content = function(file) {
+      if(input$RunINLAButton == 0){
+        model = NULL
+        save(model,file=file)
+      }else{
+        data = inputdata()
+        if(is.null(data)){
+          model = NULL
+          save(model,file=file)
+        }else{
+          model = inputmodel()
+          save(model,file=file)
+        }
+      }
+    }
+  )
+  
+  ###########################################################
+  ###### Construct Save SROC
+  ###########################################################
+  output$SaveSROC <- downloadHandler(
+    filename = function() {
+      paste('SROC-', Sys.Date(), '.',input$srocform, sep='')
+      },
+    content = function(file) {
+      fileform = input$srocform
+      width = input$SROC_width
+      height = input$SROC_height
+      if(fileform=="eps"){
+        setEPS()
+        postscript(file, width=width, height=height)
+      }else if(fileform=="pdf"){
+        pdf(file, width=width, height=height)
+      }else if(fileform=="jpg"){
+        jpeg(file, width = width, height = height, units = "in", res=300)
+      }else{
+        png(file, width = width, height = height, units = "in", res=300)
+      }
+      if(input$RunINLAButton == 0){
+        plot.new()
+      }else{
+        data = inputdata()
+        if(is.null(data)){
+          plot.new()
+        }else{
+          model = inputmodel()
+          if(is.null(model)){
+            plot.new()
+          }else{
+            est.type = input$sptype
+            sp.cex = input$spsize
+            sp.pch = switch(input$spsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                            "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                            "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                            "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                            "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+            sp.col = paste("#",input$spcolor,sep="")
+            dataShow = switch(input$dptype, "original"="o", "fitted"="f", "none"="n")
+            data.col = paste("#",input$dpcolor,sep="")
+            data.cex = input$dpsizeind
+            if(data.cex=="fixed"){data.cex=input$dpsize}
+            data.pch = switch(input$dpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                              "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                              "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                              "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                              "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+            lineShow = switch(input$srocshow, "show"=T, "notshow"=F)
+            sroc.type = switch(input$srocfunction, "srocf1"=1, "srocf2"=2, "srocf3"=3, "srocf4"=4, "srocf5"=5)
+            line.lty = switch(input$sroclt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+            line.lwd = input$srocwidth
+            line.col = paste("#",input$sroccolor,sep="")
+            crShow = switch(input$crshow, "show"=T, "notshow"=F)
+            cr.lty = switch(input$crlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+            cr.lwd = input$crwidth
+            cr.col = paste("#",input$crcolor,sep="")
+            prShow = switch(input$prshow, "show"=T, "notshow"=F)
+            pr.lty = switch(input$prlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+            pr.lwd = input$prwidth
+            pr.col = paste("#",input$prcolor,sep="")
+            main = input$SROC_title
+            xlab = input$SROC_xlab
+            ylab = input$SROC_ylab
+            cex.main = input$SROC_cex_main
+            cex.axis = input$SROC_cex_axis
+            cex.lab = input$SROC_cex_lab
+            SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+                 dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+                 lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+                 crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+                 prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+                 dataFit = T, 
+                 main=main, cex.main=cex.main, cex.axis=cex.axis,
+                 xlab=xlab, ylab=ylab, cex.lab=cex.lab)
+          }
+        }
+      }
+      dev.off()
+    }
+  )
+  
+  ###########################################################
+  ###### Construct Save Forest
+  ###########################################################
+  output$SaveForest <- downloadHandler(
+    filename = function() {
+      paste('Forest-', Sys.Date(), '.',input$forestform, sep='')
+    },
+    content = function(file) {
+        fileform = input$forestform
+        width = input$Forest_width
+        height = input$Forest_height
+        if(fileform=="eps"){
+          setEPS()
+          postscript(file, width=width, height=height)
+        }else if(fileform=="pdf"){
+          pdf(file, width=width, height=height)
+        }else if(fileform=="jpg"){
+          jpeg(file, width = width, height = height, units = "in", res=300)
+        }else{
+          png(file, width = width, height = height, units = "in", res=300)
+        }
+        if(input$RunINLAButton == 0){
+          plot.new()
+        }else{
+          data = inputdata()
+          if(is.null(data)){
+            plot.new()
+          }else{
+            model = inputmodel()
+            if(is.null(model)){
+              plot.new()
+            }else{
+              accuracy.type = input$accutype
+              est.type = input$esttype
+              nameShow = input$snshow
+              if(nameShow=="no"){nameShow = FALSE}
+              dataShow = input$odshow
+              if(dataShow=="no"){dataShow = FALSE}
+              ciShow = input$cishow
+              if(ciShow=="no"){ciShow = FALSE}
+              p.pch = switch(input$fpsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
+                             "whitetriangleup"=2,"whitetriangledown"=6,"blacksquare"=15,
+                             "blackcircle"=16,"blackdiamond"=18,"blacktriangleup"=17,"plus"=3,
+                             "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
+                             "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
+              p.cex = input$fpsizeind
+              if(p.cex=="fixed"){p.cex = input$fpsize}
+              p.col = paste("#", input$fpcolor, sep="")
+              text.cex = input$ftextsize
+              shade.col = paste("#", input$shadecolor, sep="")
+              arrow.col = paste("#", input$arrowcolor, sep="")
+              arrow.lty = switch(input$arrowlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
+              arrow.lwd = input$arrowwidth
+              forest(model, accuracy.type=accuracy.type, est.type=est.type, 
+                     p.cex=p.cex, p.pch=p.pch, p.col=p.col,
+                     nameShow=nameShow, dataShow=dataShow, estShow=ciShow, text.cex=text.cex,
+                     shade.col=shade.col, arrow.col=arrow.col, arrow.lty=arrow.lty, arrow.lwd=arrow.lwd,
+                     intervals=c(0.025,0.975),
+                     main="Forest plot", main.cex=1.5, axis.cex=1)
+            }
+          }
+        }
+        dev.off()
+    }
+  )
+  ###########################################################
+  ###### Construct Save Estimates
+  ###########################################################
+  output$saveEstimates <- downloadHandler(
+    filename = function() {
+      paste('Estimates-', Sys.Date(), '.txt', sep='')
+    },
+    content = function(file) {
+      if(input$RunINLAButton == 0){
+        model = NULL
+      }else{
+        data = inputdata()
+        if(is.null(data)){
+          model = NULL
+        }else{
+          model = inputmodel()
+        }
+      }
+      a = summary(model)
+      sink(file)
+      print(a)
+      sink()
+    }
+  )
+  ###########################################################
+  ###### Construct Save Marginals
+  ###########################################################
+  output$SaveMarginals <- downloadHandler(
+    filename = function() {
+      paste(input$marginalspar,'-', Sys.Date(), '.', input$marginalsform, sep='')
+    },
+    content = function(file) {
+      fileform = input$marginalsform
+      width = input$marginals_width
+      height = input$marginals_height
+      if(fileform=="eps"){
+        setEPS()
+        postscript(file, width=width, height=height)
+      }else if(fileform=="pdf"){
+        pdf(file, width=width, height=height)
+      }else if(fileform=="jpg"){
+        jpeg(file, width = width, height = height, units = "in", res=300)
+      }else{
+        png(file, width = width, height = height, units = "in", res=300)
+      }
+      if(input$RunINLAButton == 0){
+        plot.new()
+      }else{
+        data = inputdata()
+        if(is.null(data)){
+          plot.new()
+        }else{
+          model = inputmodel()
+          if(is.null(model)){
+            plot.new()
+          }else{
+            ind = input$marginalspar
+            if(ind != "all"){
+              plot(model, var.type=input$marginalspar)
+            }else{
+              fixed_names = rownames(model$summary.fixed)
+              hyperpar_names = rownames(model$summary.hyperppar)
+              num_fixed = length(fixed_names)
+              num_row = ceiling(0.5*num_fixed) + 2
+              par(mfrow=c(num_row,2))
+              for(i in 1:num_fixed){
+                plot(INLA::inla.smarginal(model$marginals.fixed[[i]]), type="l", xlab=fixed_names[i], ylab="")
+              }
+              if(num_fixed %% 2==1){
+                pot.new()
+              }
+              plot(model, var.type="var1")
+              plot(model, var.type="var2")
+              plot(model, var.type="rho")
+              plot(-10,-10, xlim=c(0,1),ylim=c(0,1), xaxt = "n", yaxt="n", bty="n",xlab="",ylab="")
+              legend("center",legend=c("prior", "posterior"),lty=c(1,2),col=c("black","gray"), bty="n")
+            }
+          }
+        }
+      }
+      dev.off()
+    }
+  )
 #   ###########################################################
 #   ###### Construct Save Priors
 #   ###########################################################

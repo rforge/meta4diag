@@ -47,15 +47,15 @@ SROC(x,...)
   A string or a numerical value indicating the symbol of the plotted dataset points.
 }
   \item{sroc.type}{
-  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1}, the SROC line is plotted as "Regression Line 1" according to Arends et al.(2008),
+  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1}, the SROC line is plotted as " The regression line 1" according to Arends et al.(2008),
   \deqn{y = \mu + \rho\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \rho\sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
-  When \code{sroc.type=2}, the SROC line is plotted as "The major Axis Line",
+  When \code{sroc.type=2}, the SROC line is plotted as "The major axis method",
   \deqn{y = \frac{\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2}}{2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2})/(2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=3}, the SROC line is plotted as "Moses and Littenberg's Line",
+  When \code{sroc.type=3}, the SROC line is plotted as "The Moses and Littenberg's regression line",
   \deqn{y = \frac{\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}{\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})/(\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=4}, the SROC line is plotted as "Regression Line 2",
+  When \code{sroc.type=4}, the SROC line is plotted as "The regression line 2",
   \deqn{y = \mu + \frac{1}{\rho}\sqrt(\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2})(x-\nu)}{y = \mu + 1/\rho\sqrt(\sigma_{\mu}^2/\sigma_{\nu}^2)(x-\nu)}
-  When \code{sroc.type=5}, the SROC line is plotted as "Rutter and Gatsonis SROC",
+  When \code{sroc.type=5}, the SROC line is plotted as "The Rutter and Gatsonis's SROC curve",
   \deqn{y = \mu + \sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
 }
   \item{lineShow}{

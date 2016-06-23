@@ -54,6 +54,7 @@
 
 <body>
 <script src="shared/js/ASCIIMathML.js"></script>
+<script src="shared/js/validation_numeric.js"></script>
 <div class="container-fluid">
     <h4>Meta4diag: Bayesian Bivariate Meta-analysis of Diagnostic Test Studies</h4>
     <!-- Top Control Panel -->
@@ -222,13 +223,21 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- PC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name ">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1PCu"><i>u</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1PCu" type="number" class="form-control" value="3" min="0.05" max="50" step="0.05"/> 
+                                                        <input id="var1PCu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="3" min="0.05" max="50" step="0.05"/> 
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1PCu <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var1PCu > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 <tr>
@@ -236,7 +245,18 @@
                                                         <label class="sidebar-prior-name-label" for="var1PCalpha"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1PCalpha" type="number" class="form-control" value="0.05" min="0.005" max="0.995" step="0.005"/>
+                                                        <input id="var1PCalpha" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.05" min="0.005" max="0.995" step="0.005"/>
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1PCalpha <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var1PCalpha >= 1">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var1PCalpha > 0 && input.var1PCalpha < 1">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -265,19 +285,28 @@
                                                     <fieldset>
                                                         <legend>Description</legend>
                                                         The inverse gamma prior is defined for the variance <i>&sigma;<sup>2</sup></i> using 
-                                                        <div style="text-align:center; width:100%"><i>&sigma; ~ &Gamma;<sup>-1</sup>(&alpha;,&beta;)</i>,</div> 
+                                                        <div style="text-align:center; width:100%"><i>&sigma;<sup>2</sup> ~ &Gamma;<sup>-1</sup>(&alpha;,&beta;)</i>,</div> 
                                                         where <i>&alpha;</i> is the shape parameter and <i>&beta;</i> is the rate parameter.
                                                     </fieldset>
                                                 </form>
                                                 <!-- IG prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IGa"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IGa" type="number" class="form-control" value="0.25" min="0.005" max="10" step="0.005"/>
+                                                        <input id="var1IGa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.25" min="0.005" max="10" step="0.005"/>
                                                         <!--<div id="var1IGa" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1IGa <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1IGa > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 <tr>
@@ -285,8 +314,17 @@
                                                         <label class="sidebar-prior-name-label" for="var1IGb"><i>&beta;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IGb" type="number" class="form-control" value="0.025" min="0.005" max="10" step="0.005"/>
+                                                        <input id="var1IGb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.025" min="0.005" max="10" step="0.005"/>
                                                         <!--<div id="var1IGb" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1IGb <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1IGb > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -327,14 +365,23 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- HC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1HCa"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1HCa" type="number" class="form-control" value="3" min="0.1" max="5" step="0.05"/>
+                                                        <input id="var1HCa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="3" min="0.1" max="5" step="0.05"/>
                                                         <!--<div id="var1HCa" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1HCa <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1HCa > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -366,23 +413,37 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- T-Normal: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1TNa"><i>&mu;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1TNa" type="number" class="form-control" value="0" min="-5" max="5" step="0.05"/>
+                                                        <input id="var1TNa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0" min="-5" max="5" step="0.05"/>
                                                         <!--<div id="var1TNa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
+                                                    <td>
+                                                        <div>
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1TNb"><i>&tau;<sup>2</sup></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1TNb" type="number" class="form-control" value="1" min="0.05" max="5" step="0.05"/>
+                                                        <input id="var1TNb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="0.05" max="5" step="0.05"/>
                                                         <!--<div id="var1TNb" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1TNb <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1TNb > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -457,38 +518,70 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- Inverse-Wishart: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IWnu"><i>&nu;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IWnu" type="number" class="form-control" value="4" min="3" max="10" step="1"/>
+                                                        <input id="var1IWnu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="4" min="3" max="10" step="1"/>
                                                     </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1IWnu < 3">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1IWnu >= 3">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IWa"><i>R<sub>11</sub></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IWa" type="number" class="form-control" value="1" min="1" max="5" step="0.05"/>
+                                                        <input id="var1IWa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="1" max="5" step="0.05"/>
                                                     </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1IWa <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1IWa > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IWb"><i>R<sub>22</sub></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IWb" type="number" class="form-control" value="1" min="1" max="5" step="0.05"/>
+                                                        <input id="var1IWb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="1" max="5" step="0.05"/>
                                                     </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var1IWb <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1IWb > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IWc"><i>R<sub>12</sub></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var1IWc" type="number" class="form-control" value="0" min="-5" max="5" step="0.05"/>
+                                                        <input id="var1IWc" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0" min="-5" max="5" step="0.05"/>
                                                     </td> 
+                                                    <td>
+                                                        <div>
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 </table>
                                                 <!-- Inverse-Wishart prior: reset default and Show plot -->
@@ -553,14 +646,22 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- PC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2PCu"><i>u</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2PCu" type="number" class="form-control" value="3" min="0.05" max="50" step="0.05"/>
+                                                        <input id="var2PCu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="3" min="0.05" max="50" step="0.05"/>
                                                         <!--<div id="var2PCu" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2PCu <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var2PCu > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 <tr>
@@ -568,8 +669,19 @@
                                                         <label class="sidebar-prior-name-label" for="var2PCalpha"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2PCalpha" type="number" class="form-control" value="0.05" min="0.005" max="0.995" step="0.005"/>
+                                                        <input id="var2PCalpha" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.05" min="0.005" max="0.995" step="0.005"/>
                                                         <!--<div id="var2PCalpha" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2PCalpha <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var2PCalpha >= 1">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        </div>
+                                                        <div data-display-if="input.var2PCalpha > 0 && input.var2PCalpha < 1">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -598,19 +710,28 @@
                                                     <fieldset>
                                                         <legend>Description</legend>
                                                         The inverse gamma prior is defined for the variance <i>&sigma;<sup>2</sup></i> using 
-                                                        <div style="text-align:center; width:100%"><i>&sigma; ~ &Gamma;<sup>-1</sup>(&alpha;,&beta;)</i>,</div> 
+                                                        <div style="text-align:center; width:100%"><i>&sigma;<sup>2</sup> ~ &Gamma;<sup>-1</sup>(&alpha;,&beta;)</i>,</div> 
                                                         where <i>&alpha;</i> is the shape parameter and <i>&beta;</i> is the rate parameter.
                                                     </fieldset>
                                                 </form>
                                                 <!-- IG prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2IGa"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2IGa" type="number" class="form-control" value="0.25" min="0.005" max="10" step="0.005"/>
+                                                        <input id="var2IGa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.25" min="0.005" max="10" step="0.005"/>
                                                         <!--<div id="var2IGa" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2IGa <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var2IGa > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 <tr>
@@ -618,8 +739,17 @@
                                                         <label class="sidebar-prior-name-label" for="var2IGb"><i>&beta;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2IGb" type="number" class="form-control" value="0.025" min="0.005" max="10" step="0.005"/>
+                                                        <input id="var2IGb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.025" min="0.005" max="10" step="0.005"/>
                                                         <!--<div id="var2IGb" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2IGb <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var2IGb > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -660,14 +790,23 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- HC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2HCa"><i>&alpha;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2HCa" type="number" class="form-control" value="3" min="0.1" max="5" step="0.05"/>
+                                                        <input id="var2HCa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="3" min="0.1" max="5" step="0.05"/>
                                                         <!--<div id="var2HCa" class="shiny-text-output sidebar-current-prior"></div>-->
+                                                    </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2HCa <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var2HCa > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
                                                     </td> 
                                                 </tr>
                                                 </table>
@@ -699,24 +838,38 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- T-Normal: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                                <table class="form-group shiny-input-container sidebar-prior-name">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2TNa"><i>&mu;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2TNa" type="number" class="form-control" value="0" min="-5" max="5" step="0.05"/>
+                                                        <input id="var2TNa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0" min="-5" max="5" step="0.05"/>
                                                         <!--<div id="var2TNa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
+                                                    <td>
+                                                        <div>
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2TNb"><i>&tau;<sup>2</sup></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="var2TNb" type="number" class="form-control" value="1" min="0.05" max="5" step="0.05"/>
+                                                        <input id="var2TNb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="0.05" max="5" step="0.05"/>
                                                         <!--<div id="var2TNb" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
+                                                    <td>
+                                                    	<div data-display-if="input.var2TNb <= 0">
+                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var2TNb > 0">
+                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 </table>
                                                 <!-- T-Normal: reset default and Show plot -->
@@ -865,36 +1018,72 @@
                                                             <label class="sidebar-prior-name-label" for="corPC1rho0"><i>&rho;<sub>0</sub></i>:</label>
                                                         </td>
                                                         <td>
-                                                            <input id="corPC1rho0" type="number" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
+                                                            <input id="corPC1rho0" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
                                                             <!--<div id="corPC1rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC1rho0 <= -1 || input.corPC1rho0 >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC1rho0 > -1 && input.corPC1rho0 < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
                                                     </tr> 
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC1omega"><i>&omega;</i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC1omega" type="number" class="form-control" value="0.6" min="0.1" max="0.9" step="0.05"/>
+                                                    		<input id="corPC1omega" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.6" min="0.1" max="0.9" step="0.05"/>
                                                             <!--<div id="corPC1omega" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC1omega <= 0 || input.corPC1omega >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC1omega > 0 && input.corPC1omega < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
   													<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC1u"><i>u<sub>1</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC1u" type="number" class="form-control" value="-0.95" min="-0.99" max="0.99" step="0.01"/>
+                                                    		<input id="corPC1u" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="-0.95" min="-0.99" max="0.99" step="0.01"/>
                                                             <!--<div id="corPC1u" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC1u <= -1 || input.corPC1u >= input.corPC1rho0">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC1u > -1 && input.corPC1u < input.corPC1rho0">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC1alpha"><i>&alpha;<sub>1</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC1alpha" type="number" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
+                                                    		<input id="corPC1alpha" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
                                                             <!--<div id="corPC1alpha" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC1alpha <= 0 || input.corPC1alpha >= input.corPC1omega">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC1alpha > 0 && input.corPC1alpha < input.corPC1omega">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
 												</table>
                                                 <!-- PC prior strategy 1:  reset default and Show plot -->
@@ -924,36 +1113,72 @@
                                                             <label class="sidebar-prior-name-label" for="corPC2rho0"><i>&rho;<sub>0</sub></i>:</label>
                                                         </td>
                                                         <td>
-                                                            <input id="corPC2rho0" type="number" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
+                                                            <input id="corPC2rho0" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
                                                             <!--<div id="corPC2rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC2rho0 <= -1 || input.corPC2rho0 >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC2rho0 > -1 && input.corPC2rho0 < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
                                                     </tr> 
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC2omega"><i>&omega;</i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC2omega" type="number" class="form-control" value="0.6" min="0.1" max="0.9" step="0.05"/>
+                                                    		<input id="corPC2omega" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.6" min="0.1" max="0.9" step="0.05"/>
                                                             <!--<div id="corPC2omega" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC2omega <= 0 || input.corPC2omega >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC2omega > 0 && input.corPC2omega < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
   													<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC2u"><i>u<sub>2</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC2u" type="number" class="form-control" value="0.95" min="-0.99" max="0.99" step="0.01"/>
+                                                    		<input id="corPC2u" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.95" min="-0.99" max="0.99" step="0.01"/>
                                                             <!--<div id="corPC2u" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC2u <= input.corPC2rho0 || input.corPC2u >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC2u > input.corPC2rho0 && input.corPC2u < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC2alpha"><i>&alpha;<sub>2</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC2alpha" type="number" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
+                                                    		<input id="corPC2alpha" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
                                                             <!--<div id="corPC2alpha" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC2alpha <= 0 || input.corPC2alpha >= 1-input.corPC2omega">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC2alpha > 0 && input.corPC2alpha < 1-input.corPC2omega">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
 												</table>
                                                 <!-- PC prior strategy 2:  reset default and Show plot -->
@@ -983,45 +1208,90 @@
                                                             <label class="sidebar-prior-name-label" for="corPC3rho0"><i>&rho;<sub>0</sub></i>:</label>
                                                         </td>
                                                         <td>
-                                                            <input id="corPC3rho0" type="number" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
+                                                            <input id="corPC3rho0" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="-0.2" min="-0.95" max="0.95" step="0.05"/>
                                                             <!--<div id="corPC3rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC3rho0 <= -1 || input.corPC3rho0 >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC3rho0 > -1 && input.corPC3rho0 < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
                                                     </tr> 
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC3u1"><i>u<sub>1</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC3u1" type="number" class="form-control" value="-0.95" min="-0.99" max="0.99" step="0.01"/>
+                                                    		<input id="corPC3u1" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="-0.95" min="-0.99" max="0.99" step="0.01"/>
                                                             <!--<div id="corPC3u1" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC3u1 <= -1 || input.corPC3u1 >= input.corPC3rho0">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC3u1 > -1 && input.corPC3u1 < input.corPC3rho0">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
                                                     <tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC3alpha1"><i>&alpha;<sub>1</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC3alpha1" type="number" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
+                                                    		<input id="corPC3alpha1" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
                                                             <!--<div id="corPC3alpha1" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC3alpha1 <= 0 || input.corPC3alpha1 >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC3alpha1 > 0 && input.corPC3alpha1 < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
   													<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC3u2"><i>u<sub>2</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC3u2" type="number" class="form-control" value="0.95" min="-0.99" max="0.99" step="0.01"/>
+                                                    		<input id="corPC3u2" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.95" min="-0.99" max="0.99" step="0.01"/>
                                                             <!--<div id="corPC3u2" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC3u2 <= input.corPC3rho0 || input.corPC3u2 >= 1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC3u2 > input.corPC3rho0 && input.corPC3u2 < 1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
                                                 	<tr>
     													<td align="right" style="padding-right:10px;">
                                                     		<label class="sidebar-prior-name-label" for="corPC3alpha2"><i>&alpha;<sub>2</sub></i>:</label>
                                                 		</td>
     													<td>
-                                                    		<input id="corPC3alpha2" type="number" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
+                                                    		<input id="corPC3alpha2" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.01" min="0.005" max="0.995" step="0.005"/>
                                                             <!--<div id="corPC3alpha2" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
+                                                        <td>
+                                                            <div data-display-if="input.corPC3alpha2 <= 0 || input.corPC3alpha2 >= 1-input.corPC3alpha1">
+                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)."></i>
+                                                            </div>
+                                                            
+                                                            <div data-display-if="input.corPC3alpha2 > 0 && input.corPC3alpha2 < 1-input.corPC3alpha1">
+                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            </div>
+                                                   		</td>
   													</tr>
 												</table>
                                                 <!-- PC prior strategy 3:  reset default and Show plot -->
@@ -1072,18 +1342,36 @@
                                                         <label class="sidebar-prior-name-label" for="corNormalmu"><i>&mu;</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="corNormalmu" type="number" class="form-control" value="0" min="-0.9" max="0.9" step="0.05"/>
+                                                        <input id="corNormalmu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0" min="-0.9" max="0.9" step="0.05"/>
                                                         <!--<div id="corNormalmu" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
+                                                    <td>
+                                                        <div data-display-if="input.corNormalmu <= -1 || input.corNormalmu >= 1">
+                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.corNormalmu > -1 && input.corNormalmu < 1">
+                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                   	</td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="corNormalvar"><i>&sigma;<sup>2</sup></i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="corNormalvar" type="number" class="form-control" value="5" min="0.1" max="10" step="0.05"/>
+                                                        <input id="corNormalvar" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="5" min="0.1" max="10" step="0.05"/>
                                                         <!--<div id="corNormalvar" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
+                                                    <td>
+                                                        <div data-display-if="input.corNormalvar <= 0">
+                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.corNormalvar > 0">
+                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                   	</td>
                                                 </tr>
                                             </table>
                                             <!-- Normal prior:  reset default and Show plot -->
@@ -1129,18 +1417,36 @@
                                                         <label class="sidebar-prior-name-label" for="corBetaa"><i>a</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="corBetaa" type="number" class="form-control" value="0.5" min="0.1" max="10" step="0.05"/>
+                                                        <input id="corBetaa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.5" min="0.1" max="10" step="0.05"/>
                                                         <!--<div id="corBetaa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
+                                                    <td>
+                                                        <div data-display-if="input.corBetaa <= 0">
+                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.corBetaa > 0">
+                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                   	</td>
                                                 </tr>
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="corBetab"><i>b</i>:</label>
                                                     </td>
                                                     <td>
-                                                        <input id="corBetab" type="number" class="form-control" value="0.5" min="0.1" max="10" step="0.05"/>
+                                                        <input id="corBetab" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.5" min="0.1" max="10" step="0.05"/>
                                                         <!--<div id="corBetab" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
+                                                    <td>
+                                                        <div data-display-if="input.corBetab <= 0">
+                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.corBetab > 0">
+                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        </div>
+                                                   	</td>
                                                 </tr>
                                             </table>
                                             <!-- Beta prior:  reset default and Show plot -->
@@ -1401,7 +1707,7 @@
                                 	<label class="control-label" for="modelnos">Number of Samples:</label>
                                 	<table class="form-group shiny-input-container sidebar-table">
                                 	<tr>
-  										<input id="modelnos" type="number" class="form-control sidebar-numberinput" value="1000" min="100" max="10000000" step="1000" style="width:100%;"/>
+  										<input id="modelnos" type="number" onkeypress="return isNumberKey(event)" class="form-control sidebar-numberinput" value="1000" min="100" max="10000000" step="1000" style="width:100%;"/>
                                     </tr>
                                     </table>
                                     <!-- Description -->
@@ -1496,12 +1802,12 @@
                                     <!-- Color -->
                                     <table class="form-group shiny-input-container sidebar-table_four_six">
                                     	<tr>
-                                    	<td>
-                                    		<label class="control-label" for="spcolor">Color:</label>
-                                    	</td>
-                                		<td>
-  											<input id="spcolor" type="text" class="jscolor" style="width:100%" value="FF0000">
-                                    	</td>
+                                            <td>
+                                                <label class="control-label" for="spcolor">Color:</label>
+                                            </td>
+                                            <td>
+                                                <input id="spcolor" type="text" class="jscolor" style="width:100%" value="A60000">
+                                            </td>
                                     	</tr>
       								</table>
 								</div> 
@@ -1607,7 +1913,7 @@
                                     		<label class="control-label" for="dpcolor">Color:</label>
                                     	</td>
                                 		<td>
-  											<input id="dpcolor" type="text" class="jscolor" value="51FF17" style="width:100%">
+  											<input id="dpcolor" type="text" class="jscolor" value="D2FFB1" style="width:100%">
                                     	</td>
                                     	</tr>
       								</table>
@@ -1694,7 +2000,7 @@
                                     		<label class="control-label" for="sroccolor">Color:</label>
                                     	</td>
                                 		<td>
-  											<input id="sroccolor" type="text" class="jscolor" value="000000" style="width:100%">
+  											<input id="sroccolor" type="text" class="jscolor" value="05088C" style="width:100%">
                                     	</td>
                                     	</tr>
       								</table>
@@ -1826,7 +2132,7 @@
                                     		<label class="control-label" for="prcolor">Color:</label>
                                     	</td>
                                 		<td>
-  											<input id="prcolor" type="text" class="jscolor" value="818489" style="width:100%">
+  											<input id="prcolor" type="text" class="jscolor" value="AEB0DC" style="width:100%">
                                     	</td>
                                     	</tr>
       								</table>
@@ -2531,9 +2837,36 @@
                         		<div id="marginalsOut" class="shiny-html-output"></div>
                         	</div>
                         	<!-- Saving Control -->
-                            <div class="form-group shiny-input-container sidebar-each-block" style="width:90%;">
+                            <div class="form-group shiny-input-container sidebar-each-block" style="width:90%; height:120px">
+                            	
                             	<table style="width:100%;">
-                                	<tr>
+                                	<tr style="padding-bottom:20px">
+                                    	<td align="right" style="padding-right:10px; width:15%; padding-bottom:5px">
+                                            <label class="control-label" for="marginalspar">Parameter:</label>
+                                        </td>
+                                        <td style="width:35%; padding-bottom:5px">
+                                            <select id="marginalspar" style="width:100%; height:30px">
+                                            	<option value="all" selected>All</option>
+                                                <option value="var1">var_phi</option>
+                                                <option value="var2">var_psi</option>
+                                                <option value="rho">rho</option>
+                                            </select>
+                                            <!--<script type="application/json" data-for="marginalspar" data-nonempty="">{}</script>-->
+                                        </td> 
+                                    	<td align="right" style="padding-right:10px; width:15%; padding-bottom:5px">
+                                            <label class="control-label" for="marginalsform">Form:</label>
+                                        </td>
+                                        <td style="width:35%; padding-bottom:5px">
+                                            <select id="marginalsform" style="width:100%; height:30px">
+                                                <option value="pdf" selected>.pdf</option>
+                                                <option value="eps">.eps</option>
+                                                <option value="png">.png</option>
+                                                <option value="jpg">.jpg</option>
+                                            </select>
+                                            <!--<script type="application/json" data-for="marginalsform" data-nonempty="">{}</script>-->
+                                        </td> 
+                                    </tr>
+                                	<tr style="margin-top:20px; padding-top:10px">
                                 		<td style="text-align:right; padding-right:10px;">
                                             <label class="control-label" for="marginals_width">Width:</label>
                                         </td>
@@ -2547,31 +2880,7 @@
                                             <input id="marginals_height" type="number" class="form-control" value="5" min="5" max="15" step="1"/>
                                         </td>
                                 	</tr>
-                                    <tr>
-                                    	<td align="right" style="padding-right:10px;">
-                                            <label class="sidebar-prior-name-label" for="marginalspar">Parameter:</label>
-                                        </td>
-                                        <td>
-                                            <select id="marginalspar">
-                                                <option value="var1" selected>var_phi</option>
-                                                <option value="var2">var_psi</option>
-                                                <option value="rho">rho</option>
-                                            </select>
-                                            <script type="application/json" data-for="marginalspar" data-nonempty="">{}</script>
-                                        </td> 
-                                    	<td align="right" style="padding-right:10px;">
-                                            <label class="sidebar-prior-name-label" for="marginalsform">Form:</label>
-                                        </td>
-                                        <td>
-                                            <select id="marginalsform">
-                                                <option value="pdf" selected>.pdf</option>
-                                                <option value="eps">.eps</option>
-                                                <option value="png">.png</option>
-                                                <option value="jpg">.jpg</option>
-                                            </select>
-                                            <script type="application/json" data-for="marginalsform" data-nonempty="">{}</script>
-                                        </td> 
-                                    </tr>
+                                    
                                 </table>
                                 
                                 <div style="width:20%; float:right; text-align:right; margin-top:5px;">
@@ -2769,33 +3078,33 @@
                 <h4 class="modal-title">SROC Lines:</h4>
               </div>
               <div class="modal-body">
-              	<label class="control-label">Type 1 - Regression Line 1</label>
+              	<label class="control-label">Type 1 - The Regression Line 1</label>
                     <div style="width:100%; text-align:center">
                     	<img src="img/sroctype1.png" alt="sroctype1" height="60"/>
                     </div>
                 <!--$$y = \mu + \rho\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)$$-->
-                <label class="control-label">Type 2 - The major axis</label>
+                <label class="control-label">Type 2 - The Major Axis Method</label>
                 	<div style="width:100%; text-align:center">
                     	<img src="img/sroctype2.png" alt="sroctype2" height="60"/>
                     </div>
                 	<!--$$y = \frac{\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2}}{2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu$$-->
-                <label class="control-label">Type 3 - Moses and Littenberg's Line</label>
+                <label class="control-label">Type 3 - The Moses and Littenberg's Regression Line</label>
                 	<div style="width:100%; text-align:center">
                     	<img src="img/sroctype3.png" alt="sroctype3" height="60"/>
                     </div>
                 	<!--$$y = \frac{\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}{\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu$$-->
-                <label class="control-label">Type 4 - Regression Line 2</label>
+                <label class="control-label">Type 4 - The Regression Line 2</label>
                 	<div style="width:100%; text-align:center">
                     	<img src="img/sroctype4.png" alt="sroctype4" height="60"/>
                     </div>
                 	<!--$$y = \mu + \frac{1}{\rho}\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)$$-->
-                <label class="control-label">Type 5 - Rutter and Gatsonis SROC</label>
+                <label class="control-label">Type 5 - The Rutter and Gatsonis's SROC curve</label>
                 	<div style="width:100%; text-align:center">
                     	<img src="img/sroctype5.png" alt="sroctype5" height="60"/>
                     </div>
                 	<!--$$y = \mu + \sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)$$-->
                 
-                    where <i>y</i> is the g(sensitivity), <i>x</i>is the g(1-specificity) and g is the link function. 
+                    where <i>y</i> is the g(sensitivity), <i>x</i> is the g(1-specificity) and g is the link function. 
                 <p>Arends et al.(2008) "Bivariate random effects meta-analysis of ROC curves." Medical Decision Making, 28(5), 621-638.</p>
               </div>
               <div class="modal-footer">
@@ -3690,7 +3999,9 @@
         
     </div>
     <!-- Foot -->
-    <div class="row" style="background-color:#CEEBF7; height:30px; padding-bottom:5px; padding-top:5px"></div>
+    <div class="row" style="background-color:#CEEBF7; height:20px; padding-bottom:5px; padding-top:5px; text-align:center">
+    	<p style="font-size:10px;">Meta4diag is an R-INLA project. &copy; 2016 INLA group.</p>
+    </div>
 </div>
 </body>
 </html>
