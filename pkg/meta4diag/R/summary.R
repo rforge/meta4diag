@@ -9,7 +9,7 @@ summary.meta4diag = function(object,...){
   summarym4d$mlik = object$mlik[2,]
   summarym4d$var.type = c(rownames(object$summary.fixed),"var1", "var2", "rho")
   if(!object$misc$covariates.flag){
-    summarym4d$correlation.expected.g = object$correlation.linear.comb
+    summarym4d$correlation.expected.g = object[[paste("correlation.expected.",link,".accuracy",sep="")]]
   }
   summarym4d$modality.name = object$misc$modality.name
   summarym4d$modality.level = object$misc$modality.level

@@ -1,7 +1,6 @@
 library(shiny)
 library(shinyBS)
 
-# source("../../R/SROC.R")
 
 shinyServer(function(input, output, session) {
   observe({
@@ -579,9 +578,10 @@ shinyServer(function(input, output, session) {
     }else{
       if(inputDataInfo()=="Data is valid!"){
         df = inputDataFile()
-        datanames = tolower(colnames(df))
+        original_datanames = colnames(df)
+        datanames = tolower(original_datanames)
         if(dim(df)[2]>5){
-          pt_variables = datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn"))]
+          pt_variables = original_datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn"))]
           pt_variables = c("None", pt_variables)
         }else{
           pt_variables = "None"
@@ -604,44 +604,61 @@ shinyServer(function(input, output, session) {
       var.prior = "PC"
       u = input$var1PCu
       alpha = input$var1PCalpha
-      if(u < 0.0001){u = 0.0001}
-      if(alpha < 0.00005){alpha = 0.00005}
-      if(alpha > 0.99995){alpha = 0.99995}
+      if(is.na(u) || is.na(alpha) || u < 0.0001 || alpha < 0.00005 || alpha > 0.99995){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       var.par = c(u, alpha)
     }else if(var1PriorName=="var1ig"){
       var.prior = "invgamma"
       a = input$var1IGa
       b = input$var1IGb
-      if(a < 0.005){a = 0.005}
-      if(b < 0.005){b = 0.005}
+      if(is.na(a) || is.na(b) ||a < 0.005 || b < 0.005){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       var.par = c(a, b)
     }else if(var1PriorName=="var1hc"){
       var.prior = "hcauchy"
       a = input$var1HCa
-      if(a < 0.0005){a=0.0005}
+      if(is.na(a) ||a < 0.0005){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       var.par = c(a)
     }else if(var1PriorName=="var1tn"){
       var.prior = "tnormal"
       a = input$var1TNa
       b = input$var1TNb
-      if(b < 0.005){b=0.005}
+      if(is.na(a) || is.na(b) || b < 0.005){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       var.par = c(a, b)
     }else if(var1PriorName=="var1unif"){
       var.prior = "unif"
       var.par = c()
+      var.flag = TRUE
     }else{
       var.prior = "invwishart"
       nu = input$var1IWnu
       a = input$var1IWa
       b = input$var1IWb
       c = input$var1IWc
-      if(nu < 3){nu = 3}
-      if(a < 0.01){a=0.01}
-      if(b < 0.01){b=0.01}
+      if(is.na(a) || is.na(b) || is.na(c) || is.na(nu) ||nu < 3 || a < 0.01 || b < 0.01){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       var.par = c(nu, a, b, c)
     }
     value$var.prior = var.prior
     value$var.par = var.par
+    value$var.flag = var.flag
     return(value)
   })
   
@@ -654,34 +671,49 @@ shinyServer(function(input, output, session) {
       var.prior = "PC"
       u = input$var2PCu
       alpha = input$var2PCalpha
-      if(u < 0.0001){u = 0.0001}
-      if(alpha < 0.005){alpha = 0.005}
-      if(alpha > 0.995){alpha = 0.995}
+      if(is.na(u) || is.na(alpha) || u < 0.0001 || alpha < 0.005 || alpha > 0.995){
+        var2.flag = FALSE
+      }else{
+        var2.flag = TRUE
+      }
       var2.par = c(u, alpha)
     }else if(var2PriorName=="var2ig"){
       var2.prior = "invgamma"
       a = input$var2IGa
       b = input$var2IGb
-      if(a < 0.005){a = 0.005}
-      if(b < 0.005){b = 0.005}
+      if(is.na(a) || is.na(b) || a < 0.005 || b < 0.005){
+        var2.flag = FALSE
+      }else{
+        var2.flag = TRUE
+      }
       var2.par = c(a, b)
     }else if(var2PriorName=="var2hc"){
       var2.prior = "hcauchy"
       a = input$var2HCa
-      if(a < 0.0005){a=0.0005}
+      if(is.na(a) || a < 0.0005){
+        var2.flag = FALSE
+      }else{
+        var2.flag = TRUE
+      }
       var2.par = c(a)
     }else if(var2PriorName=="var2tn"){
       var2.prior = "tnormal"
       a = input$var2TNa
       b = input$var2TNb
-      if(b < 0.005){b=0.005}
+      if(is.na(a) || is.na(b) || b < 0.005){
+        var2.flag = FALSE
+      }else{
+        var2.flag = TRUE
+      }
       var2.par = c(a, b)
     }else{
       var2.prior = "unif"
       var2.par = c()
+      var2.flag = TRUE
     }
     value$var.prior = var2.prior
     value$var.par = var2.par
+    value$var.flag = var2.flag
     return(value)
   })
   
@@ -697,28 +729,22 @@ shinyServer(function(input, output, session) {
         omega = input$corPC1omega
         u = input$corPC1u
         alpha = input$corPC1alpha
-        if(rho0 < -0.95){rho0 = -0.95}
-        if(rho0 > 0.95){rho0 = 0.95}
-        if(omega < 0.01){omega = 0.01}
-        if(omega > 0.99){omega = 0.99}
-        if(u < -0.99){u = -0.99}
-        if(u > rho0){u = rho0-0.000001}
-        if(alpha < 0.001){alpha = 0.001}
-        if(alpha > omega){alpha = omega - 0.001}
+        if(is.na(rho0) || is.na(omega) || is.na(u) || is.na(alpha) || rho0 < -0.95 || rho0 > 0.95 || omega < 0.01 || omega > 0.99 || u < -0.99 || u > (rho0-0.000001) || alpha < 0.001 || alpha > (omega - 0.001)){
+          var.flag = FALSE
+        }else{
+          var.flag = TRUE
+        }
         cor.par = c(1, rho0, omega, u, alpha, NA, NA)
       }else if(strategy=="strategy2"){
         rho0 = input$corPC2rho0
         omega = input$corPC2omega
         u = input$corPC2u
         alpha = input$corPC2alpha
-        if(rho0 < -0.95){rho0 = -0.95}
-        if(rho0 > 0.95){rho0 = 0.95}
-        if(omega < 0.01){omega = 0.01}
-        if(omega > 0.99){omega = 0.99}
-        if(u > 0.99){u = 0.99}
-        if(u < rho0){u = rho0+0.000001}
-        if(alpha < 0.001){alpha = 0.001}
-        if(alpha > (1-omega)){alpha = 1- omega - 0.001}
+        if(is.na(rho0) || is.na(omega) || is.na(u) || is.na(alpha) || rho0 < -0.95 || rho0 > 0.95 || omega < 0.01 || omega > 0.99 || u > 0.99 || u < (rho0+0.000001) || alpha < 0.001 || alpha > (1-omega-0.001)){
+          var.flag = FALSE
+        }else{
+          var.flag = TRUE
+        }
         cor.par = c(2, rho0, omega, NA, NA, u, alpha)
       }else{
         rho0 = input$corPC3rho0
@@ -726,37 +752,41 @@ shinyServer(function(input, output, session) {
         alpha1 = input$corPC3alpha1
         u2 = input$corPC3u2
         alpha2 = input$corPC3alpha2
-        if(rho0 < -0.95){rho0 = -0.95}
-        if(rho0 > 0.95){rho0 = 0.95}
-        if(u1 < -0.99){u1 = -0.99}
-        if(u1 > rho0){u1 = rho0-0.000001}
-        if(u2 > 0.99){u2 = 0.99}
-        if(u2 < rho0){u2 = rho0+0.000001}
-        if(alpha1 < 0.001){alpha1 = 0.001}
-        if(alpha1 > 0.99){alpha1 = 0.99}
-        if(alpha2 < 0.001){alpha2 = 0.001}
-        if(alpha2 > (1-alpha1)){alpha2 = 1-alpha1 - 0.0001}
+        if(is.na(rho0) || is.na(u1) || is.na(u2) || is.na(alpha1) || is.na(alpha2) || rho0 < -0.95 || rho0 > 0.95 || u1 < -0.99 || u1 > (rho0-0.000001) || u2 > 0.99 || u2 < (rho0+0.000001) || alpha1 < 0.001 || alpha1 > 0.99 || alpha2 < 0.001 || alpha2 > (1-alpha1-0.0001)){
+          var.flag = FALSE
+        }else{
+          var.flag = TRUE
+        }
         cor.par = c(3, rho0, NA, u1, alpha1, u2, alpha2)
       }
     }else if(corPriorName=="cor-prior-name-normal"){
       cor.prior = "normal"
       mu = input$corNormalmu
       var = input$corNormalvar
-      if(var < 0.001){var = 0.001}
+      if(is.na(mu) || is.na(var) || var < 0.001){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       cor.par = c(mu, var)
     }else if(corPriorName=="cor-prior-name-beta"){
       cor.prior = "beta"
       a = input$corBetaa
       b = input$corBetab
-      if(a < 0.01){a = 0.01}
-      if(b < 0.01){b = 0.01}
+      if(is.na(a) || is.na(b) || a < 0.01 || b < 0.01){
+        var.flag = FALSE
+      }else{
+        var.flag = TRUE
+      }
       cor.par = c(a, b)
     }else{
       cor.prior = "unif"
       cor.par = c()
+      var.flag = TRUE
     }
     value$var.prior = cor.prior
     value$var.par = cor.par
+    value$var.flag = var.flag
     return(value)
   })
   
@@ -765,16 +795,20 @@ shinyServer(function(input, output, session) {
     var1 = inputPriorVar1()
     var2 = inputPriorVar2()
     cor = inputPriorCor()
-    if(var1$var.prior=="invwishart"){
-      outpriors = makePriors(var.prior = "invwishart",
-                             wishart.par = var1$var.par,
-                             init = c(0.01, 0.01, -0.1))
+    if(!var1$var.flag || !var2$var.flag || !cor$var.flag){
+      return(NULL)
     }else{
-      outpriors = makePriors(var.prior = var1$var.prior, var2.prior=var2$var.prior, cor.prior = cor$var.prior,
-                             var.par = var1$var.par, var2.par=var2$var.par, cor.par = cor$var.par,
-                             init = c(0.01, 0.01, -0.1))
+      if(var1$var.prior=="invwishart"){
+        outpriors = makePriors(var.prior = "invwishart",
+                               wishart.par = var1$var.par,
+                               init = c(0.01, 0.01, -0.1))
+      }else{
+        outpriors = makePriors(var.prior = var1$var.prior, var2.prior=var2$var.prior, cor.prior = cor$var.prior,
+                               var.par = var1$var.par, var2.par=var2$var.par, cor.par = cor$var.par,
+                               init = c(0.01, 0.01, -0.1))
+      }
+      return(outpriors)
     }
-    return(outpriors)
   })
   
   ###########################################################
@@ -787,8 +821,12 @@ shinyServer(function(input, output, session) {
     if(length(pt_names)>1){
       new_pt_names = pt_names[pt_names!="None"]
       class_pt_names = unlist(lapply(1:length(new_pt_names), function(x) class(data[,new_pt_names[x]])))
-      modality = new_pt_names[class_pt_names=="factor"]
-      radioButtons("datamodality", label = NULL, choices = c("None",modality),selected = "None")
+      if(any(class_pt_names=="factor")){
+        modality = new_pt_names[class_pt_names=="factor"]
+        radioButtons("datamodality", label = NULL, choices = c("None",modality),selected = "None")
+      }else{
+        radioButtons("datamodality", label = NULL, choices = "None",selected = "None")
+      }
     }else{
       radioButtons("datamodality", label = NULL, choices = pt_names, selected=pt_names)
     }
@@ -846,6 +884,7 @@ shinyServer(function(input, output, session) {
   
   #----------- INLA Version ---------------#
   output$inlaversion  = renderPrint({
+    cat(input$var1PCu)
     #   cat(length(input$partialdata))
     #   cat("\n")
         # cat(input$modelnos)
@@ -907,126 +946,176 @@ shinyServer(function(input, output, session) {
     if(is.null(data)){
       return(NULL)
     }else{
-      model.type = switch(input$modeltype, "type1" = 1, "type2" = 2, "type3" = 3, "type4" = 4)
-      link = input$modellink
-      quantiles = as.numeric(input$modellevel)
-      verbose = input$modelverbose
-      if(verbose=="On"){
-        model = runModel(outdata=inputdata(), outpriors = inputPrior(), link=link, quantiles=quantiles, verbose=TRUE)
-      }else{
-        model = runModel(outdata=inputdata(), outpriors = inputPrior(), link=link, quantiles=quantiles, verbose=FALSE)
-      }
-      
-      if(model$ok){
-        object = makeObject(outdata=inputdata(), outpriors=inputPrior(), model=model, nsample=input$modelnos)
-        return(object)
-      }else{
+      priors = inputPrior()
+      if(is.null(priors)){
         return(NULL)
+      }else{
+        model.type = switch(input$modeltype, "type1" = 1, "type2" = 2, "type3" = 3, "type4" = 4)
+        link = input$modellink
+        quantiles = as.numeric(input$modellevel)
+        verbose = input$modelverbose
+        if(verbose=="On"){
+          model = runModel(outdata=data, outpriors = priors, link=link, quantiles=quantiles, verbose=TRUE)
+        }else{
+          model = runModel(outdata=data, outpriors = priors, link=link, quantiles=quantiles, verbose=FALSE)
+        }
+        if(model$ok){
+          object = makeObject(model=model, nsample=input$modelnos)
+          return(object)
+        }else{
+          return(NULL)
+        }
       }
-      
     }
   })
   
-  #----------- R-code ---------------#
-  output$Rcode  = renderPrint({
-    var1 = inputPriorVar1()
-    var2 = inputPriorVar2()
-    cor = inputPriorCor()
-    cat("library(INLA)")
-    cat("\n")
-    cat("library(meta4diag)")
-    cat("\n")
-    cat("\n")
-    inFile <- input$datafile
-    if (is.null(inFile)){
-      names = input$choosedata
-      cat(paste("data(",names,")",sep=""))
-      cat("\n")
-      cat(paste("data = ",names,sep=""))
+  ###########################################################
+  ###### Construct Main Rcode needed UI
+  ###########################################################
+  rcodeReact <- eventReactive(input$RunINLAButton, {
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
     }else{
-      fullname = inFile$name
-      splitname = unlist(strsplit(basename(fullname), "[.]"))
-      filename = splitname[1]
-      fileform = splitname[2]
-      
-      fileform = tolower(fileform)
-      if(fileform=="txt"){
-        cat(paste("data = read.table(...your path.../",fullname,")",sep=""))
-      }
-      if(fileform=="csv"){
-        cat(paste("read.csv(...your path.../",fullname,", header = TRUE)",sep=""))
-      }
-      if(fileform == "rdata" || fileform == "rda"){
-        cat(paste("load(...your path.../",fullname,")",sep=""))
-      }
-      cat("\n")
-      cat(paste("data = ",filename,sep=""))
-    }
-    
-    cat("\n")
-    cat("\n")
-    if(var1$var.prior=="Invwishart"){
-      cat(paste("outpriors = makePriors(var.prior = \"",var1$var.prior,"\", 
-                wishart.par = c(",paste(var1$var.par,collapse = ", "),"),  
-                init = c(0.01, 0.01, -0.1))",sep=""))
-    }else{
-      cat(paste("outpriors = makePriors(var.prior = \"",var1$var.prior,"\", 
-                var2.prior = \"",var2$var.prior,"\",
-                cor.prior = \"",cor$var.prior,"\",
-                var.par = c(",paste(var1$var.par,collapse = ", "),"),  
-                var2.par = c(",paste(var2$var.par,collapse = ", "),"), 
-                cor.par = c(",paste(cor$var.par,collapse = ", "),"),
-                init = c(0.01, 0.01, -0.1))",sep=""))
-    }
-    cat("\n")
-    cat("\n")
-    modality = input$datamodality
-    partial = input$partialdata
-    covar = input$datacovar
-    model.type = as.numeric(switch(input$modeltype, "type1" = 1, "type2" = 2, "type3" = 3, "type4" = 4))
-    if(modality != "None"){
-      if(!is.null(partial)){
-        if(is.null(covar)){
-          cat(paste("outdata = makeData(data = data[data$",modality,"\" == c(\"",paste(partial,collapse="\",\""),"\"),], model.type = ",model.type,", modality = \"",modality,"\", covariates = NULL)",sep=""))
-        }else{
-          cat(paste("outdata = makeData(data = data[data$",modality,"\" == c(\"",paste(partial,collapse="\",\""),"\"),], model.type = ",model.type,", modality = \"",modality,"\", covariates = \"",covar,"\")",sep=""))
-        }
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
       }else{
-        if(is.null(covar)){
-          cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = NULL)",sep=""))
+        var1 = inputPriorVar1()
+        var2 = inputPriorVar2()
+        cor = inputPriorCor()
+        cat("library(INLA)")
+        cat("\n")
+        cat("library(meta4diag)")
+        cat("\n")
+        cat("\n")
+        inFile <- input$datafile
+        if (is.null(inFile)){
+          names = input$choosedata
+          cat(paste("data(",names,")",sep=""))
+          cat("\n")
+          cat(paste("data = ",names,sep=""))
         }else{
-          cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = \"",covar,"\")",sep=""))
+          fullname = inFile$name
+          splitname = unlist(strsplit(basename(fullname), "[.]"))
+          filename = splitname[1]
+          fileform = splitname[2]
+          
+          fileform = tolower(fileform)
+          if(fileform=="txt"){
+            cat(paste("data = read.table(...your path.../",fullname,")",sep=""))
+          }
+          if(fileform=="csv"){
+            cat(paste("read.csv(...your path.../",fullname,", header = TRUE)",sep=""))
+          }
+          if(fileform == "rdata" || fileform == "rda"){
+            cat(paste("load(...your path.../",fullname,")",sep=""))
+          }
+          cat("\n")
+          cat(paste("data = ",filename,sep=""))
         }
+        
+        cat("\n")
+        cat("\n")
+        if(var1$var.prior=="Invwishart"){
+          cat(paste("outpriors = makePriors(var.prior = \"",var1$var.prior,"\", 
+                    wishart.par = c(",paste(var1$var.par,collapse = ", "),"),  
+                    init = c(0.01, 0.01, -0.1))",sep=""))
+        }else{
+          cat(paste("outpriors = makePriors(var.prior = \"",var1$var.prior,"\", 
+                    var2.prior = \"",var2$var.prior,"\",
+                    cor.prior = \"",cor$var.prior,"\",
+                    var.par = c(",paste(var1$var.par,collapse = ", "),"),  
+                    var2.par = c(",paste(var2$var.par,collapse = ", "),"), 
+                    cor.par = c(",paste(cor$var.par,collapse = ", "),"),
+                    init = c(0.01, 0.01, -0.1))",sep=""))
+        }
+        cat("\n")
+        cat("\n")
+        modality = input$datamodality
+        partial = input$partialdata
+        covar = input$datacovar
+        model.type = as.numeric(switch(input$modeltype, "type1" = 1, "type2" = 2, "type3" = 3, "type4" = 4))
+        if(modality != "None"){
+          if(!is.null(partial)){
+            if(is.null(covar)){
+              cat(paste("outdata = makeData(data = data[which(data[, \"",modality,"\"] %in% c(\"",paste(partial,collapse="\",\""),"\")),], model.type = ",model.type,", modality = \"",modality,"\", covariates = NULL)",sep=""))
+            }else{
+              cat(paste("outdata = makeData(data = data[which(data[, \"",modality,"\"] %in% c(\"",paste(partial,collapse="\",\""),"\")),], model.type = ",model.type,", modality = \"",modality,"\", covariates = \"",covar,"\")",sep=""))
+            }
+          }else{
+            if(is.null(covar)){
+              cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = NULL)",sep=""))
+            }else{
+              cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = \"",covar,"\")",sep=""))
+            }
+          }
+        }else{
+          if(is.null(covar)){
+            cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = NULL)",sep=""))
+          }else{
+            cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = \"",covar,"\")",sep=""))
+          }
+        }
+        cat("\n")
+        cat("\n")
+        link = input$modellink
+        quantiles = input$modellevel
+        if(is.null(quantiles)){
+          quantiles = c(0.025, 0.5, 0.975)
+        }
+        verbose = input$modelverbose
+        if(verbose=="On"){
+          cat(paste("model = runModel(outdata, outpriors, link=\"",link, "\", quantiles=c(",paste(quantiles,collapse=","), "), verbose=TRUE)",sep=""))
+        }else{
+          cat(paste("model = runModel(outdata, outpriors, link=\"",link, "\", quantiles=c(",paste(quantiles,collapse=","), "), verbose=FALSE)",sep=""))
+        }
+        cat("\n")
+        cat("\n")
+        cat(paste("res = makeObject(outdata = outdata, outprior = outpriors, model = model, nsample = ",input$modelnos,")"))
       }
-    }else{
-      if(is.null(covar)){
-        cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = NULL)",sep=""))
-      }else{
-        cat(paste("outdata = makeData(data = data, model.type = ",model.type,", modality = NULL, covariates = \"",covar,"\")",sep=""))
-      }
     }
-    cat("\n")
-    cat("\n")
-    link = input$modellink
-    quantiles = input$modellevel
-    if(is.null(quantiles)){
-      quantiles = c(0.025, 0.5, 0.975)
-    }
-    verbose = input$modelverbose
-    if(verbose=="On"){
-      cat(paste("model = runModel(outdata, outpriors, link=\"",link, "\", quantiles=c(",paste(quantiles,collapse=","), "), verbose=TRUE)",sep=""))
-    }else{
-      cat(paste("model = runModel(outdata, outpriors, link=\"",link, "\", quantiles=c(",paste(quantiles,collapse=","), "), verbose=FALSE)",sep=""))
-    }
-    cat("\n")
-    cat("\n")
-    cat(paste("res = makeObject(outdata = outdata, outprior = outpriors, model = model, nsample = ",input$modelnos,")"))
+  })
+  output$Rcode <- renderPrint({
+    rcodeReact()
   })
   output$RcodeOut = renderUI({
-    verbatimTextOutput("Rcode")
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            verbatimTextOutput("Rcode")
+        } 
+      }
+      }
+    
   })
-  
-  
   
   ###########################################################
   ###### Construct Main Data needed UI
@@ -1034,17 +1123,36 @@ shinyServer(function(input, output, session) {
   output$inputdataTable <- renderTable({
       inputDataFile()
   }) #*********
-  
   output$modelRunningOut <- renderPrint({
     if(input$RunINLAButton > 0){
-      input$RunINLAButton
-      
-      res = inputmodel()
-      
-      if(is.null(res)){
-        p("Model is running. This may take some time!")
+      data = inputdata()
+      if(is.null(data)){
+        p("Invalid data! Please check data!")
       }else{
-        p("Model is ready! :-)")
+        res = inputmodel()
+        if(is.null(res)){
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not ok! Please set verbose to TRUE in Model Control Panel to check! The result is shown in R console. :-(")
+          }
+        }else{
+          p("Model is ready! :-)")
+        }
       }
     }else{
       p("Model is not running yet. Please press the RunINLA button to get estimates and results!")
@@ -1080,11 +1188,29 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
         }else{
           verbatimTextOutput("estimates")
-        }
+        } 
       }
     }
   })
@@ -1127,11 +1253,29 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
-        }else{
-          plotOutput("marginals", width="80%",height = paste(input$fheightsize,"px",sep=""))
-        }
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            plotOutput("marginals", width="80%",height = paste(input$fheightsize,"px",sep=""))
+        } 
       }
     }
   })
@@ -1161,12 +1305,12 @@ shinyServer(function(input, output, session) {
         if(number.partial>1){
           angles = 360/number.partial
           given_sp_rgb = col2rgb(sp.col)
-          given_sp_hsl = .rgb_to_hsl(given_sp_rgb[1],given_sp_rgb[2],given_sp_rgb[3])
+          given_sp_hsl = meta4diag:::.rgb_to_hsl(given_sp_rgb[1],given_sp_rgb[2],given_sp_rgb[3])
           h = given_sp_hsl[1]
           s = given_sp_hsl[2]
           l = given_sp_hsl[3]
           sp_h_list = h + angles*(0:number.partial)
-          sp_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(sp_h_list[x], s, l)))
+          sp_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(sp_h_list[x], s, l)))
           sp.col = sp_col_list
         }
         
@@ -1187,12 +1331,12 @@ shinyServer(function(input, output, session) {
         if(number.partial>1){
           angles = 360/number.partial
           given_line_rgb = col2rgb(line.col)
-          given_line_hsl = .rgb_to_hsl(given_line_rgb[1],given_line_rgb[2],given_line_rgb[3])
+          given_line_hsl = meta4diag:::.rgb_to_hsl(given_line_rgb[1],given_line_rgb[2],given_line_rgb[3])
           h = given_line_hsl[1]
           s = given_line_hsl[2]
           l = given_line_hsl[3]
           line_h_list = h + angles*(0:number.partial)
-          line_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(line_h_list[x], s, l)))
+          line_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(line_h_list[x], s, l)))
           line.col = line_col_list
         }
         crShow = switch(input$crshow, "show"=T, "notshow"=F)
@@ -1202,12 +1346,12 @@ shinyServer(function(input, output, session) {
         if(number.partial>1){
           angles = 360/number.partial
           given_cr_rgb = col2rgb(cr.col)
-          given_cr_hsl = .rgb_to_hsl(given_cr_rgb[1],given_cr_rgb[2],given_cr_rgb[3])
+          given_cr_hsl = meta4diag:::.rgb_to_hsl(given_cr_rgb[1],given_cr_rgb[2],given_cr_rgb[3])
           h = given_cr_hsl[1]
           s = given_cr_hsl[2]
           l = given_cr_hsl[3]
           cr_h_list = h + angles*(0:number.partial)
-          cr_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(cr_h_list[x], s, l)))
+          cr_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(cr_h_list[x], s, l)))
           cr.col = cr_col_list
         }
         prShow = switch(input$prshow, "show"=T, "notshow"=F)
@@ -1217,28 +1361,39 @@ shinyServer(function(input, output, session) {
         if(number.partial>1){
           angles = 360/number.partial
           given_pr_rgb = col2rgb(pr.col)
-          given_pr_hsl = .rgb_to_hsl(given_pr_rgb[1],given_pr_rgb[2],given_pr_rgb[3])
+          given_pr_hsl = meta4diag:::.rgb_to_hsl(given_pr_rgb[1],given_pr_rgb[2],given_pr_rgb[3])
           h = given_pr_hsl[1]
           s = given_pr_hsl[2]
           l = given_pr_hsl[3]
           pr_h_list = h + angles*(0:number.partial)
-          pr_col_list = unlist(lapply(1:number.partial, function(x) .hsl_to_rgb(pr_h_list[x], s, l)))
+          pr_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(pr_h_list[x], s, l)))
           pr.col = pr_col_list
         }
         main = as.character(input$SROC_title)
-        xlab = as.character(input$SROC_xlab)
-        ylab = as.character(input$SROC_ylab)
         cex.main = input$SROC_cex_main
         cex.axis = input$SROC_cex_axis
         cex.lab = input$SROC_cex_lab
-        SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
-             dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
-             lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
-             crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
-             prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
-             dataFit = T, 
-             main=main, cex.main=cex.main, cex.axis=cex.axis,
-             xlab=xlab, ylab=ylab, cex.lab=cex.lab)
+        legend = switch(input$sroclegendshow, "left"="left", "right"="right", "FALSE"="no","bottom"="bottom")
+        legend.cex = input$SROC_cex_legend
+        if(legend=="no"){
+          SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+               dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+               lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+               crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+               prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+               dataFit = T, 
+               main=main, cex.main=cex.main, cex.axis=cex.axis,
+               cex.lab=cex.lab)
+        }else{
+          SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+               dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+               lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+               crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+               prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+               dataFit = T, legend=legend, legend.cex=legend.cex,
+               main=main, cex.main=cex.main, cex.axis=cex.axis,
+               cex.lab=cex.lab)
+        }
       }
     }
   })
@@ -1252,11 +1407,29 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
-        }else{
-          plotOutput("SROC", height="400px", width = "400px")
-        }
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            plotOutput("SROC")
+        } 
       }
     }
   })
@@ -1264,7 +1437,7 @@ shinyServer(function(input, output, session) {
   ###########################################################
   ###### Construct AUC needed UI
   ###########################################################
-  AUCReact <- eventReactive(input$RunINLAButton, {
+  output$AUC <- renderPrint({
     data = inputdata()
     if(is.null(data)){
       return(NULL)
@@ -1273,13 +1446,12 @@ shinyServer(function(input, output, session) {
       if(is.null(model)){
         return(NULL)
       }else{
-        a = model$AUC
+        sroc.type = switch(input$srocfunction, "srocf1"=1, "srocf2"=2, "srocf3"=3, "srocf4"=4, "srocf5"=5)
+        est.type = input$sptype
+        a = AUC(model,sroc.type=sroc.type,est.type=est.type)
         return(round(a,2))
       }
     }
-  })
-  output$AUC <- renderPrint({
-    AUCReact()
   })
   output$AUCOut <- renderUI({
     if(input$RunINLAButton == 0){
@@ -1291,11 +1463,29 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
-        }else{
-          verbatimTextOutput("AUC")
-        }
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            verbatimTextOutput("AUC")
+        } 
       }
     }
   })
@@ -1351,13 +1541,85 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
-        }else{
-          plotOutput("Forest", width="100%",height = paste(input$fheightsize,"px",sep=""))
-        }
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            plotOutput("Forest", width="100%",height = paste(input$fheightsize,"px",sep=""))
+        } 
       }
+    }
+  })
+  
+  ###########################################################
+  ###### Construct Main Crosshair needed UI
+  ###########################################################
+  output$Crosshair <- renderPlot({
+    data = inputdata()
+    if(is.null(data)){
+      return(NULL)
+    }else{
+      model = inputmodel()
+      if(is.null(model)){
+        return(NULL)
+      }else{
+        est.type = input$sptype
+        crosshair(model,est.type=est.type)
       }
+    }
+  })
+  output$CrossOut <- renderUI({
+    if(input$RunINLAButton == 0){
+      p("Please press the RunINLA button to check the result.")
+    }else{
+      data = inputdata()
+      if(is.null(data)){
+        p("Data is not valid. Please check data.")
+      }else{
+        model = inputmodel()
+        if(is.null(model)){
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            plotOutput("Crosshair", height="400px", width = "400px")
+        } 
+      }
+    }
   })
   
   ###########################################################
@@ -1387,13 +1649,31 @@ shinyServer(function(input, output, session) {
       }else{
         model = inputmodel()
         if(is.null(model)){
-          p("Model is not valid. Please set verbose to TRUE to check the internal information. 
-            The information will be shown in the R Console.")
-        }else{
-          verbatimTextOutput("Fitted")
-        }
+          priors = inputPrior()
+          if(is.null(priors)){
+            var1 = inputPriorVar1()
+            var2 = inputPriorVar2()
+            cor = inputPriorCor()
+            if(!var1$var.flag){
+              p("Invalid hyper parameter(s) of the prior for the first variance is given!")
+            }else{
+              if(!var2$var.flag){
+                p("Invalid hyper parameter(s) of the prior for the second variance is given!")
+              }else{
+                if(!cor$var.flag){
+                  p("Invalid hyper parameter(s) of the prior for the correlation is given!")
+                }
+              }
+            }
+          }else{
+            p("Model is not valid. Please set verbose to TRUE to check the internal information. 
+              The information will be shown in the R Console.")
+          }
+          }else{
+            verbatimTextOutput("Fitted")
+        } 
       }
-      }
+    }
   })
   
   ###########################################################
@@ -1452,6 +1732,8 @@ shinyServer(function(input, output, session) {
           if(is.null(model)){
             plot.new()
           }else{
+            number.partial = length(input$partialdata)
+            
             est.type = input$sptype
             sp.cex = input$spsize
             sp.pch = switch(input$spsymbol, "whitesquare"=0, "whitecircle"=1, "whitediamond"=5,
@@ -1460,6 +1742,17 @@ shinyServer(function(input, output, session) {
                             "cross"=4,"squareplus"=12,"circleplus"=10,"squarecross"=7,"circlecross"=13,
                             "star"=8,"starfive"="*","twotriangles"=11,"dot"=20)
             sp.col = paste("#",input$spcolor,sep="")
+            if(number.partial>1){
+              angles = 360/number.partial
+              given_sp_rgb = col2rgb(sp.col)
+              given_sp_hsl = meta4diag:::.rgb_to_hsl(given_sp_rgb[1],given_sp_rgb[2],given_sp_rgb[3])
+              h = given_sp_hsl[1]
+              s = given_sp_hsl[2]
+              l = given_sp_hsl[3]
+              sp_h_list = h + angles*(0:number.partial)
+              sp_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(sp_h_list[x], s, l)))
+              sp.col = sp_col_list
+            }
             dataShow = switch(input$dptype, "original"="o", "fitted"="f", "none"="n")
             data.col = paste("#",input$dpcolor,sep="")
             data.cex = input$dpsizeind
@@ -1474,28 +1767,114 @@ shinyServer(function(input, output, session) {
             line.lty = switch(input$sroclt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
             line.lwd = input$srocwidth
             line.col = paste("#",input$sroccolor,sep="")
+            if(number.partial>1){
+              angles = 360/number.partial
+              given_line_rgb = col2rgb(line.col)
+              given_line_hsl = meta4diag:::.rgb_to_hsl(given_line_rgb[1],given_line_rgb[2],given_line_rgb[3])
+              h = given_line_hsl[1]
+              s = given_line_hsl[2]
+              l = given_line_hsl[3]
+              line_h_list = h + angles*(0:number.partial)
+              line_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(line_h_list[x], s, l)))
+              line.col = line_col_list
+            }
             crShow = switch(input$crshow, "show"=T, "notshow"=F)
             cr.lty = switch(input$crlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
             cr.lwd = input$crwidth
             cr.col = paste("#",input$crcolor,sep="")
+            if(number.partial>1){
+              angles = 360/number.partial
+              given_cr_rgb = col2rgb(cr.col)
+              given_cr_hsl = meta4diag:::.rgb_to_hsl(given_cr_rgb[1],given_cr_rgb[2],given_cr_rgb[3])
+              h = given_cr_hsl[1]
+              s = given_cr_hsl[2]
+              l = given_cr_hsl[3]
+              cr_h_list = h + angles*(0:number.partial)
+              cr_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(cr_h_list[x], s, l)))
+              cr.col = cr_col_list
+            }
             prShow = switch(input$prshow, "show"=T, "notshow"=F)
             pr.lty = switch(input$prlt, "lty1"=1, "lty2"=2, "lty3"=3, "lty4"=4, "lty5"=5, "lty6"=6)
             pr.lwd = input$prwidth
             pr.col = paste("#",input$prcolor,sep="")
+            if(number.partial>1){
+              angles = 360/number.partial
+              given_pr_rgb = col2rgb(pr.col)
+              given_pr_hsl = meta4diag:::.rgb_to_hsl(given_pr_rgb[1],given_pr_rgb[2],given_pr_rgb[3])
+              h = given_pr_hsl[1]
+              s = given_pr_hsl[2]
+              l = given_pr_hsl[3]
+              pr_h_list = h + angles*(0:number.partial)
+              pr_col_list = unlist(lapply(1:number.partial, function(x) meta4diag:::.hsl_to_rgb(pr_h_list[x], s, l)))
+              pr.col = pr_col_list
+            }
             main = input$SROC_title
-            xlab = input$SROC_xlab
-            ylab = input$SROC_ylab
             cex.main = input$SROC_cex_main
             cex.axis = input$SROC_cex_axis
             cex.lab = input$SROC_cex_lab
-            SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
-                 dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
-                 lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
-                 crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
-                 prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
-                 dataFit = T, 
-                 main=main, cex.main=cex.main, cex.axis=cex.axis,
-                 xlab=xlab, ylab=ylab, cex.lab=cex.lab)
+            legend = switch(input$sroclegendshow, "left"="left", "right"="right", "FALSE"="no","bottom"="bottom")
+            legend.cex = input$SROC_cex_legend
+            if(legend=="no"){
+              SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+                   dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+                   lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+                   crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+                   prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+                   dataFit = T, 
+                   main=main, cex.main=cex.main, cex.axis=cex.axis,
+                   cex.lab=cex.lab)
+            }else{
+              SROC(model, est.type=est.type, sp.cex=sp.cex,sp.pch=sp.pch,sp.col=sp.col,
+                   dataShow=dataShow, data.col=data.col, data.cex=data.cex, data.pch=data.pch, 
+                   lineShow=lineShow, sroc.type=sroc.type, line.lty=line.lty, line.lwd=line.lwd, line.col=line.col,
+                   crShow=crShow, cr.lty=cr.lty, cr.lwd=cr.lwd, cr.col=cr.col,
+                   prShow=prShow, pr.lty=pr.lty, pr.lwd=pr.lwd,  pr.col=pr.col,
+                   dataFit = T, legend=legend, legend.cex=legend.cex,
+                   main=main, cex.main=cex.main, cex.axis=cex.axis,
+                   cex.lab=cex.lab)
+            }
+          }
+        }
+      }
+      dev.off()
+    }
+  )
+  
+  ###########################################################
+  ###### Construct Save Crosshair
+  ###########################################################
+  output$SaveCross <- downloadHandler(
+    filename = function() {
+      paste('Crosshair-', Sys.Date(), '.',input$crossform, sep='')
+    },
+    content = function(file) {
+      fileform = input$crossform
+      width = input$Cross_width
+      height = input$Cross_height
+      if(fileform=="eps"){
+        setEPS()
+        postscript(file, width=width, height=height)
+      }else if(fileform=="pdf"){
+        pdf(file, width=width, height=height)
+      }else if(fileform=="jpg"){
+        jpeg(file, width = width, height = height, units = "in", res=300)
+      }else{
+        png(file, width = width, height = height, units = "in", res=300)
+      }
+      if(input$RunINLAButton == 0){
+        plot.new()
+      }else{
+        data = inputdata()
+        if(is.null(data)){
+          plot.new()
+        }else{
+          model = inputmodel()
+          if(is.null(model)){
+            plot.new()
+          }else{
+            est.type = input$sptype
+            
+            crosshair(model,est.type=est.type)
           }
         }
       }

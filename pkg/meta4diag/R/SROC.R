@@ -1,19 +1,64 @@
 SROC <- function(x, ...) UseMethod("SROC")
 
-SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red",
-                          dataShow="o", data.col="#FF0000FF", data.cex="bubble", data.pch=1, 
-                          lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
-                          crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
-                          prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-                          dataFit = T, add=FALSE, save=F, main="", xlim, ylim, 
-                          xlab="1-Specificity",ylab="Sensitivity",...){
-  if(class(x)!="meta4diag"){stop("Wrong input given!")}
+SROC.meta4diag = function(x, 
+                          sroc.type=1,
+                          est.type="mean", 
+                          sp.cex=1.5,
+                          sp.pch=8,
+                          sp.col="red",
+                          dataShow="o", 
+                          data.col="#FF0000", 
+                          data.cex="scaled", 
+                          data.pch=1, 
+                          lineShow=T, 
+                          line.lty=1, 
+                          line.lwd=2, 
+                          line.col="black",
+                          crShow=T, 
+                          cr.lty=2, 
+                          cr.lwd=1.5, 
+                          cr.col="blue",
+                          prShow=T, 
+                          pr.lty=3, 
+                          pr.lwd=1, 
+                          pr.col="darkgray",
+                          dataFit = T, 
+                          add=FALSE, 
+                          main="SROC Plot", 
+                          xlim,
+                          ylim,
+                          legend=F,
+                          legend.cex = 0.7,
+                          ...){
+  if(class(x)!="meta4diag"){stop("Invalid input given!")}
   if(is.character(data.cex)){
     data.cex = tolower(data.cex)
     if(!(data.cex %in% c("scaled", "bubble"))){
       stop("data.cex could be scaled, bubble or fixed to a nuerical value!")
     }
   }
+  
+  if(!is.logical(legend)){
+    if(!is.character(legend)){
+      stop("Invalid input for legend.")
+    }else{
+      if(!(tolower(legend) %in% c("bottom", "right","left"))){
+        stop("legend could only be at bottom, left or right")
+      }else{
+        legend.flag = TRUE
+        legend.pos = legend
+      }
+    }
+  }else{
+    if(legend){
+      legend.flag = TRUE
+      legend.pos = "bottom"
+    }else{
+      legend.flag = FALSE
+    }
+  }
+  
+
   est.type = tolower(est.type)
   if(est.type=="median"){est.type = "0.5quant"}
   N = x$data$fp + x$data$tn + x$data$fn + x$data$tp
@@ -37,8 +82,8 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
 
   fitname = x$names.fitted
   if(dataShow=="f"){
-    data.yy = x[[paste("summary.fitted.(", fitname[1],")",sep="")]][,est.type]
-    data.xx = x[[paste("summary.fitted.(", fitname[2],")",sep="")]][,est.type]
+    data.yy = x[[paste("summary.predictor.(", fitname[1],")",sep="")]][,est.type]
+    data.xx = x[[paste("summary.predictor.(", fitname[2],")",sep="")]][,est.type]
   }
   
   if(dataFit){
@@ -56,8 +101,10 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
   
   g.xx = seq(-10,10,by=0.01)
   
-  fit1 = x[[paste("summary.predict.(", fitname[1],")",sep="")]][,est.type]
-  fit2 = x[[paste("summary.predict.(", fitname[2],")",sep="")]][,est.type]
+  link = x$misc$link
+  
+  fit1 = x[[paste("summary.predictor.",link,"(", fitname[1],")",sep="")]][,est.type]
+  fit2 = x[[paste("summary.predictor.",link,"(", fitname[2],")",sep="")]][,est.type]
   if(x$misc$covariates.flag){  
     if(x$misc$model.type==1){
       Si = fit1 + fit2
@@ -90,14 +137,14 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     if(x$misc$model.type==4){
       g.yy = -a/(1-b)-(1+b)/(1-b)*g.xx
     }
-    invg.xx = x$misc$inv.g(g.xx)
-    invg.yy = x$misc$inv.g(g.yy)
+    invg.xx = x$misc$inv.linkfunc(g.xx)
+    invg.yy = x$misc$inv.linkfunc(g.yy)
   }else{
     if(x$misc$modality.flag){
       mod.level = x$misc$modality.level
       if(length(cr.lty)!=mod.level){cr.lty = rep(cr.lty[1],mod.level)}
       if(length(cr.lwd)!=mod.level){cr.lwd = rep(cr.lwd[1],mod.level)}
-      if(length(cr.col)!=mod.level){sp.col = rep(cr.col[1],mod.level)}
+      if(length(cr.col)!=mod.level){cr.col = rep(cr.col[1],mod.level)}
       if(length(pr.lty)!=mod.level){pr.lty = rep(pr.lty[1],mod.level)}
       if(length(pr.lwd)!=mod.level){pr.lwd = rep(pr.lwd[1],mod.level)}
       if(length(pr.col)!=mod.level){pr.col = rep(pr.col[1],mod.level)}
@@ -109,22 +156,22 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       if(length(line.col)!=mod.level){line.col = rep(line.col[1],mod.level)}
       
       
-      mean.A = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[ind,est.type]))
-      mean.B = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[(ind+mod.level),est.type]))
+      mean.A = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",link,".accuracy",sep="")]][ind,est.type]))
+      mean.B = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",link,".accuracy",sep="")]][(ind+mod.level),est.type]))
       var1 = rep(x[["summary.hyperpar"]][1,est.type], mod.level)
       var2 = rep(x[["summary.hyperpar"]][2,est.type], mod.level)
       rho = rep(x[["summary.hyperpar"]][3,est.type], mod.level)
       
-      sd.A = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[ind,2]))
-      sd.B = unlist(lapply(1:mod.level, function(ind) x$summary.expected.gtransformed.accuracy[(ind+mod.level),2]))
+      sd.A = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",link,".accuracy",sep="")]][ind,2]))
+      sd.B = unlist(lapply(1:mod.level, function(ind) x[[paste("summary.expected.",link,".accuracy",sep="")]][(ind+mod.level),2]))
       
       # confidence
-      r = x[["correlation.linear.comb"]]
+      r = x[[paste("correlation.expected.",link,".accuracy",sep="")]]
       t.conf.A = lapply(1:mod.level, function(ind) mean.A[ind] + sd.A[ind]*c*cos(t))
       t.conf.B = lapply(1:mod.level, function(ind) mean.B[ind] + sd.B[ind]*c*cos(t + acos(r[ind])))
       
-      confidence.A = lapply(1:mod.level, function(ind) x$misc$inv.g(t.conf.A[[ind]]))
-      confidence.B = lapply(1:mod.level, function(ind) x$misc$inv.g(t.conf.B[[ind]]))
+      confidence.A = lapply(1:mod.level, function(ind) x$misc$inv.linkfunc(t.conf.A[[ind]]))
+      confidence.B = lapply(1:mod.level, function(ind) x$misc$inv.linkfunc(t.conf.B[[ind]]))
       
       # predict
       covariance.predict = unlist(lapply(1:mod.level, function(ind) rho[ind]*sqrt(var1[ind]*var2[ind]) + r[ind]*sd.A[ind]*sd.B[ind]))
@@ -135,8 +182,8 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       t.pred.A = lapply(1:mod.level, function(ind) mean.A[ind] + sd.pA[ind]*c*cos(t))
       t.pred.B = lapply(1:mod.level, function(ind) mean.B[ind] + sd.pB[ind]*c*cos(t + acos(rho.predict[ind])))
       
-      predict.A = lapply(1:mod.level, function(ind) x$misc$inv.g(t.pred.A[[ind]]))
-      predict.B = lapply(1:mod.level, function(ind) x$misc$inv.g(t.pred.B[[ind]]))
+      predict.A = lapply(1:mod.level, function(ind) x$misc$inv.linkfunc(t.pred.A[[ind]]))
+      predict.B = lapply(1:mod.level, function(ind) x$misc$inv.linkfunc(t.pred.B[[ind]]))
       
       # SROC line
       if(sroc.type==1){
@@ -178,26 +225,26 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
         }
         
       }else{stop("Please give the correct sroc type, which is 1, 2, 3, 4 or 5.")}
-      invg.xx = x$misc$inv.g(g.xx)
-      invg.yy = lapply(1:mod.level, function(ind) x$misc$inv.g(g.yy[[ind]]))
+      invg.xx = x$misc$inv.linkfunc(g.xx)
+      invg.yy = lapply(1:mod.level, function(ind) x$misc$inv.linkfunc(g.yy[[ind]]))
       
     }else{ ### no covariates, no modality
-      mean.A = x$summary.expected.gtransformed.accuracy[1,est.type]
-      mean.B = x$summary.expected.gtransformed.accuracy[2,est.type]
+      mean.A = x[[paste("summary.expected.",link,".accuracy",sep="")]][1,est.type]
+      mean.B = x[[paste("summary.expected.",link,".accuracy",sep="")]][2,est.type]
       var1 = x[["summary.hyperpar"]][1,est.type]
       var2 = x[["summary.hyperpar"]][2,est.type]
       rho = x[["summary.hyperpar"]][3,est.type]
       
-      sd.A = x$summary.expected.gtransformed.accuracy[1,2]
-      sd.B = x$summary.expected.gtransformed.accuracy[2,2]
+      sd.A = x[[paste("summary.expected.",link,".accuracy",sep="")]][1,2]
+      sd.B = x[[paste("summary.expected.",link,".accuracy",sep="")]][2,2]
       
       # confidence
-      r = x[["correlation.linear.comb"]]
+      r = x[[paste("correlation.expected.",link,".accuracy",sep="")]]
       mu.A = mean.A + sd.A*c*cos(t)
       mu.B = mean.B + sd.B*c*cos(t + acos(r))
       
-      confidence.A = x$misc$inv.g(mu.A)
-      confidence.B = x$misc$inv.g(mu.B)
+      confidence.A = x$misc$inv.linkfunc(mu.A)
+      confidence.B = x$misc$inv.linkfunc(mu.B)
       
       # predict
       covariance.predict = rho*sqrt(var1*var2) + r*sd.A*sd.B
@@ -207,8 +254,8 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       mu.A = mean.A + sd.pA*c*cos(t)
       mu.B = mean.B + sd.pB*c*cos(t + acos(rho.predict))
       
-      predict.A = x$misc$inv.g(mu.A)
-      predict.B = x$misc$inv.g(mu.B)
+      predict.A = x$misc$inv.linkfunc(mu.A)
+      predict.B = x$misc$inv.linkfunc(mu.B)
       
       #### SROC Line
       if(sroc.type==1){
@@ -242,8 +289,8 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
           g.yy = mean.A - sqrt(var1/var2)*(g.xx-mean.B)
         }
       }else{stop("Please give the correct sroc type, which is 1, 2, 3, 4 or 5.")}
-      invg.xx = x$misc$inv.g(g.xx)
-      invg.yy = x$misc$inv.g(g.yy)
+      invg.xx = x$misc$inv.linkfunc(g.xx)
+      invg.yy = x$misc$inv.linkfunc(g.yy)
     }
   }
   
@@ -282,6 +329,10 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
       invg.yy = invg.yy[ind]
     }
   }
+  
+  
+  
+  
   
   if(missing(xlim)){
     if(x$misc$model.type %in% c(1,3)){
@@ -346,7 +397,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
     info = info/max(info)
     info = info*5
   }
-  
+
   if(add){
     if(dataShow=="o" || dataShow=="f"){
       if(data.cex=="bubble"){
@@ -375,7 +426,7 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
         if(lineShow){
           lapply(1:mod.level, function(ind) lines(x = invg.xx, y = invg.yy[[ind]], col=line.col[ind], lty=line.lty[ind], lwd=line.lwd[ind]))
         }
-        lapply(1:mod.level, function(ind) points(x = x$misc$inv.g(mean.B), y = x$misc$inv.g(mean.A), pch=sp.pch[ind], cex=sp.cex[ind], col=sp.col[ind]))
+        lapply(1:mod.level, function(ind) points(x = x$misc$inv.linkfunc(mean.B), y = x$misc$inv.linkfunc(mean.A), pch=sp.pch[ind], cex=sp.cex[ind], col=sp.col[ind]))
       }else{ ## no covariates, no modality
         if(crShow){
           lines(x = confidence.B, y = confidence.A, col=cr.col, lwd=cr.lwd, lty=cr.lty)
@@ -386,57 +437,180 @@ SROC.meta4diag = function(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red"
         if(lineShow){
           lines(x = invg.xx, y = invg.yy, col=line.col,lty=line.lty, lwd=line.lwd)
         }
-        points(x = x$misc$inv.g(mean.B), y = x$misc$inv.g(mean.A), pch=sp.pch,cex=sp.cex,col=sp.col)
+        points(x = x$misc$inv.linkfunc(mean.B), y = x$misc$inv.linkfunc(mean.A), pch=sp.pch,cex=sp.cex,col=sp.col)
       }
     }
     
   }else{
-
-    plot(-10,-10,xlim=xlim,ylim=ylim,main=main,asp=1,
-         xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab=xlab,ylab=ylab, ...)
-    axis(1, at = x.at, labels = x.labels,...)
-    axis(2, at = y.at, labels = y.labels,...)
-    if(dataShow=="o" || dataShow=="f"){
-      if(data.cex=="bubble"){
-        data.col = col2rgb(data.col,alpha=F)
-        fg = rgb(data.col[1],data.col[2],data.col[3],200,maxColorValue=255)
-        bg = rgb(data.col[1],data.col[2],data.col[3],100,maxColorValue=255)
-        symbols(x = data.xx, y = data.yy, circles=N,inches=0.35,fg=fg, bg=bg,add=T)
-      }else if(data.cex=="scaled"){
-        points(x = data.xx, y = data.yy, col=data.col, cex=info, pch=data.pch)
+    if(!legend.flag){
+      plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+           xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+      axis(1, at = x.at, labels = x.labels, ...)
+      axis(2, at = y.at, labels = y.labels, ...)
+      if(dataShow=="o" || dataShow=="f"){
+        if(data.cex=="bubble"){
+          data.col = col2rgb(data.col,alpha=F)
+          fg = rgb(data.col[1],data.col[2],data.col[3],200,maxColorValue=255)
+          bg = rgb(data.col[1],data.col[2],data.col[3],100,maxColorValue=255)
+          symbols(x = data.xx, y = data.yy, circles=N,inches=0.35,fg=fg, bg=bg,add=T)
+        }else if(data.cex=="scaled"){
+          points(x = data.xx, y = data.yy, col=data.col, cex=info, pch=data.pch)
+        }else{
+          points(x = data.xx, y = data.yy, col=data.col, cex=data.cex, pch=data.pch)
+        }
+      }
+      if(x$misc$covariates.flag){
+        if(lineShow){
+          lines(x = invg.xx, y = invg.yy, col=line.col, lty=line.lty, lwd=line.lwd)
+        }
       }else{
-        points(x = data.xx, y = data.yy, col=data.col, cex=data.cex, pch=data.pch)
+        if(x$misc$modality.flag){
+          if(crShow){
+            lapply(1:mod.level, function(ind) lines(x = confidence.B[[ind]], y = confidence.A[[ind]], col=cr.col[ind], lwd=cr.lwd[ind], lty=cr.lty[ind]))
+          }
+          if(prShow){
+            lapply(1:mod.level, function(ind) lines(x = predict.B[[ind]], y = predict.A[[ind]], col=pr.col[ind], lty=pr.lty[ind], lwd=pr.lwd[ind]))
+          }
+          if(lineShow){
+            lapply(1:mod.level, function(ind) lines(x = invg.xx, y = invg.yy[[ind]], col=line.col[ind], lty=line.lty[ind], lwd=line.lwd[ind]))
+          }
+          lapply(1:mod.level, function(ind) points(x = x$misc$inv.linkfunc(mean.B[ind]), y = x$misc$inv.linkfunc(mean.A[ind]), pch=sp.pch[ind], cex=sp.cex[ind], col=sp.col[ind]))
+        }else{ ## no covariates, no modality
+          if(crShow){
+            lines(x = confidence.B, y = confidence.A, col=cr.col, lwd=cr.lwd, lty=cr.lty)
+          }
+          if(prShow){
+            lines(x = predict.B, y = predict.A, col=pr.col,lty=pr.lty, lwd=pr.lwd)
+          }
+          if(lineShow){
+            lines(x = invg.xx, y = invg.yy, col=line.col,lty=line.lty, lwd=line.lwd)
+          }
+          points(x = x$misc$inv.linkfunc(mean.B), y = x$misc$inv.linkfunc(mean.A), pch=sp.pch,cex=sp.cex,col=sp.col)
+        }
+      }
+    }else{ # has legend
+      if(legend.pos=="bottom"){
+        layout(mat = matrix(c(1,2), nrow = 2, ncol = 1), heights = c(1.5,1.2))
+      }else if(legend.pos=="left"){
+        layout(mat = matrix(c(2,1), nrow = 1, ncol = 2), widths = c(1.2, 1.5))
+      }else{
+        layout(mat = matrix(c(1,2), nrow = 1, ncol = 2), widths = c(1.5, 1.2))
+      }
+      # figure 1 --- main figure
+      plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+           xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+      axis(1, at = x.at, labels = x.labels, ...)
+      axis(2, at = y.at, labels = y.labels, ...)
+      if(dataShow=="o" || dataShow=="f"){
+        if(data.cex=="bubble"){
+          data.col = col2rgb(data.col,alpha=F)
+          fg = rgb(data.col[1],data.col[2],data.col[3],200,maxColorValue=255)
+          bg = rgb(data.col[1],data.col[2],data.col[3],100,maxColorValue=255)
+          symbols(x = data.xx, y = data.yy, circles=N,inches=0.35,fg=fg, bg=bg,add=T)
+        }else if(data.cex=="scaled"){
+          points(x = data.xx, y = data.yy, col=data.col, cex=info, pch=data.pch)
+        }else{
+          points(x = data.xx, y = data.yy, col=data.col, cex=data.cex, pch=data.pch)
+        }
+      }
+      if(x$misc$covariates.flag){
+        if(lineShow){
+          lines(x = invg.xx, y = invg.yy, col=line.col, lty=line.lty, lwd=line.lwd)
+        }
+      }else{
+        if(x$misc$modality.flag){
+          if(crShow){
+            lapply(1:mod.level, function(ind) lines(x = confidence.B[[ind]], y = confidence.A[[ind]], col=cr.col[ind], lwd=cr.lwd[ind], lty=cr.lty[ind]))
+          }
+          if(prShow){
+            lapply(1:mod.level, function(ind) lines(x = predict.B[[ind]], y = predict.A[[ind]], col=pr.col[ind], lty=pr.lty[ind], lwd=pr.lwd[ind]))
+          }
+          if(lineShow){
+            lapply(1:mod.level, function(ind) lines(x = invg.xx, y = invg.yy[[ind]], col=line.col[ind], lty=line.lty[ind], lwd=line.lwd[ind]))
+          }
+          lapply(1:mod.level, function(ind) points(x = x$misc$inv.linkfunc(mean.B[ind]), y = x$misc$inv.linkfunc(mean.A[ind]), pch=sp.pch[ind], cex=sp.cex[ind], col=sp.col[ind]))
+        }else{ ## no covariates, no modality
+          if(crShow){
+            lines(x = confidence.B, y = confidence.A, col=cr.col, lwd=cr.lwd, lty=cr.lty)
+          }
+          if(prShow){
+            lines(x = predict.B, y = predict.A, col=pr.col,lty=pr.lty, lwd=pr.lwd)
+          }
+          if(lineShow){
+            lines(x = invg.xx, y = invg.yy, col=line.col,lty=line.lty, lwd=line.lwd)
+          }
+          points(x = x$misc$inv.linkfunc(mean.B), y = x$misc$inv.linkfunc(mean.A), pch=sp.pch,cex=sp.cex,col=sp.col)
+        }
+      }
+      # figure 2 --- legend
+      plot(NA,NA,xlim=xlim,ylim=ylim,main="",asp=1,xaxs = "i",xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
+      if(x$misc$covariates.flag){
+        if(dataShow=="o" || dataShow=="f"){
+          if(data.cex=="bubble"){
+            legend("center", 
+                   legend=c("SROC line","Data points"), 
+                   pch=c(NA,16), 
+                   col=c(line.col,data.col),
+                   lty=c(line.lty,NA),
+                   horiz=FALSE,bty="n", cex=legend.cex)
+          }else{
+            legend("center", 
+                   legend=c("SROC line","Data points"), 
+                   pch=c(NA,data.pch), 
+                   col=c(line.col,data.col),
+                   lty=c(line.lty,NA),
+                   horiz=FALSE,bty="n", cex=legend.cex)
+          }
+        }else{ # no data
+          legend("center", 
+                 legend="SROC line", 
+                 col=c(line.col),
+                 lty=c(line.lty),
+                 horiz=FALSE,bty="n", cex=legend.cex)
+        }
+      }else{# no covariates
+        if(x$misc$modality.flag){
+          mod.names = unique(x$data[,x$misc$modality.name])
+          mod.level = x$misc$modality.level
+          
+          sp_list = paste("Summary point for ", mod.names, sep="")
+          sroc_list = paste("SROC line for ", mod.names, sep="")
+          cr_list = paste("Credible region for ", mod.names, sep="")
+          pr_list = paste("Prediction region for ", mod.names, sep="")
+        }else{
+          mod.level = 1
+          sp_list = c("Summary point")
+          sroc_list = c("SROC line")
+          cr_list = c("Credible region")
+          pr_list = c("Prediction region")
+        }
+        if(dataShow=="o" || dataShow=="f"){
+          if(data.cex=="bubble"){
+            legend("center", 
+                   legend=c(sp_list, sroc_list,cr_list,pr_list,"Data points"), 
+                   pch=c(sp.pch,rep(c(NA,NA,NA),mod.level),16), 
+                   col=c(sp.col, line.col,cr.col,pr.col, data.col),
+                   lty=c(rep(NA,mod.level),line.lty,cr.lty, pr.lty,NA),
+                   horiz=FALSE,bty="n", cex=legend.cex)
+          }else{
+            legend("center", 
+                   legend=c(sp_list, sroc_list,cr_list,pr_list,"Data points"), 
+                   pch=c(sp.pch,rep(c(NA,NA,NA),mod.level),data.pch), 
+                   col=c(sp.col, line.col,cr.col,pr.col, data.col),
+                   lty=c(rep(NA,mod.level),line.lty,cr.lty, pr.lty,NA),
+                   horiz=FALSE,bty="n", cex=legend.cex)
+          }
+        }else{ # no data
+          legend("center", 
+                 legend=c(sp_list, sroc_list,cr_list,pr_list), 
+                 pch=c(sp.pch,rep(c(NA,NA,NA),mod.level)), 
+                 col=c(sp.col, line.col,cr.col,pr.col),
+                 lty=c(rep(NA,mod.level),line.lty,cr.lty, pr.lty),
+                 horiz=FALSE,bty="n", cex=legend.cex)
+        }
       }
     }
-    if(x$misc$covariates.flag){
-      if(lineShow){
-        lines(x = invg.xx, y = invg.yy, col=line.col, lty=line.lty, lwd=line.lwd)
-      }
-    }else{
-      if(x$misc$modality.flag){
-        if(crShow){
-          lapply(1:mod.level, function(ind) lines(x = confidence.B[[ind]], y = confidence.A[[ind]], col=cr.col[ind], lwd=cr.lwd[ind], lty=cr.lty[ind]))
-        }
-        if(prShow){
-          lapply(1:mod.level, function(ind) lines(x = predict.B[[ind]], y = predict.A[[ind]], col=pr.col[ind], lty=pr.lty[ind], lwd=pr.lwd[ind]))
-        }
-        if(lineShow){
-          lapply(1:mod.level, function(ind) lines(x = invg.xx, y = invg.yy[[ind]], col=line.col[ind], lty=line.lty[ind], lwd=line.lwd[ind]))
-        }
-        lapply(1:mod.level, function(ind) points(x = x$misc$inv.g(mean.B[ind]), y = x$misc$inv.g(mean.A[ind]), pch=sp.pch[ind], cex=sp.cex[ind], col=sp.col[ind]))
-      }else{ ## no covariates, no modality
-        if(crShow){
-          lines(x = confidence.B, y = confidence.A, col=cr.col, lwd=cr.lwd, lty=cr.lty)
-        }
-        if(prShow){
-          lines(x = predict.B, y = predict.A, col=pr.col,lty=pr.lty, lwd=pr.lwd)
-        }
-        if(lineShow){
-          lines(x = invg.xx, y = invg.yy, col=line.col,lty=line.lty, lwd=line.lwd)
-        }
-        points(x = x$misc$inv.g(mean.B), y = x$misc$inv.g(mean.A), pch=sp.pch,cex=sp.cex,col=sp.col)
-      }
-    }
+    
   }
   return(invisible())
 }

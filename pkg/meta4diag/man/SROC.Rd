@@ -9,18 +9,30 @@ Takes a \code{meta4diag} object produced by \code{meta4diag()} and makes the sta
 }
 \usage{
 SROC(x,...)
-\method{SROC}{meta4diag}(x, est.type="mean", sp.cex=1.5,sp.pch="*",sp.col="red",
-              dataShow="o", data.col="#FF0000FF", data.cex="bubble", data.pch=1, 
-              lineShow=T, sroc.type=1, line.lty=1, line.lwd=2, line.col="black",
+\method{SROC}{meta4diag}(x, sroc.type=1, est.type="mean", sp.cex=1.5,sp.pch=8,sp.col="red",
+              dataShow="o", data.col="#FF0000", data.cex="scaled", data.pch=1, 
+              lineShow=T, line.lty=1, line.lwd=2, line.col="black",
               crShow=T, cr.lty=2, cr.lwd=1.5, cr.col="blue",
               prShow=T, pr.lty=3, pr.lwd=1,  pr.col="darkgray",
-              dataFit = T, add=FALSE, save=F, main="", xlim, ylim,
-              xlab="1-Specificity",ylab="Sensitivity",...)
+              dataFit = T, add=FALSE, main="", xlim, ylim,
+              legend=F,legend.cex = 0.7,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
   A \code{meta4diag} object.
+}
+  \item{sroc.type}{
+  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1}, the SROC line is plotted as " The regression line 1" according to Arends et al.(2008),
+  \deqn{y = \mu + \rho\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \rho\sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
+  When \code{sroc.type=2}, the SROC line is plotted as "The major axis method",
+  \deqn{y = \frac{\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2}}{2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2})/(2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
+  When \code{sroc.type=3}, the SROC line is plotted as "The Moses and Littenberg's regression line",
+  \deqn{y = \frac{\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}{\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})/(\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
+  When \code{sroc.type=4}, the SROC line is plotted as "The regression line 2",
+  \deqn{y = \mu + \frac{1}{\rho}\sqrt(\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2})(x-\nu)}{y = \mu + 1/\rho\sqrt(\sigma_{\mu}^2/\sigma_{\nu}^2)(x-\nu)}
+  When \code{sroc.type=5}, the SROC line is plotted as "The Rutter and Gatsonis's SROC curve",
+  \deqn{y = \mu + \sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
 }
   \item{est.type}{
   The estimates type used to make SROC plot. Options are "mean" and "median".
@@ -40,24 +52,13 @@ SROC(x,...)
   \item{data.col}{
   Color of orignal data bubbles.
 }
-\item{data.cex}{
+  \item{data.cex}{
   A string or a numerical value indicating the size of the plotted dataset points. If is "bubble" or "scaled", the size of the data points are proportional to the total number of individuals in each study. 
 }
-\item{data.pch}{
+  \item{data.pch}{
   A string or a numerical value indicating the symbol of the plotted dataset points.
 }
-  \item{sroc.type}{
-  A numerical value specifying the function used to make SROC line. Options are 1, 2, 3, 4, 5. When \code{sroc.type=1}, the SROC line is plotted as " The regression line 1" according to Arends et al.(2008),
-  \deqn{y = \mu + \rho\sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \rho\sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
-  When \code{sroc.type=2}, the SROC line is plotted as "The major axis method",
-  \deqn{y = \frac{\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2}}{2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2-\sigma_{\nu}^2\pm\sqrt{(\sigma_{\mu}^2-\sigma_{\nu}^2)^2+4\rho^2\sigma_{\mu}^2\sigma_{\nu}^2})/(2\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=3}, the SROC line is plotted as "The Moses and Littenberg's regression line",
-  \deqn{y = \frac{\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}{\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2}}(x-\nu)+\mu}{y = (\sigma_{\mu}^2 + \rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})/(\sigma_{\nu}^2+\rho\sqrt{\sigma_{\mu}^2\sigma_{\nu}^2})(x-\nu)+\mu}
-  When \code{sroc.type=4}, the SROC line is plotted as "The regression line 2",
-  \deqn{y = \mu + \frac{1}{\rho}\sqrt(\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2})(x-\nu)}{y = \mu + 1/\rho\sqrt(\sigma_{\mu}^2/\sigma_{\nu}^2)(x-\nu)}
-  When \code{sroc.type=5}, the SROC line is plotted as "The Rutter and Gatsonis's SROC curve",
-  \deqn{y = \mu + \sqrt{\frac{\sigma_{\mu}^2}{\sigma_{\nu}^2}}(x-\nu)}{y = \mu + \sqrt{\sigma_{\mu}^2/\sigma_{\nu}^2}(x-\nu)}
-}
+
   \item{lineShow}{
   Boolean indicating whether the SROC line is shown or not.
 }
@@ -100,9 +101,6 @@ Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the
   \item{add}{
   If add is TRUE, the plots are added to an existing plot, otherwise a new plot is created.
 }
-  \item{save}{
-  If save is TRUE, the plots are saved(pdf format) automatically in the working directory. save could also be a file name, i.e. \code{save="plot1.eps"}, a file with name plot1 and eps format will be saved in the working directory.
-}
   \item{main}{
   A overall title for the plot.
 }
@@ -112,12 +110,13 @@ Boolean indicating the length SROC line. Either plotted from -1 to 1, or fit the
   \item{ylim}{
   A numeric value, giving the y coordinates ranges.
 }
-  \item{xlab}{
-  A label for the x axis, defaults to a description of x.
+  \item{legend}{
+  Boolean indicating whether the legend is shown or not. Can also be a string indicating the position to show the legend. Options are "left", "bottom" and "right".
 }
-  \item{ylab}{
-  A label for the y axis, defaults to a description of y.
+  \item{legend.cex}{
+  Lengend size. 
 }
+
  \item{\dots}{
   Further arguments passed to or from other methods.
 }

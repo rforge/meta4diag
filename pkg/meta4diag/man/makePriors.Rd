@@ -12,7 +12,7 @@ makePriors(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
 
 \arguments{
   \item{var.prior}{
-	A string specifying the prior density for the first variance component, options are "PC" for penalised complexity prior, "Invgamma" for inverse gamma prior, "Tnormal" for truncated normal prior, "Unif" for uniform prior which allow the standard deviation uniformaly distributed on [0,1000], "Hcauchy" for half-cauchy prior and  "table" for user specific prior. \code{var.prior} can also be set to "Invwishart" for inverse wishart prior for covariance matrix. When \code{var.prior="Invwishart"}, no matter what \code{var2.prior} and \code{cor.prior} are given, the inverse Wishart prior covariance matrix is used for covariance matrix and the \code{wishart.par} must be given. The definition of the priors is as following,
+	A string specifying the prior density for the first variance component, options are "PC" for penalised complexity prior, "Invgamma" for inverse gamma prior, "Tnormal" for truncated normal prior, "Unif" for uniform prior which allow the standard deviation uniformaly distributed on [0,1000], "Hcauchy" for half-cauchy prior and  "table" for user specific prior. \code{var.prior} can also be set to "Invwishart" for inverse wishart prior for covariance matrix. When \code{var.prior="Invwishart"}, no matter what \code{var2.prior} and \code{cor.prior} are given, the inverse Wishart prior covariance matrix is used for covariance matrix and the \code{wishart.par} must be given. Of note, the values of this argument is not case sensitive. The definition of the priors is as following,
   
   \itemize{
     \item \code{var.prior="Invgamma"}: This is a prior for a variance \eqn{\sigma^2}. The inverse gamma prior has density, 
@@ -31,7 +31,7 @@ makePriors(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
           which means it is unlikely that the standard deviation \eqn{\sigma}{\sigma} to be larger than a value \eqn{u}{u} with probability \eqn{\alpha}{\alpha}.
           The parameters are here \code{c(u, alpha)}, see arguments \code{var.par}.
   
-    \item \code{var.prior="HCauchy"}: This is a prior for a variance \eqn{\sigma^2}{\sigma^2} and defined as follows.  
+    \item \code{var.prior="Hcauchy"}: This is a prior for a variance \eqn{\sigma^2}{\sigma^2} and defined as follows.  
           The standard deviation \eqn{\sigma=\sqrt{\sigma^2}}{\sigma=\sqrt{\sigma^2}} is half-Cauchy distributed with density,
           \deqn{\pi(\sigma)=\frac{2\gamma}{\pi(\sigma^2+\gamma^2)},}{\pi(\sigma)=2\gamma/\pi(\sigma^2+\gamma^2),}
           where \eqn{\gamma>0}{\gamma>0} is the rate parameter.
@@ -66,7 +66,7 @@ makePriors(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
 }
 
   \item{cor.prior}{
-	A string specifying the prior density for the correlation, options are "PC" for penalised complexity prior, "Invgamma" for inverse gamma prior, "beta" for beta prior and "table" for user specific prior. \code{cor.prior} can also be set to "Invwishart" for inverse wishart prior for covariance matrix. When \code{cor.prior="Invwishart"}, no matter what \code{var.prior} and \code{var2.prior} are given, the inverse Wishart prior for covariance matrix is used and the \code{wishart.par} must be given. The definition of the priors is as following,
+	A string specifying the prior density for the correlation, options are "PC" for penalised complexity prior, "Invgamma" for inverse gamma prior, "Beta" for beta prior and "table" for user specific prior. \code{cor.prior} can also be set to "Invwishart" for inverse wishart prior for covariance matrix. When \code{cor.prior="Invwishart"}, no matter what \code{var.prior} and \code{var2.prior} are given, the inverse Wishart prior for covariance matrix is used and the \code{wishart.par} must be given. Of note, the values of this argument is not case sensitive. The definition of the priors is as following,
   
   \itemize{
     \item \code{cor.prior="Normal"}: This is a prior for a correlation \eqn{\rho}{\rho} and defined as follows. 
@@ -95,7 +95,7 @@ makePriors(var.prior = "PC", var2.prior="PC", cor.prior = "PC",
             The parameters for the third strategy are here \code{c(3, rho0, NA, u1, a1, u2, a2)}, see arguments \code{cor.par}.
             The parameters of the PC prior for the correlation here is \code{c(strategy, rho0, omega, u1, a1, u2, a2)}, see arguments \code{cor.par}.
     
-    \item \code{cor.prior="beta"}: This is a prior for a correlation \eqn{\rho}{\rho} and defined as follows. 
+    \item \code{cor.prior="Beta"}: This is a prior for a correlation \eqn{\rho}{\rho} and defined as follows. 
             The correlation parameter \eqn{\rho}{\rho} has a \eqn{Beta(a,b)}{Beta(a,b)} distribution scaled to have domain in \eqn{(-1, 1)}{(-1, 1)}:
             \deqn{\pi(\rho)=0.5\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\rho^{a-1}(1-\rho)^{b-1}}{\pi(\rho)=0.5\Gamma(a+b)/(\Gamma(a)\Gamma(b))\rho^{a-1}(1-\rho)^{b-1}},
             where \eqn{a,b>0} are the shape parameter.

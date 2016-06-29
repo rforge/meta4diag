@@ -1,5 +1,5 @@
 meta4diag = function(data=NULL, model.type = 1, 
-                     var.prior = "invgamma", var2.prior = "invgamma", cor.prior = "normal",
+                     var.prior = "Invgamma", var2.prior = "Invgamma", cor.prior = "Normal",
                      var.par = c(0.25, 0.025), var2.par, cor.par = c(0,5),
                      wishart.par = c(4, 1, 1, 0),
                      init = c(0.01,0.01,0), link="logit", quantiles=c(0.025,0.5,0.975),
@@ -8,8 +8,8 @@ meta4diag = function(data=NULL, model.type = 1,
   if(requireNamespace("INLA", quietly = TRUE)){
     if (!(sum(search()=="package:INLA"))==1){
       stop("INLA need to be loaded! \n
-           Please use the following command to load INLA,\n
-           library(INLA) \n")
+Please use the following command to load INLA,\n
+library(INLA) \n")
     }
     
     var.prior = tolower(var.prior)
@@ -74,7 +74,7 @@ meta4diag = function(data=NULL, model.type = 1,
     model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose)
     
     ##########################  construct the result
-    res = makeObject(outdata, outpriors, model, nsample=nsample)
+    res = makeObject(model, nsample=nsample)
     
     return(res)
   }else{

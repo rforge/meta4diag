@@ -1,4 +1,4 @@
-makeObject <- function(outdata, outpriors, model, nsample=FALSE){
+makeObject <- function(model, nsample=FALSE){
   if(requireNamespace("INLA", quietly = TRUE)){
     if (!(sum(search()=="package:INLA"))==1){
       stop("INLA need to be loaded! \n
@@ -6,31 +6,44 @@ Please use the following command to load INLA,\n
 library(INLA) \n")
     }
     
+    
+    ##### read a bit the previous settings
+    outdata = model$inherent.outdata
+    outpriors = model$inherent.priors
+    
+    model.type = outdata$model.type
+    
+    covariates.flag = outdata$covariates.flag
+    modality.flag = outdata$modality.flag
+    
     quantiles = sort(unique(c(model$quantiles,0.025,0.5,0.975)))
     effect.length = length(quantiles) + 2
+    
+    #### construct est
     est = list()
     est$data = outdata$originaldata
-    est$outdata = model$outdata
+    est$outdata = outdata$internaldata
     colnames(est$data) = tolower(colnames(est$data))
     est$priors.density = outpriors$density
     
     
-    ########## model type
-    if(model$model.type==1){
+    
+    ########## model type, names.fitted - which are modelled directly in INLA
+    if(model.type==1){
       est$names.fitted = c("Se","Sp")
-      est$names.transf.fitted = c("1-Se","1-Sp")
+      names.transf.fitted = c("1-Se","1-Sp")
     }
-    if(model$model.type==2){
+    if(model.type==2){
       est$names.fitted = c("Se","1-Sp")
-      est$names.transf.fitted = c("1-Se","Sp")
+      names.transf.fitted = c("1-Se","Sp")
     }
-    if(model$model.type==3){
+    if(model.type==3){
       est$names.fitted = c("1-Se","Sp")
-      est$names.transf.fitted = c("Se","1-Sp")
+      names.transf.fitted = c("Se","1-Sp")
     }
-    if(model$model.type==4){
+    if(model.type==4){
       est$names.fitted = c("1-Se","1-Sp")
-      est$names.transf.fitted = c("Se","Sp")
+      names.transf.fitted = c("Se","Sp")
     }
     
     n.marginal.point = dim(model$marginals.fixed[[1]])[1]
@@ -38,15 +51,17 @@ library(INLA) \n")
     est$cpu.used = model[["cpu.used"]]
     est$call = model[["call"]]
     
+    #############################################################################
     ######## fixed
+    #############################################################################
     est$summary.fixed = model[["summary.fixed"]][,c(1:effect.length)]
     est$marginals.fixed = model[["marginals.fixed"]]
     
+    #############################################################################
     ############# hyperpar: need transformation
+    #############################################################################
     names.var = c("var_phi","var_psi")
     names.cor = "cor"
-    #names.var = paste("var(",model$link,"s.",est$names.fitted,")",sep="")
-    #names.cor = paste("cor(",model$link,"s)",sep="")
     tau1.marginals = model[["marginals.hyperpar"]][[1]]
     var1.marginals = INLA::inla.tmarginal(function(x) 1/x, tau1.marginals, n=1024)
     tau2.marginals = model[["marginals.hyperpar"]][[2]]
@@ -67,93 +82,115 @@ library(INLA) \n")
     rownames(summary.hyperpar.temp) = c(names.var,names.cor)
     est$summary.hyperpar = summary.hyperpar.temp
     
-    
-    
-    ######## study names
+    #############################################################################
+    ######## study names and modality level names
+    #############################################################################
     studynames = as.character(outdata$originaldata$studynames)
+    
+    if(modality.flag){modalitynames = outdata$modality.level}
+    #############################################################################
     ######## Expected g=="logit","probit","cloglog" E(g(..)) and E(g(..))
-    if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
-        est$summary.expected.gtransformed.accuracy = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
-        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
-        est$correlation.matrix.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix
-        est$covariance.matrix.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix
-        est$correlation.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix[1,2]
-        names(est$correlation.linear.comb) = "Cor(mu, nu)"
-        est$covariance.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix[1,2]
-        names(est$covariance.linear.comb) = "Cov(mu, nu)"
-      } else{
+    #############################################################################
+    if(!modality.flag){ # no modality
+      if(!covariates.flag){ # no covariate
+        est[[paste("summary.expected.",model$link,".accuracy",sep="")]] = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
+        est[[paste("marginals.expected.",model$link,".accuracy",sep="")]] = model[["marginals.lincomb.derived"]]
+        # est[[paste("correlation.matrix.expected.",model$link,".accuracy",sep="")]] = model[["misc"]]$lincomb.derived.correlation.matrix
+        # est[[paste("covariance.matrix.expected.",model$link,".accuracy",sep="")]] = model[["misc"]]$lincomb.derived.covariance.matrix
+        
+        correlation.temp = model[["misc"]]$lincomb.derived.correlation.matrix[1,2]
+        names(correlation.temp) = "Cor(mu, nu)"
+        est[[paste("correlation.expected.",model$link,".accuracy",sep="")]] = correlation.temp
+        
+        covariance.temp = model[["misc"]]$lincomb.derived.covariance.matrix[1,2]
+        names(covariance.temp) = "Cov(mu, nu)"
+        est[[paste("covariance.expected.",model$link,".accuracy",sep="")]] = covariance.temp
+      } else{ # has covariate
         names.summarized.fixed1 = paste("mean(",model$link,".",est$names.fitted[1],".",studynames,")",sep="")
         names.summarized.fixed2 = paste("mean(",model$link,".",est$names.fitted[2],".",studynames,")",sep="")
         names.summarized.fixed = c(names.summarized.fixed1, names.summarized.fixed2)
-        est$summary.expected.gtransformed.accuracy = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
-        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
-        rownames(est$summary.expected.gtransformed.accuracy) = names.summarized.fixed
-        names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
         
-        est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
+        summary.temp = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
+        marginals.temp = model[["marginals.lincomb.derived"]]
+        rownames(summary.temp) = names.summarized.fixed
+        names(marginals.temp) = names.summarized.fixed
+        est[[paste("summary.expected.",model$link,".accuracy",sep="")]] = summary.temp
+        est[[paste("marginals.expected.",model$link,".accuracy",sep="")]] = marginals.temp
+          
+        correlation.temp = do.call(rbind, lapply(1:length(studynames), 
                                                             function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
-        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
-        rownames(est$correlation.linear.comb) = studynames
+        colnames(correlation.temp) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        correlation.temp = as.matrix(correlation.temp)
+        rownames(correlation.temp) = studynames
+        est[[paste("correlation.expected.",model$link,".accuracy",sep="")]] = correlation.temp
         
-        est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
+        covariance.temp = as.matrix(do.call(rbind, lapply(1:length(studynames), 
                                                                      function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
-        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
-        rownames(est$covariance.linear.comb) = studynames
+        colnames(covariance.temp) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        covariance.temp = as.matrix(covariance.temp)
+        rownames(covariance.temp) = studynames
+        est[[paste("covariance.expected.",model$link,".accuracy",sep="")]] = covariance.temp
       }
-    }else{
-      um = as.character(unique(outdata$originaldata[,outdata$modality.setting]))
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
-        est$summary.expected.gtransformed.accuracy = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
-        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
-        est$correlation.matrix.linear.comb = model[["misc"]]$lincomb.derived.correlation.matrix
-        est$covariance.matrix.linear.comb = model[["misc"]]$lincomb.derived.covariance.matrix
+    }else{ # has modality
+      um = modalitynames
+      if(!covariates.flag){ # no covariate
+        est[[paste("summary.expected.",model$link,".accuracy",sep="")]] = model[["summary.lincomb.derived"]][,c(2:(effect.length+1))]
+        est[[paste("marginals.expected.",model$link,".accuracy",sep="")]] = model[["marginals.lincomb.derived"]]
+        #est$correlation.matrix.expected.transf.accuracies = model[["misc"]]$lincomb.derived.correlation.matrix
+        #est$covariance.matrix.expected.transf.accuracies = model[["misc"]]$lincomb.derived.covariance.matrix
         
-        est$correlation.linear.comb = do.call(rbind, lapply(1:length(um), 
+        correlation.temp = do.call(rbind, lapply(1:length(um), 
                                                             function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(um)]))
-        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
-        rownames(est$correlation.linear.comb) = um
+        colnames(correlation.temp) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        correlation.temp = as.matrix(correlation.temp)
+        rownames(correlation.temp) = um
+        est[[paste("correlation.expected.",model$link,".accuracy",sep="")]] = correlation.temp
         
-        est$covariance.linear.comb = do.call(rbind, lapply(1:length(um), 
+        covariance.temp = do.call(rbind, lapply(1:length(um), 
                                                            function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(um)]))
-        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
-        rownames(est$covariance.linear.comb) = um
-      } else{
+        colnames(covariance.temp) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        covariance.temp = as.matrix(covariance.temp)
+        rownames(covariance.temp) = um
+        est[[paste("covariance.expected.",model$link,".accuracy",sep="")]] = covariance.temp
+      } else{ # has covariate
         names.summarized.fixed1 = paste("mean(",model$link,".",est$names.fitted[1],".",studynames,")",sep="")
         names.summarized.fixed2 = paste("mean(",model$link,".",est$names.fitted[2],".",studynames,")",sep="")
         names.summarized.fixed = c(names.summarized.fixed1, names.summarized.fixed2)
-        est$summary.expected.gtransformed.accuracy = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
-        est$marginals.expected.gtransformed.accuracy = model[["marginals.lincomb.derived"]]
-        rownames(est$summary.expected.gtransformed.accuracy) = names.summarized.fixed
-        names(est$marginals.expected.gtransformed.accuracy) = names.summarized.fixed
         
-        est$correlation.linear.comb = do.call(rbind, lapply(1:length(studynames), 
+        summary.temp = as.matrix(model[["summary.lincomb.derived"]][,c(2:(effect.length+1))])
+        marginals.temp = model[["marginals.lincomb.derived"]]
+        rownames(summary.temp) = names.summarized.fixed
+        names(marginals.temp) = names.summarized.fixed
+        est[[paste("summary.expected.",model$link,".accuracy",sep="")]] = summary.temp
+        est[[paste("marginals.expected.",model$link,".accuracy",sep="")]] = marginals.temp
+        
+        correlation.temp = do.call(rbind, lapply(1:length(studynames), 
                                                             function(i) model[["misc"]]$lincomb.derived.correlation.matrix[i, i+length(studynames)]))
-        colnames(est$correlation.linear.comb) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$correlation.linear.comb = as.matrix(est$correlation.linear.comb)
-        rownames(est$correlation.linear.comb) = studynames
+        colnames(correlation.temp) = paste("Cor(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        correlation.temp = as.matrix(correlation.temp)
+        rownames(correlation.temp) = studynames
+        est[[paste("correlation.expected.",model$link,".accuracy",sep="")]] = correlation.temp
         
-        est$covariance.linear.comb = as.matrix(do.call(rbind, lapply(1:length(studynames), 
+        covariance.temp = as.matrix(do.call(rbind, lapply(1:length(studynames), 
                                                                      function(i) model[["misc"]]$lincomb.derived.covariance.matrix[i, i+length(studynames)])))
-        colnames(est$covariance.linear.comb) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
-        est$covariance.linear.comb = as.matrix(est$covariance.linear.comb)
-        rownames(est$covariance.linear.comb) = studynames
+        colnames(covariance.temp) = paste("Cov(",paste("E[g(",est$names.fitted,")]",sep="", collapse=", "),")",sep="")
+        covariance.temp = as.matrix(covariance.temp)
+        rownames(covariance.temp) = studynames
+        est[[paste("covariance.expected.",model$link,".accuracy",sep="")]] = covariance.temp
       }
     }
     
-    ########## Expected accuracy E(..) and E(..)
-    if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
+    #############################################################################
+    ########## Expected accuracy E(Se) and E(Sp) if model.type=1
+    #############################################################################
+    if(!modality.flag){ # no modality
+      if(!covariates.flag){ # no covariates
         ####### original----from model
         names.expected.accuracy.original = paste("mean(",est$names.fitted,")",sep="")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -166,10 +203,10 @@ library(INLA) \n")
         rownames(summary.expected.accuracy.original) = names.expected.accuracy.original
         
         ####### transformed----from inla.tmarginal
-        names.expected.accuracy.transform = paste("mean(",est$names.transf.fitted,")",sep="")
+        names.expected.accuracy.transform = paste("mean(",names.transf.fitted,")",sep="")
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -191,7 +228,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -199,12 +236,12 @@ library(INLA) \n")
         summary.expected.accuracy.original = do.call(rbind, suminfo)
         rownames(summary.expected.accuracy.original) = names.expected.accuracy.original
         ####### transformed----from inla.tmarginal
-        names.expected.accuracy.transform1 = paste("mean(",est$names.transf.fitted[1],".",studynames,")",sep="")
-        names.expected.accuracy.transform2 = paste("mean(",est$names.transf.fitted[2],".",studynames,")",sep="")
+        names.expected.accuracy.transform1 = paste("mean(",names.transf.fitted[1],".",studynames,")",sep="")
+        names.expected.accuracy.transform2 = paste("mean(",names.transf.fitted[2],".",studynames,")",sep="")
         names.expected.accuracy.transform = c(names.expected.accuracy.transform1, names.expected.accuracy.transform2)
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -215,15 +252,15 @@ library(INLA) \n")
         est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
         est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
       }
-    }else{
-      um = as.character(unique(outdata$originaldata[,outdata$modality.setting]))
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
+    }else{ # has modality
+      um = modalitynames
+      if(!covariates.flag){ # no covariates
         ####### original----from model
         names.expected.accuracy.original = unlist(lapply(est$names.fitted,function(x) paste("mean(",x,".",um,")",sep="")))
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -232,10 +269,10 @@ library(INLA) \n")
         rownames(summary.expected.accuracy.original) = names.expected.accuracy.original
         
         ####### transformed----from inla.tmarginal
-        names.expected.accuracy.transform = unlist(lapply(est$names.transf.fitted,function(x) paste("mean(",x,".",um,")",sep="")))
+        names.expected.accuracy.transform = unlist(lapply(names.transf.fitted,function(x) paste("mean(",x,".",um,")",sep="")))
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -245,7 +282,7 @@ library(INLA) \n")
         
         est$summary.expected.accuracy = rbind(summary.expected.accuracy.original, summary.expected.accuracy.transform) 
         est$marginals.expected.accuracy = append(marginals.expected.accuracy.original, marginals.expected.accuracy.transform)
-      } else{
+      } else{ # has covariates
         ####### original----from model
         names.expected.accuracy.original1 = paste("mean(",est$names.fitted[1],".",studynames,")",sep="")
         names.expected.accuracy.original2 = paste("mean(",est$names.fitted[2],".",studynames,")",sep="")
@@ -253,7 +290,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -261,12 +298,12 @@ library(INLA) \n")
         summary.expected.accuracy.original = do.call(rbind, suminfo)
         rownames(summary.expected.accuracy.original) = names.expected.accuracy.original
         ####### transformed----from inla.tmarginal
-        names.expected.accuracy.transform1 = paste("mean(",est$names.transf.fitted[1],".",studynames,")",sep="")
-        names.expected.accuracy.transform2 = paste("mean(",est$names.transf.fitted[2],".",studynames,")",sep="")
+        names.expected.accuracy.transform1 = paste("mean(",names.transf.fitted[1],".",studynames,")",sep="")
+        names.expected.accuracy.transform2 = paste("mean(",names.transf.fitted[2],".",studynames,")",sep="")
         names.expected.accuracy.transform = c(names.expected.accuracy.transform1, names.expected.accuracy.transform2)
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.g(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -279,9 +316,7 @@ library(INLA) \n")
       }
     }
     
-    
-    
-    
+
     if(outpriors$wishart.flag){
       fitted1.ind = seq(1,dim(est$data)[1],by=1)
       fitted2.ind = seq((dim(est$data)[1]+1),dim(est$outdata)[1],by=1)
@@ -290,50 +325,102 @@ library(INLA) \n")
       fitted2.ind = seq(2,dim(est$outdata)[1],by=2)
     }
     
-    ############# predict
-    studynames = as.character(est$outdata$studynames[fitted1.ind])
+    #######################################################################################
+    ############# predictors: for transf accuracy, i.e. logit(se)....
+    #######################################################################################
+    # original---- from model
     summary.predict.temp1 = as.matrix(model[["summary.linear.predictor"]][fitted1.ind,c(1:effect.length)])
     rownames(summary.predict.temp1) = studynames
     summary.predict.temp2 = as.matrix(model[["summary.linear.predictor"]][fitted2.ind,c(1:effect.length)])
     rownames(summary.predict.temp2) = studynames
-    est[[paste("summary.predict.(",est$names.fitted[1],")",sep="")]] = summary.predict.temp1
-    est[[paste("summary.predict.(",est$names.fitted[2],")",sep="")]] = summary.predict.temp2
+    est[[paste("summary.predictor.",model$link,"(",est$names.fitted[1],")",sep="")]] = summary.predict.temp1
+    est[[paste("summary.predictor.",model$link,"(",est$names.fitted[2],")",sep="")]] = summary.predict.temp2
     
     marginals.predict.temp1 = lapply(fitted1.ind, function(y){model[["marginals.linear.predictor"]][[y]]})
     names(marginals.predict.temp1) = studynames
     marginals.predict.temp2 = lapply(fitted2.ind, function(y){model[["marginals.linear.predictor"]][[y]]})
     names(marginals.predict.temp2) = studynames
-    est[[paste("marginals.predict.(",est$names.fitted[1],")",sep="")]] = marginals.predict.temp1
-    est[[paste("marginals.predict.(",est$names.fitted[2],")",sep="")]] = marginals.predict.temp2
+    est[[paste("marginals.predictor.",model$link,"(",est$names.fitted[1],")",sep="")]] = marginals.predict.temp1
+    est[[paste("marginals.predictor.",model$link,"(",est$names.fitted[2],")",sep="")]] = marginals.predict.temp2
     
-    ############# transform to other accurary that not fitted here directly
-    transfunc = function(x) 1-model$inv.g(x)
-    marginals.transf.fitted1 = lapply(marginals.predict.temp1, function(x){INLA::inla.tmarginal(transfunc, x, n=n.marginal.point)})
-    marginals.transf.fitted2 = lapply(marginals.predict.temp2, function(x){INLA::inla.tmarginal(transfunc, x, n=n.marginal.point)})
-    
-    suminfo1 = do.call(rbind,lapply(marginals.transf.fitted1, function(x) .summary.marginal(x,level=quantiles)))
-    suminfo2 = do.call(rbind,lapply(marginals.transf.fitted2, function(x) .summary.marginal(x,level=quantiles)))
-    
-    est[[paste("summary.fitted.(",est$names.transf.fitted[1],")",sep="")]] = suminfo1
-    est[[paste("summary.fitted.(",est$names.transf.fitted[2],")",sep="")]] = suminfo2
-    
-    ############# fitted
+    #######################################################################################
+    ############# predictors: for accuracy, i.e. se and sp if model=1
+    #######################################################################################
     summary.fitted.temp1 = as.matrix(model[["summary.fitted.values"]][fitted1.ind,c(1:effect.length)])
     rownames(summary.fitted.temp1) = studynames
     summary.fitted.temp2 = as.matrix(model[["summary.fitted.values"]][fitted2.ind,c(1:effect.length)])
     rownames(summary.fitted.temp2) = studynames
-    est[[paste("summary.fitted.(",est$names.fitted[1],")",sep="")]] = summary.fitted.temp1
-    est[[paste("summary.fitted.(",est$names.fitted[2],")",sep="")]] = summary.fitted.temp2
+    est[[paste("summary.predictor.(",est$names.fitted[1],")",sep="")]] = summary.fitted.temp1
+    est[[paste("summary.predictor.(",est$names.fitted[2],")",sep="")]] = summary.fitted.temp2
     
-    marginals.fitted.temp1 = lapply(fitted1.ind, function(y){model[["marginals.fitted.values"]][[y]]})
+    model.marginals.fitted.values = lapply(1:length(model[["marginals.fitted.values"]]), function(ind){
+      y = model[["marginals.fitted.values"]][[ind]][,2]
+      nan.index = which(is.nan(y))
+      inf.index = which(is.infinite(y))
+      index = c(nan.index, inf.index)
+      if(length(index)!=0){
+        mfv = model[["marginals.fitted.values"]][[ind]][-index,]
+      }else{
+        mfv = model[["marginals.fitted.values"]][[ind]]
+      }
+      return(mfv)
+    })
+    
+    model.marginals.fitted.values.used = lapply(1:length(model[["marginals.fitted.values"]]), function(ind){
+      x = model.marginals.fitted.values[[ind]][,1]
+      zero.index = which(abs(x-0)<1e-8)
+      one.index = which(abs(x-1)<1e-8)
+      if(length(zero.index)!=0){zero.index = zero.index[-which(zero.index==max(zero.index))]}
+      if(length(one.index)!=0){one.index = one.index[-which(one.index==min(one.index))]}
+      index = c(zero.index, one.index)
+      if(length(index)!=0){
+        mfv = model.marginals.fitted.values[[ind]][-index,]
+      }else{
+        mfv = model.marginals.fitted.values[[ind]]
+      }
+      return(mfv)
+    })
+    
+    marginals.fitted.temp1 = lapply(fitted1.ind, function(y){model.marginals.fitted.values.used[[y]]})
     names(marginals.fitted.temp1) = studynames
-    marginals.fitted.temp2 = lapply(fitted2.ind, function(y){model[["marginals.fitted.values"]][[y]]})
+    marginals.fitted.temp2 = lapply(fitted2.ind, function(y){model.marginals.fitted.values.used[[y]]})
     names(marginals.fitted.temp2) = studynames
-    est[[paste("marginals.fitted.(",est$names.fitted[1],")",sep="")]] = marginals.fitted.temp1
-    est[[paste("marginals.fitted.(",est$names.fitted[2],")",sep="")]] = marginals.fitted.temp2
+    est[[paste("marginals.predictor.(",est$names.fitted[1],")",sep="")]] = marginals.fitted.temp1
+    est[[paste("marginals.predictor.(",est$names.fitted[2],")",sep="")]] = marginals.fitted.temp2
+    
+    #######################################################################################
+    ############# predictors: for accuracy, i.e. 1-se and 1-sp if model=1
+    #######################################################################################
+    transfunc.fitted = function(x) 1-x
     
     
+    marginals.transf.fitted.temp1 = lapply(marginals.fitted.temp1, function(x){INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)})
+    marginals.transf.fitted.temp2 = lapply(marginals.fitted.temp2, function(x){INLA::inla.tmarginal(transfunc.fitted, x, n=n.marginal.point)})
+    est[[paste("marginals.predictor.","(",names.transf.fitted[1],")",sep="")]] = marginals.transf.fitted.temp1
+    est[[paste("marginals.predictor.","(",names.transf.fitted[2],")",sep="")]] = marginals.transf.fitted.temp2
+    
+    suminfo1 = do.call(rbind,lapply(marginals.transf.fitted.temp1, function(x) .summary.marginal(x,level=quantiles)))
+    suminfo2 = do.call(rbind,lapply(marginals.transf.fitted.temp2, function(x) .summary.marginal(x,level=quantiles)))
+    
+    est[[paste("summary.predictor.","(",names.transf.fitted[1],")",sep="")]] = suminfo1
+    est[[paste("summary.predictor.","(",names.transf.fitted[2],")",sep="")]] = suminfo2
+    
+    # transform ----- from inla.tmarginal
+    #transfunc.predict = function(x) model$linkfunc(x)
+    
+    #marginals.transf.predict.temp1 = lapply(marginals.transf.fitted.temp1, function(x){INLA::inla.tmarginal(transfunc.predict, x, n=n.marginal.point)})
+    #marginals.transf.predict.temp2 = lapply(marginals.transf.fitted.temp2, function(x){INLA::inla.tmarginal(transfunc.predict, x, n=n.marginal.point)})
+    #est[[paste("marginals.predictor.",model$link,"(",names.transf.fitted[1],")",sep="")]] = marginals.transf.predict.temp1
+    #est[[paste("marginals.predictor.",model$link,"(",names.transf.fitted[2],")",sep="")]] = marginals.transf.predict.temp2
+    
+    #suminfo1 = do.call(rbind,lapply(marginals.transf.predict.temp1, function(x) .summary.marginal(x,level=quantiles)))
+    #suminfo2 = do.call(rbind,lapply(marginals.transf.predict.temp2, function(x) .summary.marginal(x,level=quantiles)))
+    
+    #est[[paste("summary.predictor.",model$link,"(",names.transf.fitted[1],")",sep="")]] = suminfo1
+    #est[[paste("summary.predictor.",model$link,"(",names.transf.fitted[2],")",sep="")]] = suminfo2
+    #######################################################################################
     ############# samples
+    #######################################################################################
     if(is.logical(nsample)){
       if(nsample==FALSE){
         est$misc$sample.flag = FALSE
@@ -355,13 +442,14 @@ library(INLA) \n")
       message("Argument \"nsample\" should be TRUE, FALSE or a integer, we set it to FALSE!")
     }
     if(est$misc$sample.flag){
-      ##################
-      ## samples
-      ##################
+      ############################
+      ## samples from posteriors
+      ############################
       options(warn=-1)
       samples = INLA::inla.posterior.sample(n = nsample, model)
       options(warn=0)
       predictors.samples = do.call(cbind,lapply(c(1:nsample), function(x) samples[[x]]$latent[1:dim(outdata$internaldata)[1]]))
+
       ##############################
       ## fixed and hyperpar samples
       ##############################
@@ -372,145 +460,156 @@ library(INLA) \n")
       }))
       fixed.names = rownames(model$summary.fixed)
       rownames(fixed.samples) = fixed.names
+      
       hyperpar.samples = do.call(cbind,lapply(c(1:nsample), function(x){
         a = samples[[x]]$hyperpar
         return(a)
       }))
-      hyperpar.samples[1,] = 1/sqrt(hyperpar.samples[1,])
-      hyperpar.samples[2,] = 1/sqrt(hyperpar.samples[2,])
-      hyperpar.names = c("sig_phi", "sig_psi", "rho")
+      hyperpar.names = c("var_phi", "var_psi", "rho")
       rownames(hyperpar.samples) = hyperpar.names
-      ##################
-      ## calcaulate AUC
-      ##################
-      AUC_function = function(mu, nu, sig1, sig2, rho){
-        y = integrate(function(x) .invlogit(mu-rho*nu*sig1/sig2 + rho*sig1/sig2*.logit(1-x)), lower=0, upper=1)
-        return(y)
-      }
-      AUC_est = do.call(cbind, lapply(c(1:nsample), function(x) {
-        AUC_function(fixed.samples[1,x], fixed.samples[2,x], hyperpar.samples[1,x], hyperpar.samples[2,x], hyperpar.samples[3,x])
-      }))
-      AUC_samples = unlist(AUC_est[1,])
-      AUC_summary = .summary.samples(AUC_samples, level=quantiles)
-      ############# save AUC
       
-      est$AUC = AUC_summary
+      est$samples.fixed = fixed.samples
+      est$samples.hyperpar = hyperpar.samples
       ##################
-      ## 
+      ## if there is no covariate, the non-linear estimates are overall estimates
       ##################
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){ #  no covariate
+      if(!covariates.flag){ #  no covariate
         ind.fitted1  = agrep("mu", fixed.names, max.distance=0)
         ind.fitted2  = agrep("nu", fixed.names, max.distance=0)
-        if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){# and no modality
-          mean.logit.fitted1.samples = fixed.samples[ind.fitted1,]
-          mean.logit.fitted2.samples = fixed.samples[ind.fitted2,]
+        if(!modality.flag){# and no modality
+          mu.samples = fixed.samples[ind.fitted1,]
+          nu.samples = fixed.samples[ind.fitted2,]
           
-          mean.fitted1.samples = model$inv.g(mean.logit.fitted1.samples)
-          mean.fitted2.samples = model$inv.g(mean.logit.fitted2.samples)
+          overall.fitted1.samples = model$inv.linkfunc(mu.samples)
+          overall.fitted2.samples = model$inv.linkfunc(nu.samples)
           
-          if(model$model.type==1){
-            mean.LRpos.samples = mean.fitted1.samples/(1-mean.fitted2.samples)
-            mean.LRneg.samples = (1-mean.fitted1.samples)/mean.fitted2.samples
-            mean.DOR.samples = mean.LRpos.samples/mean.LRneg.samples
-            mean.RD.samples = mean.fitted1.samples - (1-mean.fitted2.samples)
-            mean.LLRpos.samples = log(mean.LRpos.samples)
-            mean.LLRneg.samples = log(mean.LRneg.samples)
-            mean.LDOR.samples = log(mean.DOR.samples)
+          if(model.type==1){
+            overall.LRpos.samples = overall.fitted1.samples/(1-overall.fitted2.samples)
+            overall.LRneg.samples = (1-overall.fitted1.samples)/overall.fitted2.samples
+            overall.DOR.samples = overall.LRpos.samples/overall.LRneg.samples
+            overall.RD.samples = overall.fitted1.samples - (1-overall.fitted2.samples)
+            overall.LLRpos.samples = log(overall.LRpos.samples)
+            overall.LLRneg.samples = log(overall.LRneg.samples)
+            overall.LDOR.samples = log(overall.DOR.samples)
+            
+            est$samples.overall.Se = overall.fitted1.samples
+            est$samples.overall.Sp = overall.fitted2.samples
           }
-          if(model$model.type==2){
-            mean.LRpos.samples = mean.fitted1.samples/mean.fitted2.samples
-            mean.LRneg.samples = (1-mean.fitted1.samples)/(1-mean.fitted2.samples)
-            mean.DOR.samples = mean.LRpos.samples/mean.LRneg.samples
-            mean.RD.samples = mean.fitted1.samples - mean.fitted2.samples
-            mean.LLRpos.samples = log(mean.LRpos.samples)
-            mean.LLRneg.samples = log(mean.LRneg.samples)
-            mean.LDOR.samples = log(mean.DOR.samples)
+          if(model.type==2){
+            overall.LRpos.samples = overall.fitted1.samples/overall.fitted2.samples
+            overall.LRneg.samples = (1-overall.fitted1.samples)/(1-overall.fitted2.samples)
+            overall.DOR.samples = overall.LRpos.samples/overall.LRneg.samples
+            overall.RD.samples = overall.fitted1.samples - overall.fitted2.samples
+            overall.LLRpos.samples = log(overall.LRpos.samples)
+            overall.LLRneg.samples = log(overall.LRneg.samples)
+            overall.LDOR.samples = log(overall.DOR.samples)
+            
+            est$samples.overall.Se = overall.fitted1.samples
+            est$samples.overall.Sp = 1-overall.fitted2.samples
           }
-          if(model$model.type==3){
-            mean.LRpos.samples = (1-mean.fitted1.samples)/(1-mean.fitted2.samples)
-            mean.LRneg.samples = mean.fitted1.samples/mean.fitted2.samples
-            mean.DOR.samples = mean.LRpos.samples/mean.LRneg.samples
-            mean.RD.samples = (1-mean.fitted1.samples) - (1-mean.fitted2.samples)
-            mean.LLRpos.samples = log(mean.LRpos.samples)
-            mean.LLRneg.samples = log(mean.LRneg.samples)
-            mean.LDOR.samples = log(mean.DOR.samples)
+          if(model.type==3){
+            overall.LRpos.samples = (1-overall.fitted1.samples)/(1-overall.fitted2.samples)
+            overall.LRneg.samples = overall.fitted1.samples/overall.fitted2.samples
+            overall.DOR.samples = overall.LRpos.samples/overall.LRneg.samples
+            overall.RD.samples = (1-overall.fitted1.samples) - (1-overall.fitted2.samples)
+            overall.LLRpos.samples = log(overall.LRpos.samples)
+            overall.LLRneg.samples = log(overall.LRneg.samples)
+            overall.LDOR.samples = log(overall.DOR.samples)
+            
+            est$samples.overall.Se = 1-overall.fitted1.samples
+            est$samples.overall.Sp = overall.fitted2.samples
           }
-          if(model$model.type==4){
-            mean.LRpos.samples = (1-mean.fitted1.samples)/mean.fitted2.samples
-            mean.LRneg.samples = mean.fitted1.samples/(1-mean.fitted2.samples)
-            mean.DOR.samples = mean.LRpos.samples/mean.LRneg.samples
-            mean.RD.samples = (1-mean.fitted1.samples) - mean.fitted2.samples
-            mean.LLRpos.samples = log(mean.LRpos.samples)
-            mean.LLRneg.samples = log(mean.LRneg.samples)
-            mean.LDOR.samples = log(mean.DOR.samples)
+          if(model.type==4){
+            overall.LRpos.samples = (1-overall.fitted1.samples)/overall.fitted2.samples
+            overall.LRneg.samples = overall.fitted1.samples/(1-overall.fitted2.samples)
+            overall.DOR.samples = overall.LRpos.samples/overall.LRneg.samples
+            overall.RD.samples = (1-overall.fitted1.samples) - overall.fitted2.samples
+            overall.LLRpos.samples = log(overall.LRpos.samples)
+            overall.LLRneg.samples = log(overall.LRneg.samples)
+            overall.LDOR.samples = log(overall.DOR.samples)
+            
+            est$samples.overall.Se = 1-overall.fitted1.samples
+            est$samples.overall.Sp = 1-overall.fitted2.samples
           }
           
-          summary.LRpos.temp = .summary.samples(mean.LRpos.samples, level=quantiles)
-          summary.LRneg.temp = .summary.samples(mean.LRneg.samples, level=quantiles)
-          summary.DOR.temp = .summary.samples(mean.DOR.samples, level=quantiles)
-          summary.RD.temp = .summary.samples(mean.RD.samples, level=quantiles)
-          summary.LDOR.temp = .summary.samples(mean.LDOR.samples, level=quantiles)
-          summary.LLRpos.temp = .summary.samples(mean.LLRpos.samples, level=quantiles)
-          summary.LLRneg.temp = .summary.samples(mean.LLRneg.samples, level=quantiles)
+          summary.LRpos.temp = .summary.samples(overall.LRpos.samples, level=quantiles)
+          summary.LRneg.temp = .summary.samples(overall.LRneg.samples, level=quantiles)
+          summary.DOR.temp = .summary.samples(overall.DOR.samples, level=quantiles)
+          summary.RD.temp = .summary.samples(overall.RD.samples, level=quantiles)
+          summary.LDOR.temp = .summary.samples(overall.LDOR.samples, level=quantiles)
+          summary.LLRpos.temp = .summary.samples(overall.LLRpos.samples, level=quantiles)
+          summary.LLRneg.temp = .summary.samples(overall.LLRneg.samples, level=quantiles)
           
-          summary.summarized.statistics = rbind(summary.LRpos.temp, summary.LRneg.temp, summary.DOR.temp, summary.RD.temp, summary.LDOR.temp, summary.LLRpos.temp, summary.LLRneg.temp)
-          rownames(summary.summarized.statistics) = c("mean(LRpos)","mean(LRneg)","mean(DOR)", "mean(RD)", "mean(LDOR)", "mean(LLRpos)", "mean(LLRneg)")
-          est$summary.summarized.statistics = summary.summarized.statistics
+          summary.overall.statistics = rbind(summary.LRpos.temp, summary.LRneg.temp, summary.DOR.temp, summary.RD.temp, summary.LDOR.temp, summary.LLRpos.temp, summary.LLRneg.temp)
+          rownames(summary.overall.statistics) = c("overall.LRpos","overall.LRneg","overall.DOR", "overall.RD", "overall.LDOR", "overall.LLRpos", "overall.LLRneg")
+          est$summary.overall.statistics = summary.overall.statistics
         }else{ # no covariates, but modality
           mod.level = length(unique(outdata$originaldata[,outdata$modality.setting]))
           
-          mean.g.fitted1.samples = lapply(1:mod.level, function(i) fixed.samples[ind.fitted1[i],])
-          mean.g.fitted2.samples = lapply(1:mod.level, function(i) fixed.samples[ind.fitted2[i],])
+          mu.samples = lapply(1:mod.level, function(i) fixed.samples[ind.fitted1[i],])
+          nu.samples = lapply(1:mod.level, function(i) fixed.samples[ind.fitted2[i],])
           
-          mean.fitted1.samples = lapply(1:mod.level, function(i)  model$inv.g(mean.g.fitted1.samples[[i]]))
-          mean.fitted2.samples = lapply(1:mod.level, function(i)  model$inv.g(mean.g.fitted2.samples[[i]]))
+          overall.fitted1.samples = lapply(1:mod.level, function(i)  model$inv.linkfunc(mu.samples[[i]]))
+          overall.fitted2.samples = lapply(1:mod.level, function(i)  model$inv.linkfunc(nu.samples[[i]]))
           
-          if(model$model.type==1){
-            mean.LRpos.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]]/(1-mean.fitted2.samples[[i]]))
-            mean.LRneg.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]])/mean.fitted2.samples[[i]])
-            mean.DOR.samples = lapply(1:mod.level, function(i) mean.LRpos.samples[[i]]/mean.LRneg.samples[[i]])
-            mean.RD.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]] - (1-mean.fitted2.samples[[i]]))
-            mean.LLRpos.samples = lapply(1:mod.level, function(i) log(mean.LRpos.samples[[i]]))
-            mean.LLRneg.samples = lapply(1:mod.level, function(i) log(mean.LRneg.samples[[i]]))
-            mean.LDOR.samples = lapply(1:mod.level, function(i) log(mean.DOR.samples[[i]]))
+          if(model.type==1){
+            overall.LRpos.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]]/(1-overall.fitted2.samples[[i]]))
+            overall.LRneg.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]])/overall.fitted2.samples[[i]])
+            overall.DOR.samples = lapply(1:mod.level, function(i) overall.LRpos.samples[[i]]/overall.LRneg.samples[[i]])
+            overall.RD.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]] - (1-overall.fitted2.samples[[i]]))
+            overall.LLRpos.samples = lapply(1:mod.level, function(i) log(overall.LRpos.samples[[i]]))
+            overall.LLRneg.samples = lapply(1:mod.level, function(i) log(overall.LRneg.samples[[i]]))
+            overall.LDOR.samples = lapply(1:mod.level, function(i) log(overall.DOR.samples[[i]]))
+            
+            est$samples.overall.Se = overall.fitted1.samples
+            est$samples.overall.Sp = overall.fitted2.samples
           }
-          if(model$model.type==2){
-            mean.LRpos.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]]/mean.fitted2.samples[[i]])
-            mean.LRneg.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]])/(1-mean.fitted2.samples[[i]]))
-            mean.DOR.samples = lapply(1:mod.level, function(i) mean.LRpos.samples[[i]]/mean.LRneg.samples[[i]])
-            mean.RD.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]] - mean.fitted2.samples[[i]])
-            mean.LLRpos.samples = lapply(1:mod.level, function(i) log(mean.LRpos.samples[[i]]))
-            mean.LLRneg.samples = lapply(1:mod.level, function(i) log(mean.LRneg.samples[[i]]))
-            mean.LDOR.samples = lapply(1:mod.level, function(i) log(mean.DOR.samples[[i]]))
+          if(model.type==2){
+            overall.LRpos.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]]/overall.fitted2.samples[[i]])
+            overall.LRneg.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]])/(1-overall.fitted2.samples[[i]]))
+            overall.DOR.samples = lapply(1:mod.level, function(i) overall.LRpos.samples[[i]]/overall.LRneg.samples[[i]])
+            overall.RD.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]] - overall.fitted2.samples[[i]])
+            overall.LLRpos.samples = lapply(1:mod.level, function(i) log(overall.LRpos.samples[[i]]))
+            overall.LLRneg.samples = lapply(1:mod.level, function(i) log(overall.LRneg.samples[[i]]))
+            overall.LDOR.samples = lapply(1:mod.level, function(i) log(overall.DOR.samples[[i]]))
+            
+            est$samples.overall.Se = overall.fitted1.samples
+            est$samples.overall.Sp = lapply(1:mod.level, function(i) 1-overall.fitted2.samples[[i]])
           }
-          if(model$model.type==3){
-            mean.LRpos.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]])/(1-mean.fitted2.samples[[i]]))
-            mean.LRneg.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]]/mean.fitted2.samples[[i]])
-            mean.DOR.samples = lapply(1:mod.level, function(i) mean.LRpos.samples[[i]]/mean.LRneg.samples[[i]])
-            mean.RD.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]]) - (1-mean.fitted2.samples[[i]]))
-            mean.LLRpos.samples = lapply(1:mod.level, function(i) log(mean.LRpos.samples[[i]]))
-            mean.LLRneg.samples = lapply(1:mod.level, function(i) log(mean.LRneg.samples[[i]]))
-            mean.LDOR.samples = lapply(1:mod.level, function(i) log(mean.DOR.samples[[i]]))
+          if(model.type==3){
+            overall.LRpos.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]])/(1-overall.fitted2.samples[[i]]))
+            overall.LRneg.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]]/overall.fitted2.samples[[i]])
+            overall.DOR.samples = lapply(1:mod.level, function(i) overall.LRpos.samples[[i]]/overall.LRneg.samples[[i]])
+            overall.RD.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]]) - (1-overall.fitted2.samples[[i]]))
+            overall.LLRpos.samples = lapply(1:mod.level, function(i) log(overall.LRpos.samples[[i]]))
+            overall.LLRneg.samples = lapply(1:mod.level, function(i) log(overall.LRneg.samples[[i]]))
+            overall.LDOR.samples = lapply(1:mod.level, function(i) log(overall.DOR.samples[[i]]))
+            
+            est$samples.overall.Se = lapply(1:mod.level, function(i) 1-overall.fitted1.samples[[i]])
+            est$samples.overall.Sp = overall.fitted2.samples
           }
-          if(model$model.type==4){
-            mean.LRpos.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]])/mean.fitted2.samples[[i]])
-            mean.LRneg.samples = lapply(1:mod.level, function(i) mean.fitted1.samples[[i]]/(1-mean.fitted2.samples[[i]]))
-            mean.DOR.samples = lapply(1:mod.level, function(i) mean.LRpos.samples[[i]]/mean.LRneg.samples[[i]])
-            mean.RD.samples = lapply(1:mod.level, function(i) (1-mean.fitted1.samples[[i]]) - mean.fitted2.samples[[i]])
-            mean.LLRpos.samples = lapply(1:mod.level, function(i) log(mean.LRpos.samples[[i]]))
-            mean.LLRneg.samples = lapply(1:mod.level, function(i) log(mean.LRneg.samples[[i]]))
-            mean.LDOR.samples = lapply(1:mod.level, function(i) log(mean.DOR.samples[[i]]))
+          if(model.type==4){
+            overall.LRpos.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]])/overall.fitted2.samples[[i]])
+            overall.LRneg.samples = lapply(1:mod.level, function(i) overall.fitted1.samples[[i]]/(1-overall.fitted2.samples[[i]]))
+            overall.DOR.samples = lapply(1:mod.level, function(i) overall.LRpos.samples[[i]]/overall.LRneg.samples[[i]])
+            overall.RD.samples = lapply(1:mod.level, function(i) (1-overall.fitted1.samples[[i]]) - overall.fitted2.samples[[i]])
+            overall.LLRpos.samples = lapply(1:mod.level, function(i) log(overall.LRpos.samples[[i]]))
+            overall.LLRneg.samples = lapply(1:mod.level, function(i) log(overall.LRneg.samples[[i]]))
+            overall.LDOR.samples = lapply(1:mod.level, function(i) log(overall.DOR.samples[[i]]))
+            
+            est$samples.overall.Se = lapply(1:mod.level, function(i) 1-overall.fitted1.samples[[i]])
+            est$samples.overall.Sp = lapply(1:mod.level, function(i) 1-overall.fitted2.samples[[i]])
           }
           
-          summary.LRpos.temp = lapply(1:mod.level, function(i) .summary.samples(mean.LRpos.samples[[i]], level=quantiles))
-          summary.LRneg.temp = lapply(1:mod.level, function(i) .summary.samples(mean.LRneg.samples[[i]], level=quantiles))
-          summary.DOR.temp = lapply(1:mod.level, function(i) .summary.samples(mean.DOR.samples[[i]], level=quantiles))
-          summary.RD.temp = lapply(1:mod.level, function(i) .summary.samples(mean.RD.samples[[i]], level=quantiles))
-          summary.LDOR.temp = lapply(1:mod.level, function(i) .summary.samples(mean.LDOR.samples[[i]], level=quantiles))
-          summary.LLRpos.temp = lapply(1:mod.level, function(i) .summary.samples(mean.LLRpos.samples[[i]], level=quantiles))
-          summary.LLRneg.temp = lapply(1:mod.level, function(i) .summary.samples(mean.LLRneg.samples[[i]], level=quantiles))
+          summary.LRpos.temp = lapply(1:mod.level, function(i) .summary.samples(overall.LRpos.samples[[i]], level=quantiles))
+          summary.LRneg.temp = lapply(1:mod.level, function(i) .summary.samples(overall.LRneg.samples[[i]], level=quantiles))
+          summary.DOR.temp = lapply(1:mod.level, function(i) .summary.samples(overall.DOR.samples[[i]], level=quantiles))
+          summary.RD.temp = lapply(1:mod.level, function(i) .summary.samples(overall.RD.samples[[i]], level=quantiles))
+          summary.LDOR.temp = lapply(1:mod.level, function(i) .summary.samples(overall.LDOR.samples[[i]], level=quantiles))
+          summary.LLRpos.temp = lapply(1:mod.level, function(i) .summary.samples(overall.LLRpos.samples[[i]], level=quantiles))
+          summary.LLRneg.temp = lapply(1:mod.level, function(i) .summary.samples(overall.LLRneg.samples[[i]], level=quantiles))
           
-          summary.summarized.statistics = lapply(1:mod.level, function(i) rbind(summary.LRpos.temp[[i]], 
+          summary.overall.statistics = lapply(1:mod.level, function(i) rbind(summary.LRpos.temp[[i]], 
                                                                                 summary.LRneg.temp[[i]], 
                                                                                 summary.DOR.temp[[i]], 
                                                                                 summary.RD.temp[[i]], 
@@ -518,18 +617,19 @@ library(INLA) \n")
                                                                                 summary.LLRpos.temp[[i]], 
                                                                                 summary.LLRneg.temp[[i]]))
           for(j in 1:mod.level){
-            rownames(summary.summarized.statistics[[j]]) = c("mean(LRpos)","mean(LRneg)","mean(DOR)", "mean(RD)", "mean(LDOR)", "mean(LLRpos)", "mean(LLRneg)")
+            rownames(summary.overall.statistics[[j]]) = c("overall.LRpos","overall.LRneg","overall.DOR", "overall.RD", "overall.LDOR", "overall.LLRpos", "overall.LLRneg")
           }
-          names(summary.summarized.statistics) = unique(outdata$originaldata[,outdata$modality.setting])
-          est$summary.summarized.statistics = summary.summarized.statistics
+          names(summary.overall.statistics) = unique(outdata$originaldata[,outdata$modality.setting])
+          est$summary.overall.statistics = summary.overall.statistics
         }
       }
+      #############
+      ############# study specific LRpos, DOR,......
+      #############
+      fitted1.samples = model$inv.linkfunc(predictors.samples[fitted1.ind,])
+      fitted2.samples = model$inv.linkfunc(predictors.samples[fitted2.ind,])
       
-      ############# fitted samples to calculate LRpos, LRneg, DOR for each study
-      fitted1.samples = model$inv.g(predictors.samples[fitted1.ind,])
-      fitted2.samples = model$inv.g(predictors.samples[fitted2.ind,])
-      
-      if(model$model.type==1){
+      if(model.type==1){
         LRpos.samples = fitted1.samples/(1-fitted2.samples)
         LRneg.samples = (1-fitted1.samples)/fitted2.samples
         DOR.samples = LRpos.samples/LRneg.samples
@@ -537,8 +637,11 @@ library(INLA) \n")
         LLRpos.samples = log(LRpos.samples)
         LLRneg.samples = log(LRneg.samples)
         LDOR.samples = log(DOR.samples)
+        
+        est$samples.study.specific.Se = fitted1.samples
+        est$samples.study.specific.Sp = fitted2.samples
       }
-      if(model$model.type==2){
+      if(model.type==2){
         LRpos.samples = fitted1.samples/fitted2.samples
         LRneg.samples = (1-fitted1.samples)/(1-fitted2.samples)
         DOR.samples = LRpos.samples/LRneg.samples
@@ -546,8 +649,11 @@ library(INLA) \n")
         LLRpos.samples = log(LRpos.samples)
         LLRneg.samples = log(LRneg.samples)
         LDOR.samples = log(DOR.samples)
+        
+        est$samples.study.specific.Se = fitted1.samples
+        est$samples.study.specific.Sp = 1-fitted2.samples
       }
-      if(model$model.type==3){
+      if(model.type==3){
         LRpos.samples = (1-fitted1.samples)/(1-fitted2.samples)
         LRneg.samples = fitted1.samples/fitted2.samples
         DOR.samples = LRpos.samples/LRneg.samples
@@ -555,8 +661,11 @@ library(INLA) \n")
         LLRpos.samples = log(LRpos.samples)
         LLRneg.samples = log(LRneg.samples)
         LDOR.samples = log(DOR.samples)
+        
+        est$samples.study.specific.Se = 1-fitted1.samples
+        est$samples.study.specific.Sp = fitted2.samples
       }
-      if(model$model.type==4){
+      if(model.type==4){
         LRpos.samples = (1-fitted1.samples)/fitted2.samples
         LRneg.samples = fitted1.samples/(1-fitted2.samples)
         DOR.samples = LRpos.samples/LRneg.samples
@@ -564,6 +673,9 @@ library(INLA) \n")
         LLRpos.samples = log(LRpos.samples)
         LLRneg.samples = log(LRneg.samples)
         LDOR.samples = log(DOR.samples)
+        
+        est$samples.study.specific.Se = 1-fitted1.samples
+        est$samples.study.specific.Sp = 1-fitted2.samples
       }
       
       summary.fitted.LRpos.temp = t(apply(LRpos.samples, 1, function(x) .summary.samples(x, level=quantiles)))
@@ -582,67 +694,13 @@ library(INLA) \n")
       rownames(summary.fitted.LLRneg.temp) = studynames
       
       
-      est$summary.fitted.LRpos = summary.fitted.LRpos.temp
-      est$summary.fitted.LRneg = summary.fitted.LRneg.temp
-      est$summary.fitted.DOR = summary.fitted.DOR.temp
-      est$summary.fitted.RD = summary.fitted.RD.temp
-      est$summary.fitted.LDOR = summary.fitted.LDOR.temp
-      est$summary.fitted.LLRpos = summary.fitted.LLRpos.temp
-      est$summary.fitted.LLRneg = summary.fitted.LLRneg.temp
-      
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
-        if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
-          if(model$model.type==1){
-            est$Se.samples = fitted1.samples
-            est$Sp.samples = fitted2.samples
-            est[["mean(Se).samples"]] = mean.fitted1.samples
-            est[["mean(Sp).samples"]] = mean.fitted2.samples
-          }
-          if(model$model.type==2){
-            est$Se.samples = fitted1.samples
-            est$Sp.samples = 1-fitted2.samples
-            est[["mean(Se).samples"]] = mean.fitted1.samples
-            est[["mean(Sp).samples"]] = 1-mean.fitted2.samples
-          }
-          if(model$model.type==3){
-            est$Se.samples = 1-fitted1.samples
-            est$Sp.samples = fitted2.samples
-            est[["mean(Se).samples"]] = 1-mean.fitted1.samples
-            est[["mean(Sp).samples"]] = mean.fitted2.samples
-          }
-          if(model$model.type==4){
-            est$Se.samples = 1-fitted1.samples
-            est$Sp.samples = 1-fitted2.samples
-            est[["mean(Se).samples"]] = 1-mean.fitted1.samples
-            est[["mean(Sp).samples"]] = 1-mean.fitted2.samples
-          }
-        }else{
-          if(model$model.type==1){
-            est$Se.samples = fitted1.samples
-            est$Sp.samples = fitted2.samples
-            est[["mean(Se).samples"]] = mean.fitted1.samples
-            est[["mean(Sp).samples"]] = mean.fitted2.samples
-          }
-          if(model$model.type==2){
-            est$Se.samples = fitted1.samples
-            est$Sp.samples = 1-fitted2.samples
-            est[["mean(Se).samples"]] = mean.fitted1.samples
-            est[["mean(Sp).samples"]] = lapply(1:mod.level, function(i) 1-mean.fitted2.samples[[i]])
-          }
-          if(model$model.type==3){
-            est$Se.samples = 1-fitted1.samples
-            est$Sp.samples = fitted2.samples
-            est[["mean(Se).samples"]] = lapply(1:mod.level, function(i) 1-mean.fitted1.samples[[i]])
-            est[["mean(Sp).samples"]] = mean.fitted2.samples
-          }
-          if(model$model.type==4){
-            est$Se.samples = 1-fitted1.samples
-            est$Sp.samples = 1-fitted2.samples
-            est[["mean(Se).samples"]] = lapply(1:mod.level, function(i) 1-mean.fitted1.samples[[i]])
-            est[["mean(Sp).samples"]] = lapply(1:mod.level, function(i) 1-mean.fitted2.samples[[i]])
-          }
-        }
-      }
+      est$summary.study.specific.LRpos = summary.fitted.LRpos.temp
+      est$summary.study.specific.LRneg = summary.fitted.LRneg.temp
+      est$summary.study.specific.DOR = summary.fitted.DOR.temp
+      est$summary.study.specific.RD = summary.fitted.RD.temp
+      est$summary.study.specific.LDOR = summary.fitted.LDOR.temp
+      est$summary.study.specific.LLRpos = summary.fitted.LLRpos.temp
+      est$summary.study.specific.LLRneg = summary.fitted.LLRneg.temp
     }
     
     variables.names = tolower(colnames(est$data))
@@ -678,11 +736,12 @@ library(INLA) \n")
       est$misc$modality.level = length(unique(outdata$originaldata[,outdata$modality.setting]))
     }
     est$misc$link = model$link
-    est$misc$model.type = model$model.type
+    est$misc$model.type = model.type
     est$misc$quantiles = model$quantiles
     est$misc$verbose = model$verbose
-    est$misc$g = model$g
-    est$misc$inv.g = model$inv.g
+    est$misc$linkfunc = model$linkfunc
+    est$misc$inv.linkfunc = model$inv.linkfunc
+    est$misc$wishart.flag = outpriors$wishart.flag
     ################### make new class
     class(est) = 'meta4diag'
     return(est)

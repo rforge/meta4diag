@@ -117,12 +117,12 @@
                             	<!-- Custom data  -->
                                 <div class="sidebar-each-block">
                                 	<label>Upload Data File</label>
-                                    <table class="form-group shiny-input-container">
+                                    <table class="form-group shiny-input-container" >
                                     	<tr>
-                                        	<input id="datafile" class="sidebar-datainput" name="datafile" type="file" accept="text/csv,text/comma-separated-values,text/plain,.csv, .Rdata, .Rda, .rdata, .rda"/>
+                                        	<input id="datafile" class="sidebar-datainput" name="datafile" type="file" accept="text/csv,text/comma-separated-values,text/plain,.csv, .Rdata, .Rda, .rdata, .rda" style="padding-bottom:10px; padding-top:10px; "/>
                                         </tr>
-                                        <tr>
-                                        	<div id="datafile_progress" class="progress progress-striped active shiny-file-input-progress">
+                                        <tr style="padding-top:10px; margin-top: 10px">
+                                        	<div id="datafile_progress" class="progress progress-striped active shiny-file-input-progress" >
                                             	<div class="progress-bar"></div>
                                         	</div>
                                         </tr>
@@ -233,7 +233,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1PCu <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         <div data-display-if="input.var1PCu > 0">
                                                         	<i class="glyphicon glyphicon-ok"></i>
@@ -249,10 +249,10 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1PCalpha <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
                                                         </div>
                                                         <div data-display-if="input.var1PCalpha >= 1">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
                                                         </div>
                                                         <div data-display-if="input.var1PCalpha > 0 && input.var1PCalpha < 1">
                                                         	<i class="glyphicon glyphicon-ok"></i>
@@ -301,7 +301,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1IGa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1IGa > 0">
@@ -319,7 +319,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1IGb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1IGb > 0">
@@ -376,7 +376,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1HCa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1HCa > 0">
@@ -438,7 +438,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1TNb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1TNb > 0">
@@ -528,7 +528,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1IWnu < 3">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1IWnu >= 3">
@@ -545,7 +545,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1IWa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1IWa > 0">
@@ -562,7 +562,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var1IWb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var1IWb > 0">
@@ -657,7 +657,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2PCu <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         <div data-display-if="input.var2PCu > 0">
                                                         	<i class="glyphicon glyphicon-ok"></i>
@@ -674,10 +674,10 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2PCalpha <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
                                                         </div>
                                                         <div data-display-if="input.var2PCalpha >= 1">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
                                                         </div>
                                                         <div data-display-if="input.var2PCalpha > 0 && input.var2PCalpha < 1">
                                                         	<i class="glyphicon glyphicon-ok"></i>
@@ -726,7 +726,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2IGa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var2IGa > 0">
@@ -744,7 +744,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2IGb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var2IGb > 0">
@@ -801,7 +801,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2HCa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var2HCa > 0">
@@ -863,7 +863,7 @@
                                                     </td> 
                                                     <td>
                                                     	<div data-display-if="input.var2TNb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.var2TNb > 0">
@@ -1023,7 +1023,7 @@
                                                         </td> 
                                                         <td>
                                                             <div data-display-if="input.corPC1rho0 <= -1 || input.corPC1rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC1rho0 > -1 && input.corPC1rho0 < 1">
@@ -1041,7 +1041,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC1omega <= 0 || input.corPC1omega >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC1omega > 0 && input.corPC1omega < 1">
@@ -1059,7 +1059,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC1u <= -1 || input.corPC1u >= input.corPC1rho0">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC1u > -1 && input.corPC1u < input.corPC1rho0">
@@ -1077,7 +1077,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC1alpha <= 0 || input.corPC1alpha >= input.corPC1omega">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC1alpha > 0 && input.corPC1alpha < input.corPC1omega">
@@ -1118,7 +1118,7 @@
                                                         </td> 
                                                         <td>
                                                             <div data-display-if="input.corPC2rho0 <= -1 || input.corPC2rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC2rho0 > -1 && input.corPC2rho0 < 1">
@@ -1136,7 +1136,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC2omega <= 0 || input.corPC2omega >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC2omega > 0 && input.corPC2omega < 1">
@@ -1154,7 +1154,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC2u <= input.corPC2rho0 || input.corPC2u >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC2u > input.corPC2rho0 && input.corPC2u < 1">
@@ -1172,7 +1172,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC2alpha <= 0 || input.corPC2alpha >= 1-input.corPC2omega">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC2alpha > 0 && input.corPC2alpha < 1-input.corPC2omega">
@@ -1213,7 +1213,7 @@
                                                         </td> 
                                                         <td>
                                                             <div data-display-if="input.corPC3rho0 <= -1 || input.corPC3rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC3rho0 > -1 && input.corPC3rho0 < 1">
@@ -1231,7 +1231,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC3u1 <= -1 || input.corPC3u1 >= input.corPC3rho0">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC3u1 > -1 && input.corPC3u1 < input.corPC3rho0">
@@ -1249,7 +1249,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC3alpha1 <= 0 || input.corPC3alpha1 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC3alpha1 > 0 && input.corPC3alpha1 < 1">
@@ -1267,7 +1267,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC3u2 <= input.corPC3rho0 || input.corPC3u2 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC3u2 > input.corPC3rho0 && input.corPC3u2 < 1">
@@ -1285,7 +1285,7 @@
                                                     	</td> 
                                                         <td>
                                                             <div data-display-if="input.corPC3alpha2 <= 0 || input.corPC3alpha2 >= 1-input.corPC3alpha1">
-                                                                <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)."></i>
+                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)."></i>
                                                             </div>
                                                             
                                                             <div data-display-if="input.corPC3alpha2 > 0 && input.corPC3alpha2 < 1-input.corPC3alpha1">
@@ -1347,7 +1347,7 @@
                                                     </td>
                                                     <td>
                                                         <div data-display-if="input.corNormalmu <= -1 || input.corNormalmu >= 1">
-                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.corNormalmu > -1 && input.corNormalmu < 1">
@@ -1365,7 +1365,7 @@
                                                     </td>
                                                     <td>
                                                         <div data-display-if="input.corNormalvar <= 0">
-                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.corNormalvar > 0">
@@ -1422,7 +1422,7 @@
                                                     </td>
                                                     <td>
                                                         <div data-display-if="input.corBetaa <= 0">
-                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.corBetaa > 0">
@@ -1440,7 +1440,7 @@
                                                     </td>
                                                     <td>
                                                         <div data-display-if="input.corBetab <= 0">
-                                                            <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
                                                         </div>
                                                         
                                                         <div data-display-if="input.corBetab > 0">
@@ -1851,8 +1851,8 @@
                                     </td>
                                 	<td>
   										<select id="dpsizeind" style="width:100%">
-                                        	<option value="bubble" selected>bubble</option>
-											<option value="scaled">scaled</option>
+                                        	<option value="bubble">bubble</option>
+											<option value="scaled" selected>scaled</option>
                                             <option value="fixed">fixed</option>   
                                         </select>
     									<script type="application/json" data-for="dpsizeind" data-nonempty="">{}</script>
@@ -1862,36 +1862,36 @@
                                     <div data-display-if="input.dpsizeind != &#39;bubble&#39;">
                                     	<!-- Symbol -->
                                 		<table class="form-group shiny-input-container sidebar-table_four_six">
-                                    <tr>
-                                    <td>
-                                    	<label class="control-label" for="dpsymbol">Symbol:</label>
-                                    </td>
-                                	<td>
-  										<select id="dpsymbol" style="width:100%">
-                                        	<option value="whitesquare" selected>&#9633;</option>
-											<option value="whitecircle">&#9675;</option>
-                                            <option value="whitediamond">&#9671;</option>
-											<option value="whitetriangleup">&#9651;</option>
-                                            <option value="whitetriangledown">&#9661;</option>
-                                            <option value="blacksquare">&#9632;</option>
-                                            <option value="blackcircle">&#9679;</option>
-                                            <option value="blackdiamond">&#9670;</option>
-                                            <option value="blacktriangleup">&#9650;</option>
-                                            <option value="plus">&#43;</option>
-                                            <option value="cross">&#10005;</option>
-                                            <option value="squareplus">&#8862;</option>
-                                            <option value="circleplus">&#8853;</option>
-                                            <option value="squarecross">&#8864;</option>
-                                            <option value="circlecross">&#8855;</option>
-                                            <option value="star">&#10035;</option>
-                                            <option value="starfive">&#42;</option>
-                                            <option value="twotriangles">&#10017;</option>
-                                            <option value="dot">&#183;</option>   
-                                        </select>
-    									<script type="application/json" data-for="dpsymbol" data-nonempty="">{}</script>
-                                    </td>
-                                    </tr>
-                                    </table>
+                                            <tr>
+                                            <td>
+                                    			<label class="control-label" for="dpsymbol">Symbol:</label>
+                                            </td>
+                                            <td>
+                                                <select id="dpsymbol" style="width:100%">
+                                                    <option value="whitesquare">&#9633;</option>
+                                                    <option value="whitecircle" selected>&#9675;</option>
+                                                    <option value="whitediamond">&#9671;</option>
+                                                    <option value="whitetriangleup">&#9651;</option>
+                                                    <option value="whitetriangledown">&#9661;</option>
+                                                    <option value="blacksquare">&#9632;</option>
+                                                    <option value="blackcircle">&#9679;</option>
+                                                    <option value="blackdiamond">&#9670;</option>
+                                                    <option value="blacktriangleup">&#9650;</option>
+                                                    <option value="plus">&#43;</option>
+                                                    <option value="cross">&#10005;</option>
+                                                    <option value="squareplus">&#8862;</option>
+                                                    <option value="circleplus">&#8853;</option>
+                                                    <option value="squarecross">&#8864;</option>
+                                                    <option value="circlecross">&#8855;</option>
+                                                    <option value="star">&#10035;</option>
+                                                    <option value="starfive">&#42;</option>
+                                                    <option value="twotriangles">&#10017;</option>
+                                                    <option value="dot">&#183;</option>   
+                                                </select>
+                                                <script type="application/json" data-for="dpsymbol" data-nonempty="">{}</script>
+                                            </td>
+                                            </tr>
+                                    	</table>
                                     	<!-- Size -->
                                         <div data-display-if="input.dpsizeind == &#39;fixed&#39;">
                                 			<table class="form-group shiny-input-container sidebar-table_four_six">
@@ -2140,8 +2140,8 @@
                                 <!-- Axis and Title -->
                                 <div id="srocat" class="sidebar-each-block">
                                 	<label class="control-label" for="srocat">Axis and Title:</label>
-                                    <table class="form-group shiny-input-container sidebar-table_half_half">
-                                        <tr>
+                                    <table class="form-group shiny-input-container sidebar-table_half_half plot-tables">
+                                    	<tr>
                                             <td>
                                                 <label class="control-label" for="SROC_title">Title:</label>
                                             </td>
@@ -2151,22 +2151,12 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label class="control-label" for="SROC_xlab">X-axis Name:</label>
+                                                <label class="control-label" for="SROC_cex_main">Title Size:</label>
                                             </td>
                                             <td>
-                                                <input id="SROC_xlab" type="text" class="form-control" value="1-Specificity"/>
+                                                <input id="SROC_cex_main" type="number" class="form-control" value="1.5" min="1" max="5" step="0.5"/>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <label class="control-label" for="SROC_ylab">Y-axis Name:</label>
-                                            </td>
-                                            <td>
-                                                <input id="SROC_ylab" type="text" class="form-control" value="Sensitivity"/>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <table class="form-group shiny-input-container sidebar-table_half_half plot-tables">
                                         <tr>
                                             <td>
                                                 <label class="control-label" for="SROC_cex_axis">Axis Size:</label>
@@ -2183,16 +2173,59 @@
                                                 <input id="SROC_cex_lab" type="number" class="form-control" value="1.5" min="1" max="5" step="0.5"/>
                                             </td>
                                         </tr>
+                                    </table>
+								</div>
+                                <!-- Legend -->
+                                <div id="sroclegend" class="sidebar-each-block">
+                                	<label class="control-label" for="srocat">Legend:</label>
+                                    <table id="sroclegendshow" class="form-group shiny-input-radiogroup shiny-input-container sidebar-table_half_half">
+                                	<tr>
+                                    	<td>
+                                        	<div class="radio"  style="padding:0px; margin:0px">
+      											<label>
+        										<input type="radio" name="sroclegendshow" value="left" />
+        										<span data-toggle="tooltip" data-placement="bottom" title="The legend is shown to the right of the main plot." style="font-size:12px;">Left</span>
+      											</label>
+    										</div>
+                                    	</td>
+                                    	<td>
+                                    		<div class="radio"  style="padding:0px; margin:0px">
+      											<label>
+        										<input type="radio" name="sroclegendshow" value="right" checked="checked" />
+        										<span data-toggle="tooltip" data-placement="bottom" title="The legend is shown to the right of the main plot." style="font-size:12px;">Right</span>
+      											</label>
+    										</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                    	<td>
+                                    		<div class="radio"  style="padding:0px; margin:0px">
+      											<label>
+        										<input type="radio" name="sroclegendshow" value="bottom" />
+        										<span data-toggle="tooltip" data-placement="bottom" title="The legend is shown at the bottom of the main plot." style="font-size:12px;">Bottom</span>
+      											</label>
+    										</div>
+                                    	</td>
+                                    	<td>
+                                    		<div class="radio"  style="padding:0px; margin:0px">
+      											<label>
+        										<input type="radio" name="sroclegendshow" value="FALSE" />
+        										<span data-toggle="tooltip" data-placement="bottom" title="The legend is not shown." style="font-size:12px;">Not show</span>
+      											</label>
+    										</div>
+                                        </td>
+                                    </tr>
+                                    </table>
+                                    <table class="form-group shiny-input-container sidebar-table_half_half plot-tables">
                                         <tr>
                                             <td>
-                                                <label class="control-label" for="SROC_cex_main">Title Size:</label>
+                                                <label class="control-label" for="SROC_cex_legend">Legend Size:</label>
                                             </td>
                                             <td>
-                                                <input id="SROC_cex_main" type="number" class="form-control" value="1.5" min="1" max="5" step="0.5"/>
+                                                <input id="SROC_cex_legend" type="number" class="form-control" value="0.5" min="0.2" max="5" step="0.1"/>
                                             </td>
                                         </tr>
                                     </table>
-                                    
 								</div>
                             </div>
                         </div>
@@ -2761,6 +2794,7 @@
             			<li><a href="#mainNote-Fitted" data-toggle="tab">Fitted</a></li>
                         <li><a href="#mainNote-SROC" data-toggle="tab">SROC</a></li>
                         <li><a href="#mainNote-Forest" data-toggle="tab">Forest</a></li>
+                        <li><a href="#mainNote-Cross" data-toggle="tab">Crosshair</a></li>
                         <li><a href="#mainNote-Rcode" data-toggle="tab">R code</a></li>
           			</ul>
          		</div>
@@ -2824,16 +2858,16 @@
                         <!-- ----------------------------- -->
                     	<!-- Main NoteBook Estimates content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-Estimates" style="width:100%; height:auto; margin:10px 20px">
-                        	<div class="row" style="width:100%;">
+            			<div class="tab-pane" id="mainNote-Estimates" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="row" style="width:96%; padding-right:20px">
                         	<div id="estimatesOut" class="shiny-html-output" style="width:95%"></div>
                             </div>
                         </div>
                         <!-- ----------------------------- -->
                     	<!-- Main NoteBook Marginals content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-Marginals" style="width:100%; height:100%; margin:10px 20px">
-                        	<div class="sidebar-contain" style="width:100%">
+            			<div class="tab-pane" id="mainNote-Marginals" style="width:100%; height:100%; margin:10px 20px; white-space:normal">
+                        	<div class="sidebar-contain" style="width:96%; padding-right:20px">
                         		<div id="marginalsOut" class="shiny-html-output"></div>
                         	</div>
                         	<!-- Saving Control -->
@@ -2895,17 +2929,17 @@
                         <!-- ----------------------------- -->
                     	<!-- Main NoteBook Fitted content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-Fitted" style="width:100%; height:auto; margin:10px 20px">
-                        	<div class="row" style="width:100%">
+            			<div class="tab-pane" id="mainNote-Fitted" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="row" style="width:96%; padding-right:20px">
                         		<div id="FittedOut" class="shiny-html-output" style="width:95%"></div>
                             </div>
                         </div>
                         <!-- ----------------------------- -->
                     	<!-- Main NoteBook SROC content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-SROC" style="width:100%; height:auto; margin:10px 20px">
-                        	<div class="sidebar-contain" style="width:100%; text-align:center; display:table">
-                            	<div id="SROCOut" class="shiny-html-output" style="display:table-cell; text-align:center"></div>
+            			<div class="tab-pane" id="mainNote-SROC" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="sidebar-contain" style="width:96%; padding-right:20px">
+                            	<div id="SROCOut" class="shiny-html-output" style="display:table-cell; height:50vh; width:80vh"></div>
                             </div>
                             <div class="sidebar-each-block" style="margin-right:40px;">
                             	<label class="control-label">AUC estimates:</label>
@@ -2980,8 +3014,8 @@
                         <!-- ----------------------------- -->
                     	<!-- Main NoteBook Forest content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-Forest" style="width:100%; height:auto; margin:10px 20px">
-                        	<div class="row" style="width:100%">
+            			<div class="tab-pane" id="mainNote-Forest" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="row" style="width:96%; padding-right:20px">
                         		<div id="ForestOut" class="shiny-html-output"></div>
                             </div>
                             <!-- Saving Control -->
@@ -3051,9 +3085,82 @@
                             </div>
                         </div>
                         <!-- ----------------------------- -->
+                    	<!-- Main NoteBook Crosshair content -->
+                        <!-- ----------------------------- -->
+            			<div class="tab-pane" id="mainNote-Cross" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="sidebar-contain" style="width:96%; padding-right:20px">
+                            	<div id="CrossOut" class="shiny-html-output"></div>
+                            </div>
+                            
+                            <!-- Saving Control -->
+                            <div class="sidebar-each-block" style="margin-right:40px; height:130px;">
+                                <table class="form-group shiny-input-container" style="width:100%; margin-top:20px;">
+                                    <tr>
+                                        <td style="text-align:right; padding-right:10px;">
+                                            <label class="control-label" for="Cross_width">Width:</label>
+                                        </td>
+                                        <td>
+                                            <input id="Cross_width" type="number" class="form-control" value="5" min="5" max="15" step="1"/>
+                                        </td>
+                                        <td style="text-align:right; padding-right:10px;">
+                                            <label class="control-label" for="Cross_height">Height:</label>
+                                        </td>
+                                        <td>
+                                            <input id="Cross_height" type="number" class="form-control" value="5" min="5" max="15" step="1"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div id="crossform" class="form-group shiny-input-radiogroup shiny-input-container" style="width:75%; float:left">
+                                    <table style="width:100%">
+                                            <tr>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="crossform" value="pdf" checked="checked"/>
+                                                            <span style="font-size:12px;">.pdf</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="crossform" value="eps"/>
+                                                            <span style="font-size:12px;">.eps</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="crossform" value="png"/>
+                                                            <span style="font-size:12px;">.png</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="crossform" value="jpg"/>
+                                                            <span style="font-size:12px;">.jpg</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                </div>
+                                <div style="width:25%; float:right; text-align:right">
+                                    <a id="SaveCross" class="btn btn-default shiny-download-link" href="#" target="_blank">
+                                    <i class="glyphicon glyphicon-save"></i>
+                                    Save
+                                    </a>
+                                </div>
+                                      
+                            </div>
+                        </div>
+                        <!-- ----------------------------- -->
                     	<!-- Main NoteBook R-code content -->
                         <!-- ----------------------------- -->
-            			<div class="tab-pane" id="mainNote-Rcode" style="width:100%; height:auto; margin:10px 20px">
+            			<div class="tab-pane" id="mainNote-Rcode" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
                         	<div class="row" style="width:100%">
                         		<div id="RcodeOut" class="shiny-html-output" style="width:95%"></div>
                             </div>
@@ -3125,10 +3232,11 @@
                 <h4 class="modal-title">Tutorial:</h4>
               </div>
               <div class="modal-body">
-              	<p>Step 1: Upload your data or choose one xxample data.</p>
-                <p>Step 2: Choose the priors you want or use the defaul priors.</p>
+              	<p>Step 1: Upload your data or choose one example dataset.</p>
+                <p>Step 2: Choose the priors you want or use the default priors.</p>
                 <p>Step 3: Press RunINLA button to run the model.</p>
                 <p>Step 4: Check result.</p>
+                <p><b>Note</b>: Please press the RunINLA button to update results if any settings changed in Prior Control Panel or Model Control Panel.</p>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

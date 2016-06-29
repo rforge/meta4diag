@@ -15,47 +15,47 @@ fitted.meta4diag = function(object, accuracy.type="sens",...){
   #cat('Diagnostic accuracies ')
   if(accuracy.type=="sens" || accuracy.type=="tpr"){
     #cat('true positive rate (sensitivity): \n')
-    a = object[["summary.fitted.(Se)"]]
+    a = object[["summary.predictor.(Se)"]]
   }
   if(accuracy.type=="spec" || accuracy.type=="tnr"){
     #cat('true negative rate (specificity): \n')
-    a = object[["summary.fitted.(Sp)"]]
+    a = object[["summary.predictor.(Sp)"]]
   }
   if(accuracy.type=="fpr"){
     #cat('false positive rate (1-specificity): \n')
-    a = object[["summary.fitted.(1-Sp)"]]
+    a = object[["summary.predictor.(1-Sp)"]]
   }
   if(accuracy.type=="fnr"){
     #cat('false negative rate (1-sensitivity): \n')
-    a = object[["summary.fitted.(1-Se)"]]
+    a = object[["summary.predictor.(1-Se)"]]
   }
   if(accuracy.type=="lrpos"){
     #cat('positive likelihood ratio (LR+): \n')
-    a = object[["summary.fitted.LRpos"]]
+    a = object[["summary.study.specific.LRpos"]]
   }
   if(accuracy.type=="lrneg"){
     #cat('negative likelihood ratio (LR-): \n')
-    a = object[["summary.fitted.LRneg"]]
+    a = object[["summary.study.specific.LRneg"]]
   }
   if(accuracy.type=="dor"){
     #cat('diagnostic odds ratio (DOR): \n')
-    a = object[["summary.fitted.DOR"]]
+    a = object[["summary.study.specific.DOR"]]
   }
   if(accuracy.type=="ldor"){
     #cat('log diagnostic odds ratio (LDOR): \n')
-    a = object[["summary.fitted.LDOR"]]
+    a = object[["summary.study.specific.LDOR"]]
   }
   if(accuracy.type=="rd"){
     #cat('risk difference (RD): \n')
-    a = object[["summary.fitted.RD"]]
+    a = object[["summary.study.specific.RD"]]
   }
   if(accuracy.type=="llrpos"){
     #cat('log positive likelihood ratio (LLR+): \n')
-    a = object[["summary.fitted.LLRpos"]]
+    a = object[["summary.study.specific.LLRpos"]]
   }
   if(accuracy.type=="llrneg"){
     #cat('log negative likelihood ratio (LLR-): \n')
-    a = object[["summary.fitted.LLRneg"]]
+    a = object[["summary.study.specific.LLRneg"]]
   }
   fm = list()
   fm$accuracy.type = accuracy.type

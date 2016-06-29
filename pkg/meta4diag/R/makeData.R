@@ -195,8 +195,13 @@ library(INLA) \n")
     outdata = list()
     outdata$internaldata = internaldata
     outdata$originaldata = data
+    outdata$covariates.flag = cov.flag
+    outdata$modality.flag = mod.flag
     outdata$covariates.setting = covariates 
     outdata$modality.setting = modality
+    if(mod.flag){
+      outdata$modality.level = um
+    }
     outdata$model.type = model.type
     
     return(outdata)  

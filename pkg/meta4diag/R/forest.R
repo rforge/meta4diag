@@ -136,47 +136,47 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
   ######################### main estimates
   if(accuracy.type=="sens" || accuracy.type=="tpr"){
     fitname = "True positive rate (Sensitivity)"
-    fit = x[["summary.fitted.(Se)"]]
+    fit = x[["summary.predictor.(Se)"]]
   }
   if(accuracy.type=="spec" || accuracy.type=="tnr"){
     fitname = "True negative rate (Specificity)"
-    fit = x[["summary.fitted.(Sp)"]]
+    fit = x[["summary.predictor.(Sp)"]]
   }
   if(accuracy.type=="fpr"){
     fitname = "False positive rate (1-Specificity)"
-    fit = x[["summary.fitted.(1-Sp)"]]
+    fit = x[["summary.predictor.(1-Sp)"]]
   }
   if(accuracy.type=="fnr"){
     fitname = "False negative rate (1-Sensitivity)"
-    fit = x[["summary.fitted.(1-Se)"]]
+    fit = x[["summary.predictor.(1-Se)"]]
   }
   if(accuracy.type=="lrpos"){
     fitname = "Positive likelihood ratio (LR+)"
-    fit = x[["summary.fitted.LRpos"]]
+    fit = x[["summary.study.specific.LRpos"]]
   }
   if(accuracy.type=="lrneg"){
     fitname = "Negative likelihood ratio (LR-)"
-    fit = x[["summary.fitted.LRneg"]]
+    fit = x[["summary.study.specific.LRneg"]]
   }
   if(accuracy.type=="dor"){
     fitname = "Diagnostic odds ratio (DOR)"
-    fit = x[["summary.fitted.DOR"]]
+    fit = x[["summary.study.specific.DOR"]]
   }
   if(accuracy.type=="ldor"){
     fitname = "Log Diagnostic odds ratio (LDOR)"
-    fit = x[["summary.fitted.LDOR"]]
+    fit = x[["summary.study.specific.LDOR"]]
   }
   if(accuracy.type=="youden" || accuracy.type=="rd"){
     fitname = "Youden Index (Youden)"
-    fit = x[["summary.fitted.RD"]]
+    fit = x[["summary.study.specific.RD"]]
   }
   if(accuracy.type=="llrpos"){
     fitname = "Log Positive likelihood ratio (LLR+)"
-    fit = x[["summary.fitted.LLRpos"]]
+    fit = x[["summary.study.specific.LLRpos"]]
   }
   if(accuracy.type=="llrneg"){
     fitname = "Log Negative likelihood ratio (LLR-)"
-    fit = x[["summary.fitted.LLRneg"]]
+    fit = x[["summary.study.specific.LLRneg"]]
   }
   est.fit = fit[,est.type]  
   lb.fit = fit[,intervals[1]]
@@ -228,13 +228,13 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
       if(accuracy.type=="spec" || accuracy.type=="tnr"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.expected.accuracy"]][paste("mean(Sp.",level.name[i],")",sep=""),]))}
       if(accuracy.type=="fpr"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.expected.accuracy"]][paste("mean(1-Sp.",level.name[i],")",sep=""),]))}
       if(accuracy.type=="fnr"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.expected.accuracy"]][paste("mean(1-Se.",level.name[i],")",sep=""),]))}
-      if(accuracy.type=="lrpos"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LRpos)",]))}
-      if(accuracy.type=="lrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LRneg)",]))}
-      if(accuracy.type=="dor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(DOR)",]))}
-      if(accuracy.type=="ldor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LDOR)",]))}
-      if(accuracy.type=="youden"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(RD)",]))}
-      if(accuracy.type=="llrpos"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LLRpos)",]))}
-      if(accuracy.type=="llrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.summarized.statistics"]][[i]]["mean(LLRneg)",]))}
+      if(accuracy.type=="lrpos"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.LRpos",]))}
+      if(accuracy.type=="lrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.LRneg",]))}
+      if(accuracy.type=="dor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.DOR",]))}
+      if(accuracy.type=="ldor"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.LDOR",]))}
+      if(accuracy.type=="youden"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.RD",]))}
+      if(accuracy.type=="llrpos"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.LLRpos",]))}
+      if(accuracy.type=="llrneg"){sfit = do.call(rbind, lapply(1:mod.level, function(i) x[["summary.overall.statistics"]][[i]]["overall.LLRneg",]))}
       
       est.sfit = sfit[,est.type]
       lb.sfit = sfit[,intervals[1]]
@@ -245,13 +245,13 @@ forest.meta4diag = function(x, accuracy.type="sens", est.type="mean", p.cex="sca
       if(accuracy.type=="spec" || accuracy.type=="tnr"){sfit = x[["summary.expected.accuracy"]]["mean(Sp)",]}
       if(accuracy.type=="fpr"){sfit = x[["summary.expected.accuracy"]]["mean(1-Sp)",]}
       if(accuracy.type=="fnr"){sfit = x[["summary.expected.accuracy"]]["mean(1-Se)",]}
-      if(accuracy.type=="lrpos"){sfit = x[["summary.summarized.statistics"]]["mean(LRpos)",]}
-      if(accuracy.type=="lrneg"){sfit = x[["summary.summarized.statistics"]]["mean(LRneg)",]}
-      if(accuracy.type=="dor"){sfit = x[["summary.summarized.statistics"]]["mean(DOR)",]}
-      if(accuracy.type=="ldor"){sfit = x[["summary.summarized.statistics"]]["mean(LDOR)",]}
-      if(accuracy.type=="youden"){sfit = x[["summary.summarized.statistics"]]["mean(RD)",]}
-      if(accuracy.type=="llrpos"){sfit = x[["summary.summarized.statistics"]]["mean(LLRpos)",]}
-      if(accuracy.type=="llrneg"){sfit = x[["summary.summarized.statistics"]]["mean(LLRneg)",]}
+      if(accuracy.type=="lrpos"){sfit = x[["summary.overall.statistics"]]["overall.LRpos",]}
+      if(accuracy.type=="lrneg"){sfit = x[["summary.overall.statistics"]]["overall.LRneg",]}
+      if(accuracy.type=="dor"){sfit = x[["summary.overall.statistics"]]["overall.DOR",]}
+      if(accuracy.type=="ldor"){sfit = x[["summary.overall.statistics"]]["overall.LDOR",]}
+      if(accuracy.type=="youden"){sfit = x[["summary.overall.statistics"]]["overall.RD",]}
+      if(accuracy.type=="llrpos"){sfit = x[["summary.overall.statistics"]]["overall.LLRpos",]}
+      if(accuracy.type=="llrneg"){sfit = x[["summary.overall.statistics"]]["overall.LLRneg",]}
       
       est.sfit = sfit[est.type]
       lb.sfit = sfit[intervals[1]]

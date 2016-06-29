@@ -5,6 +5,7 @@ runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5,
 Please use the following command to load INLA,\n
 library(INLA) \n")
     }
+    
     model.type = outdata$model.type
     N = dim(outdata$internaldata)[1]
     varnames = names(outdata$internaldata)
@@ -28,8 +29,8 @@ library(INLA) \n")
     if(model.type==4){names.fitted = c("1-Se","1-Sp")}
     
     
-    if(is.null(outdata$modality.setting) || outdata$modality.setting==FALSE){
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
+    if(!outdata$modality.flag){ # no modality
+      if(!outdata$covariates.flag){ # no covariates
         
         names.summarized.fitted = paste("mean(",link,".",names.fitted,")",sep="")
         
@@ -44,7 +45,7 @@ library(INLA) \n")
         lc2 = eval(parse(text=lc2text))
         names(lc2) = names.summarized.fitted[2]
         lc = c(lc1, lc2) 
-      } else{
+      }else{ # has covariates
         studynames = outdata$originaldata$studynames
         
         mu.ind = which(data[,"mu"]==1)
@@ -60,9 +61,9 @@ library(INLA) \n")
         names(lc2) = paste("mean(",link,".",names.fitted[2],".",1:(0.5*N),")",sep="")
         lc = c(lc1, lc2)   
       }
-    }else{
+    }else{ # has modality
       um = as.character(unique(outdata$originaldata[,outdata$modality.setting]))
-      if(is.null(outdata$covariates.setting) || outdata$covariates.setting==FALSE){
+      if(!outdata$covariates.flag){ # no covariates
         lc1 = c()
         lc2 = c()
         for(i in 1:length(um)){
@@ -81,7 +82,7 @@ library(INLA) \n")
           lc2 = append(lc2, lc2_um)
         }
         lc = c(lc1, lc2) 
-      }else{
+      }else{ # has covariates
         lc1 = c()
         lc2 = c()
         for(i in 1:length(um)){
@@ -148,24 +149,23 @@ library(INLA) \n")
       } 
     }
     
-    model$model.type = model.type
     model$link = link
     model$quantiles = quantiles
     model$verbose = verbose
-    model$outdata = data
-    model$wishart.flag = outpriors$wishart.flag
+    model$inherent.outdata = outdata
+    model$inherent.priors = outpriors
     
     if(link=="logit"){
-      model$g = function(x){return(log(x/(1-x)))}
-      model$inv.g = function(x){return(exp(x)/(1+exp(x)))}
+      model$linkfunc = function(x){return(log(x/(1-x)))}
+      model$inv.linkfunc = function(x){return(exp(x)/(1+exp(x)))}
     }
     if(link=="probit"){
-      model$g = function(x){return(qnorm(x))}
-      model$inv.g = function(x){return(pnorm(x))}
+      model$linkfunc = function(x){return(qnorm(x))}
+      model$inv.linkfunc = function(x){return(pnorm(x))}
     }
     if(link=="cloglog"){
-      model$g = function(x){return(log(-log(1-x)))}
-      model$inv.g = function(x){return(1-exp(-exp(x)))}
+      model$linkfunc = function(x){return(log(-log(1-x)))}
+      model$inv.linkfunc = function(x){return(1-exp(-exp(x)))}
     }
     
     return(model)

@@ -15,7 +15,9 @@ export(meta4diag,
 	print.meta4diag,
 	print.summary.meta4diag,
 	print.fitted.meta4diag,
-	makeObject)
+	makeObject,
+       AUC,
+       AUC.meta4diag)
 
 
 S3method(SROC,meta4diag)
@@ -27,6 +29,7 @@ S3method(print,fitted.meta4diag)
 S3method(print,meta4diag)
 S3method(plot,meta4diag)
 S3method(summary,meta4diag)
+S3method(AUC,meta4diag)
 
 importFrom("grDevices", "cairo_ps", "col2rgb", "contourLines",
             "dev.off", "jpeg", "palette", "pdf", "png", "postscript",
@@ -45,3 +48,4 @@ import(shinyBS)
 import(sp)
 import(grid)
 import(methods)
+import(caTools)
