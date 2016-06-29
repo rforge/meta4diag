@@ -884,7 +884,6 @@ shinyServer(function(input, output, session) {
   
   #----------- INLA Version ---------------#
   output$inlaversion  = renderPrint({
-    cat(input$var1PCu)
     #   cat(length(input$partialdata))
     #   cat("\n")
         # cat(input$modelnos)
