@@ -46,13 +46,14 @@ SROC.meta4diag = function(x,
         stop("legend could only be at bottom, left or right")
       }else{
         legend.flag = TRUE
-        legend.pos = legend
+        legend.pos = switch(legend,"bottom"="top", "right"="left", "left"="right")
       }
     }
   }else{
     if(legend){
       legend.flag = TRUE
-      legend.pos = "bottom"
+      legend = "bottom"
+      legend.pos = "top"
     }else{
       legend.flag = FALSE
     }
@@ -489,12 +490,12 @@ SROC.meta4diag = function(x,
         }
       }
     }else{ # has legend
-      if(legend.pos=="bottom"){
-        layout(mat = matrix(c(1,2), nrow = 2, ncol = 1), heights = c(1.5,1.2))
-      }else if(legend.pos=="left"){
-        layout(mat = matrix(c(2,1), nrow = 1, ncol = 2), widths = c(1.2, 1.5))
+      if(legend=="bottom"){
+        layout(mat = matrix(c(1,2), nrow = 2, ncol = 1), heights = c(1,1))
+      }else if(legend=="left"){
+        layout(mat = matrix(c(2,1), nrow = 1, ncol = 2), widths = c(1,1))
       }else{
-        layout(mat = matrix(c(1,2), nrow = 1, ncol = 2), widths = c(1.5, 1.2))
+        layout(mat = matrix(c(1,2), nrow = 1, ncol = 2), widths = c(1,1))
       }
       # figure 1 --- main figure
       plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
@@ -547,14 +548,14 @@ SROC.meta4diag = function(x,
       if(x$misc$covariates.flag){
         if(dataShow=="o" || dataShow=="f"){
           if(data.cex=="bubble"){
-            legend("center", 
+            legend(legend.pos, 
                    legend=c("SROC line","Data points"), 
                    pch=c(NA,16), 
                    col=c(line.col,data.col),
                    lty=c(line.lty,NA),
                    horiz=FALSE,bty="n", cex=legend.cex)
           }else{
-            legend("center", 
+            legend(legend.pos, 
                    legend=c("SROC line","Data points"), 
                    pch=c(NA,data.pch), 
                    col=c(line.col,data.col),
@@ -562,7 +563,7 @@ SROC.meta4diag = function(x,
                    horiz=FALSE,bty="n", cex=legend.cex)
           }
         }else{ # no data
-          legend("center", 
+          legend(legend.pos, 
                  legend="SROC line", 
                  col=c(line.col),
                  lty=c(line.lty),
@@ -586,14 +587,14 @@ SROC.meta4diag = function(x,
         }
         if(dataShow=="o" || dataShow=="f"){
           if(data.cex=="bubble"){
-            legend("center", 
+            legend(legend.pos, 
                    legend=c(sp_list, sroc_list,cr_list,pr_list,"Data points"), 
                    pch=c(sp.pch,rep(c(NA,NA,NA),mod.level),16), 
                    col=c(sp.col, line.col,cr.col,pr.col, data.col),
                    lty=c(rep(NA,mod.level),line.lty,cr.lty, pr.lty,NA),
                    horiz=FALSE,bty="n", cex=legend.cex)
           }else{
-            legend("center", 
+            legend(legend.pos, 
                    legend=c(sp_list, sroc_list,cr_list,pr_list,"Data points"), 
                    pch=c(sp.pch,rep(c(NA,NA,NA),mod.level),data.pch), 
                    col=c(sp.col, line.col,cr.col,pr.col, data.col),
@@ -601,7 +602,7 @@ SROC.meta4diag = function(x,
                    horiz=FALSE,bty="n", cex=legend.cex)
           }
         }else{ # no data
-          legend("center", 
+          legend(legend.pos, 
                  legend=c(sp_list, sroc_list,cr_list,pr_list), 
                  pch=c(sp.pch,rep(c(NA,NA,NA),mod.level)), 
                  col=c(sp.col, line.col,cr.col,pr.col),

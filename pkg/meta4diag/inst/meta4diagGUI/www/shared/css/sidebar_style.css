@@ -1,6 +1,10 @@
 @charset "UTF-8";
 /* CSS Document */
 
+.chcek-prior-valid{
+	color:red;
+}
+
 .sidebar-title {
 	height:30px; 
 	width:100%;
@@ -55,6 +59,26 @@
 .sidebar-table_half_half tr td:nth-child(even) {  
 	width:50%;
 }
+
+.sidebar-table3 {
+	width:100%;
+}
+.sidebar-table3 tr td label {
+	text-decoration:none;
+	font-size:13px;
+	font-weight:400;
+}
+.sidebar-table3 tr td:nth-child(1) {  
+	width:20%;
+}
+.sidebar-table3 tr td:nth-child(2) {  
+	width:60%;
+}
+.sidebar-table3 tr td:nth-child(3) {  
+	width:20%;
+}
+
+
 
 .sidebar-table_three_seven {
 	width:100%;

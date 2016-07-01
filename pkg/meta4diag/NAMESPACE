@@ -42,6 +42,7 @@ importFrom("stats", "as.formula", "dbeta", "dgamma", "dnorm", "fitted",
 importFrom("utils", "install.packages", "installed.packages",
             "read.csv", "read.table", "tail")
 importFrom("stats", "integrate")
+importFrom("grDevices", "rainbow")
 
 import(shiny)
 import(shinyBS)

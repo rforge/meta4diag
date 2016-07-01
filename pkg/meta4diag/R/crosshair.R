@@ -1,6 +1,6 @@
 crosshair <- function(x, ...) UseMethod("crosshair")
 
-crosshair.meta4diag = function(x, est.type="mean", add=FALSE, main="Crosshair Plot", xlim, ylim, ...){
+crosshair.meta4diag = function(x, est.type="mean", add=FALSE, main="Crosshair Plot", xlim, ylim, col, ...){
   if(class(x)!="meta4diag"){stop("Wrong input given!")}
   if(!(est.type %in% c("mean","median","mode"))){stop("Argument \"est.type\" should be \"mean\",\"median\" or \"mode\".")}
 
@@ -78,18 +78,78 @@ crosshair.meta4diag = function(x, est.type="mean", add=FALSE, main="Crosshair Pl
       y.labels = as.character(1-y.at)
     }
   }
-  
-  if(add){
-    points(est.B, est.A, ...)
-    arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, ...)
-    arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, ...)
+  if(missing(col)){
+    if(x$misc$covariates.flag){
+      col = c(1:length(est.B))
+      if(add){
+        points(est.B, est.A, col=col)
+        arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, col=col)
+        arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, col=col)
+      }else{
+        plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+             xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+        axis(1, at = x.at, labels = x.labels, ...)
+        axis(2, at = y.at, labels = y.labels, ...)
+        points(est.B, est.A,col=col)
+        arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05,col=col)
+        arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05,col=col)
+      }
+    }else{
+      if(x$misc$modality.flag){
+        col = rainbow(x$misc$modality.level)
+        modalitynames = unique(x$data[,x$misc$modality.name])
+        ind = lapply(1:x$misc$modality.level, function(i) which(x$data[,x$misc$modality.name]==modalitynames[i]))
+        if(add){
+          lapply(1:x$misc$modality.level, function(i){
+            points(est.B[ind[[i]]], est.A[ind[[i]]], col=col[i])
+            arrows(lb.B[ind[[i]]], est.A[ind[[i]]], ub.B[ind[[i]]], est.A[ind[[i]]], angle=90, code=3, length=0.05, col=col[i])
+            arrows(est.B[ind[[i]]], lb.A[ind[[i]]], est.B[ind[[i]]], ub.A[ind[[i]]], angle=90, code=3, length=0.05, col=col[i])
+          })
+        }else{
+          plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+               xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+          axis(1, at = x.at, labels = x.labels, ...)
+          axis(2, at = y.at, labels = y.labels, ...)
+          lapply(1:x$misc$modality.level, function(i){
+            points(est.B[ind[[i]]], est.A[ind[[i]]],col=col[i])
+            arrows(lb.B[ind[[i]]], est.A[ind[[i]]], ub.B[ind[[i]]], est.A[ind[[i]]], angle=90, code=3, length=0.05,col=col[i])
+            arrows(est.B[ind[[i]]], lb.A[ind[[i]]], est.B[ind[[i]]], ub.A[ind[[i]]], angle=90, code=3, length=0.05,col=col[i])
+          })
+        }
+        
+          
+        
+      }else{
+        col="black"
+        if(add){
+          points(est.B, est.A, col=col)
+          arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, col=col)
+          arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, col=col)
+        }else{
+          plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+               xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+          axis(1, at = x.at, labels = x.labels, ...)
+          axis(2, at = y.at, labels = y.labels, ...)
+          points(est.B, est.A,col=col)
+          arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05,col=col)
+          arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05,col=col)
+        }
+      }
+    }
   }else{
-    plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
-         xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
-    axis(1, at = x.at, labels = x.labels, ...)
-    axis(2, at = y.at, labels = y.labels, ...)
-    points(est.B, est.A, ...)
-    arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, ...)
-    arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, ...)
+    if(add){
+      points(est.B, est.A, col=col)
+      arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05, col=col)
+      arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05, col=col)
+    }else{
+      plot(NA,NA,xlim=xlim,ylim=ylim,main=main,asp=1,
+           xaxs = "i",xaxt="n",yaxt="n",bty="o",xlab="1-Specificity",ylab="Sensitivity", ...)
+      axis(1, at = x.at, labels = x.labels, ...)
+      axis(2, at = y.at, labels = y.labels, ...)
+      points(est.B, est.A,col=col)
+      arrows(lb.B, est.A, ub.B, est.A, angle=90, code=3, length=0.05,col=col)
+      arrows(est.B, lb.A, est.B, ub.A, angle=90, code=3, length=0.05,col=col)
+    }
   }
+  return(invisible())
 }

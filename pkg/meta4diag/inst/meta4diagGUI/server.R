@@ -1427,7 +1427,15 @@ shinyServer(function(input, output, session) {
               The information will be shown in the R Console.")
           }
           }else{
-            plotOutput("SROC")
+            legend = switch(input$sroclegendshow, "left"="left", "right"="right", "FALSE"="no","bottom"="bottom")
+            if(legend=="no"){
+              plotOutput("SROC", width = "300px", height = "300px")
+            }else if(legend=="bottom"){
+              plotOutput("SROC", width = "300px", height = "600px")
+            }else{
+              plotOutput("SROC", width = "600px", height = "300px")
+            }
+            
         } 
       }
     }

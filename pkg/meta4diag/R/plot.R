@@ -31,15 +31,21 @@ plot.meta4diag = function(x, var.type="var1", add=FALSE, overlay.prior = TRUE, s
   }
   
   fixed.name = rownames(x$summary.fixed)
-  hyper.name = c("var1", "var2", "rho")
-  fullnames = c(fixed.name, hyper.name)
+  hyper.name = rownames(x$summary.hyperpar)
+  fullnames = c(fixed.name, hyper.name, "var1", "var2", "rho")
   if(!(var.type %in% fullnames)){
-    stop(paste("Please give the correct \"type\" name, which should be ", paste(fullnames,collapse=", "),sep=""))
+    stop(paste("Please give the correct \"type\" name, which should be ", paste(fullnames,collapse=", ")," var1, var2, rho.",sep=""))
   }
+  
+  if(var.type=="var1"){var.type="var_phi"}
+  if(var.type=="var2"){var.type="var_psi"}
+  if(var.type=="rho"){var.type="cor"}
+  
+  
   fixed.prior = data.frame(x=seq(-10,10,len=100),y=dnorm(seq(-10,10,len=100),mean=0,sd=sqrt(1000)))
   fullmarginals = append(x$marginals.fixed,x$marginals.hyperpar)
   ind = which(fullnames==var.type)
-  if(var.type=="var1" || var.type=="var2"){
+  if(var.type=="var_phi" || var.type=="var_psi"){
     marginals.plot = fullmarginals[[ind]]
   }else{
     marginals.plot = INLA::inla.smarginal(fullmarginals[[ind]])
@@ -70,21 +76,19 @@ plot.meta4diag = function(x, var.type="var1", add=FALSE, overlay.prior = TRUE, s
       }
     }
     
-    par(mar=c(5.1, 4.1, 4.1, 2.1))
     plot(marginals.plot, type="l", xlab=xlabnames[ind], ylab="",xaxs = "r",xaxt="s",yaxt="s",bty="o",...)
     if(!x$misc$wishart.flag){
       if(overlay.prior){
-        nom = length(fullnames)
-        if(ind<=(nom-3)){
-          lines(fixed.prior,lty=2,col="darkgray")
-        }else if(ind==(nom-2)){
-          lines(x$priors.density[[1]],lty=2,col="darkgray")
-        }else if(ind==(nom-1)){
-          lines(x$priors.density[[2]],lty=2,col="darkgray")
-        }else if(ind==nom){
-          lines(x$priors.density[[3]],lty=2,col="darkgray")
+        if(var.type %in% c("var_phi","var_psi","cor")){
+          if(var.type=="var_phi"){
+            lines(x$priors.density[[1]],lty=2,col="darkgray")
+          }else if(var.type == "var_psi"){
+            lines(x$priors.density[[2]],lty=2,col="darkgray")
+          }else{
+            lines(x$priors.density[[3]],lty=2,col="darkgray")
+          }
         }else{
-          stop("Wrong var.type!")
+          lines(fixed.prior,lty=2,col="darkgray")
         }
       }
     }

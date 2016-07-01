@@ -223,7 +223,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- PC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name ">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1PCu"><i>u</i>:</label>
@@ -232,11 +232,13 @@
                                                         <input id="var1PCu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="3" min="0.05" max="50" step="0.05"/> 
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1PCu <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1PCu <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var1PCu > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1PCu > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -248,14 +250,17 @@
                                                         <input id="var1PCalpha" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0.05" min="0.005" max="0.995" step="0.005"/>
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1PCalpha <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                    	<div data-display-if="input.var1PCalpha <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var1PCalpha >= 1">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        <div data-display-if="input.var1PCalpha >= 1" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var1PCalpha > 0 && input.var1PCalpha < 1">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1PCalpha > 0 && input.var1PCalpha < 1" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -290,7 +295,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- IG prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IGa"><i>&alpha;</i>:</label>
@@ -300,12 +305,14 @@
                                                         <!--<div id="var1IGa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1IGa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1IGa <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1IGa > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IGa > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -318,12 +325,14 @@
                                                         <!--<div id="var1IGb" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1IGb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1IGb <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1IGb > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IGb > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -365,7 +374,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- HC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1HCa"><i>&alpha;</i>:</label>
@@ -375,12 +384,14 @@
                                                         <!--<div id="var1HCa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1HCa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1HCa <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1HCa > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1HCa > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -413,7 +424,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- T-Normal: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1TNa"><i>&mu;</i>:</label>
@@ -423,8 +434,20 @@
                                                         <!--<div id="var1TNa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                        <div>
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1TNa == 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var1TNa != 0" style="padding-left:7px;">
+                                                        	<div data-display-if="!input.var1TNa">
+                                                            	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input missing."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                            </div>
+                                                            <div data-display-if="input.var1TNa">
+                                                            	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -437,12 +460,14 @@
                                                         <!--<div id="var1TNb" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1TNb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1TNb <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1TNb > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1TNb > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -518,7 +543,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- Inverse-Wishart: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var1IWnu"><i>&nu;</i>:</label>
@@ -527,12 +552,14 @@
                                                         <input id="var1IWnu" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="4" min="3" max="10" step="1"/>
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1IWnu < 3">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3."></i>
+                                                    	<div data-display-if="input.var1IWnu < 3" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 3." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1IWnu >= 3">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IWnu >= 3" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -544,12 +571,14 @@
                                                         <input id="var1IWa" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="1" max="5" step="0.05"/>
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1IWa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1IWa <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1IWa > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IWa > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -561,12 +590,14 @@
                                                         <input id="var1IWb" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="1" min="1" max="5" step="0.05"/>
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var1IWb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var1IWb <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var1IWb > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IWb > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -578,8 +609,17 @@
                                                         <input id="var1IWc" type="number" onkeypress="return isNumberKey(event)" class="form-control" value="0" min="-5" max="5" step="0.05"/>
                                                     </td> 
                                                     <td>
-                                                        <div>
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var1IWc == 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                        </div>
+                                                        <div data-display-if="input.var1IWc != 0" style="padding-left:7px;">
+                                                        	<div data-display-if="input.var1IWc">
+                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                        	</div>
+                                                            <div data-display-if="!input.var1IWc">
+                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                        	</div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -646,7 +686,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- PC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2PCu"><i>u</i>:</label>
@@ -656,11 +696,13 @@
                                                         <!--<div id="var2PCu" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2PCu <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var2PCu <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var2PCu > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2PCu > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -673,14 +715,17 @@
                                                         <!--<div id="var2PCalpha" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2PCalpha <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                    	<div data-display-if="input.var2PCalpha <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var2PCalpha >= 1">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>
+                                                        <div data-display-if="input.var2PCalpha >= 1" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval [0,1]."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
-                                                        <div data-display-if="input.var2PCalpha > 0 && input.var2PCalpha < 1">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2PCalpha > 0 && input.var2PCalpha < 1" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -715,7 +760,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- IG prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2IGa"><i>&alpha;</i>:</label>
@@ -725,12 +770,14 @@
                                                         <!--<div id="var2IGa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2IGa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var2IGa <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var2IGa > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2IGa > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -743,12 +790,14 @@
                                                         <!--<div id="var2IGb" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2IGb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var2IGb <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var2IGb > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2IGb > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -790,7 +839,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- HC prior: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2HCa"><i>&alpha;</i>:</label>
@@ -800,12 +849,14 @@
                                                         <!--<div id="var2HCa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2HCa <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var2HCa <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var2HCa > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2HCa > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td> 
                                                 </tr>
@@ -838,7 +889,7 @@
                                                     </fieldset>
                                                 </form>
                                                 <!-- T-Normal: Parameter Control -->
-                                                <table class="form-group shiny-input-container sidebar-prior-name">
+                                                <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="var2TNa"><i>&mu;</i>:</label>
@@ -848,8 +899,20 @@
                                                         <!--<div id="var2TNa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                        <div>
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2TNa == 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                        </div>
+                                                        
+                                                        <div data-display-if="input.var2TNa != 0" style="padding-left:7px;">
+                                                        	<div data-display-if="!input.var2TNa">
+                                                            	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input missing."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                            </div>
+                                                            <div data-display-if="input.var2TNa">
+                                                            	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -862,12 +925,14 @@
                                                         <!--<div id="var2TNb" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td> 
                                                     <td>
-                                                    	<div data-display-if="input.var2TNb <= 0">
-                                                        	<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                    	<div data-display-if="input.var2TNb <= 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.var2TNb > 0">
-                                                        	<i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.var2TNb > 0" style="padding-left:7px;">
+                                                        	<!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -1012,7 +1077,7 @@
                                             <!-- Strategy 1 -->
                                             <div data-display-if="input.strategy == &#39;strategy1&#39;">
                                             	<!-- PC prior strategy 1: parameter -->
-                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                     <tr>
                                                         <td align="right" style="padding-right:10px;">
                                                             <label class="sidebar-prior-name-label" for="corPC1rho0"><i>&rho;<sub>0</sub></i>:</label>
@@ -1022,12 +1087,23 @@
                                                             <!--<div id="corPC1rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC1rho0 <= -1 || input.corPC1rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
-                                                            </div>
                                                             
-                                                            <div data-display-if="input.corPC1rho0 > -1 && input.corPC1rho0 < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC1rho0 == 0" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            </div>
+                                                            <div data-display-if="input.corPC1rho0 != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC1rho0">
+                                                            		<div data-display-if="input.corPC1rho0 <= -1 || input.corPC1rho0 >= 1">
+                                                                		<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>-->
+                                                                		<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                            		</div>
+                                                                    <div data-display-if="input.corPC1rho0 > -1 && input.corPC1rho0 < 1">
+                                                                		<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            		</div>
+                                                            	</div>
+                                                                <div data-display-if="!input.corPC1rho0">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
                                                             </div>
                                                    		</td>
                                                     </tr> 
@@ -1040,12 +1116,14 @@
                                                             <!--<div id="corPC1omega" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC1omega <= 0 || input.corPC1omega >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                            <div data-display-if="input.corPC1omega <= 0 || input.corPC1omega >= 1" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
                                                             
-                                                            <div data-display-if="input.corPC1omega > 0 && input.corPC1omega < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC1omega > 0 && input.corPC1omega < 1" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1058,13 +1136,28 @@
                                                             <!--<div id="corPC1u" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC1u <= -1 || input.corPC1u >= input.corPC1rho0">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                        	<div data-display-if="input.corPC1u == 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC1u >= input.corPC1rho0">
+	                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                <div data-display-if="input.corPC1u < input.corPC1rho0">
+	                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC1u > -1 && input.corPC1u < input.corPC1rho0">
-                                                                <i class="glyphicon glyphicon-ok"></i>
-                                                            </div>
+                                                            <div data-display-if="input.corPC1u != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="!input.corPC1u">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                            	<div data-display-if="input.corPC1u">
+                                                                    <div data-display-if="input.corPC1u <= -1 || input.corPC1u >= input.corPC1rho0">
+                                                                    	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                	</div>
+                                                                    <div data-display-if="input.corPC1u > -1 && input.corPC1u < input.corPC1rho0">
+                                                                        <!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                                        <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                    </div>
+                                                                </div>
+                                                             </div>
                                                    		</td>
   													</tr>
                                                 	<tr>
@@ -1076,12 +1169,19 @@
                                                             <!--<div id="corPC1alpha" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC1alpha <= 0 || input.corPC1alpha >= input.corPC1omega">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)."></i>
+                                                        	<div data-display-if="!input.corPC1alpha" style="padding-left:7px;">
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC1alpha > 0 && input.corPC1alpha < input.corPC1omega">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC1alpha" style="padding-left:7px;">
+                                                                <div data-display-if="input.corPC1alpha <= 0 || input.corPC1alpha >= input.corPC1omega">
+                                                                    <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)."></i>-->
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, &omega;)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                
+                                                                <div data-display-if="input.corPC1alpha > 0 && input.corPC1alpha < input.corPC1omega">
+                                                                    <!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                                    <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1107,7 +1207,7 @@
                                             <!-- Strategy 2 -->
                                             <div data-display-if="input.strategy == &#39;strategy2&#39;">
                                             	<!-- PC prior strategy 2: parameter -->
-                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                     <tr>
                                                         <td align="right" style="padding-right:10px;">
                                                             <label class="sidebar-prior-name-label" for="corPC2rho0"><i>&rho;<sub>0</sub></i>:</label>
@@ -1117,12 +1217,22 @@
                                                             <!--<div id="corPC2rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC2rho0 <= -1 || input.corPC2rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            <div data-display-if="input.corPC2rho0 == 0" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC2rho0 > -1 && input.corPC2rho0 < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC2rho0 != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC2rho0">
+                                                            		<div data-display-if="input.corPC2rho0 <= -1 || input.corPC2rho0 >= 1">
+                                                                		<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>-->
+                                                                		<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                            		</div>
+                                                                    <div data-display-if="input.corPC2rho0 > -1 && input.corPC2rho0 < 1">
+                                                                		<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            		</div>
+                                                            	</div>
+                                                                <div data-display-if="!input.corPC2rho0">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
                                                             </div>
                                                    		</td>
                                                     </tr> 
@@ -1135,12 +1245,13 @@
                                                             <!--<div id="corPC2omega" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC2omega <= 0 || input.corPC2omega >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>
+                                                            <div data-display-if="input.corPC2omega <= 0 || input.corPC2omega >= 1" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
                                                             
-                                                            <div data-display-if="input.corPC2omega > 0 && input.corPC2omega < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC2omega > 0 && input.corPC2omega < 1" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1153,13 +1264,29 @@
                                                             <!--<div id="corPC2u" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC2u <= input.corPC2rho0 || input.corPC2u >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                        	<div data-display-if="input.corPC2u == 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC2u <= input.corPC2rho0">
+	                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                <div data-display-if="input.corPC2u > input.corPC2rho0">
+	                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC2u > input.corPC2rho0 && input.corPC2u < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
-                                                            </div>
+                                                            <div data-display-if="input.corPC2u != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="!input.corPC2u">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                            	<div data-display-if="input.corPC2u">
+                                                                    <div data-display-if="input.corPC2u <= input.corPC2rho0 || input.corPC2u >= 1">
+                                                                        <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>-->
+                                                                        <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                    </div>
+                                                                    
+                                                                    <div data-display-if="input.corPC2u > input.corPC2rho0 && input.corPC2u < 1">
+                                                                        <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                    </div>
+                                                                </div>
+                                                             </div>
                                                    		</td>
   													</tr>
                                                 	<tr>
@@ -1171,12 +1298,13 @@
                                                             <!--<div id="corPC2alpha" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC2alpha <= 0 || input.corPC2alpha >= 1-input.corPC2omega">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)."></i>
+                                                            <div data-display-if="input.corPC2alpha <= 0 || input.corPC2alpha >= 1-input.corPC2omega" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1- &omega;)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
                                                             
-                                                            <div data-display-if="input.corPC2alpha > 0 && input.corPC2alpha < 1-input.corPC2omega">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC2alpha > 0 && input.corPC2alpha < 1-input.corPC2omega" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1202,7 +1330,7 @@
                                             <!-- Strategy 3 -->
                                             <div data-display-if="input.strategy == &#39;strategy3&#39;">
                                             	<!-- PC prior strategy 3: parameter -->
-                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                            	<table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                     <tr>
                                                         <td align="right" style="padding-right:10px;">
                                                             <label class="sidebar-prior-name-label" for="corPC3rho0"><i>&rho;<sub>0</sub></i>:</label>
@@ -1212,12 +1340,22 @@
                                                             <!--<div id="corPC3rho0" class="shiny-text-output sidebar-current-prior"></div>-->
                                                         </td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC3rho0 <= -1 || input.corPC3rho0 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                            <div data-display-if="input.corPC3rho0 == 0" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC3rho0 > -1 && input.corPC3rho0 < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC3rho0 != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC3rho0">
+                                                            		<div data-display-if="input.corPC3rho0 <= -1 || input.corPC3rho0 >= 1">
+                                                                		<!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>-->
+                                                                		<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                            		</div>
+                                                                    <div data-display-if="input.corPC3rho0 > -1 && input.corPC3rho0 < 1">
+                                                                		<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                            		</div>
+                                                            	</div>
+                                                                <div data-display-if="!input.corPC3rho0">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
                                                             </div>
                                                    		</td>
                                                     </tr> 
@@ -1230,13 +1368,28 @@
                                                             <!--<div id="corPC3u1" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC3u1 <= -1 || input.corPC3u1 >= input.corPC3rho0">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)."></i>
+                                                            <div data-display-if="input.corPC3u1 == 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC3u1 >= input.corPC3rho0">
+	                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                <div data-display-if="input.corPC3u1 < input.corPC3rho0">
+	                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC3u1 > -1 && input.corPC3u1 < input.corPC3rho0">
-                                                                <i class="glyphicon glyphicon-ok"></i>
-                                                            </div>
+                                                            <div data-display-if="input.corPC3u1 != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="!input.corPC3u1">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                            	<div data-display-if="input.corPC3u1">
+                                                                    <div data-display-if="input.corPC3u1 <= -1 || input.corPC3u1 >= input.corPC3rho0">
+                                                                    	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1, &rho;_0)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                	</div>
+                                                                    <div data-display-if="input.corPC3u1 > -1 && input.corPC3u1 < input.corPC3rho0">
+                                                                        <!--<i class="glyphicon glyphicon-ok"></i>-->
+                                                                        <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                    </div>
+                                                                </div>
+                                                             </div>
                                                    		</td>
   													</tr>
                                                     <tr>
@@ -1248,12 +1401,13 @@
                                                             <!--<div id="corPC3alpha1" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC3alpha1 <= 0 || input.corPC3alpha1 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)."></i>
+                                                            <div data-display-if="input.corPC3alpha1 <= 0 || input.corPC3alpha1 >= 1" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
                                                             
-                                                            <div data-display-if="input.corPC3alpha1 > 0 && input.corPC3alpha1 < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC3alpha1 > 0 && input.corPC3alpha1 < 1" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1266,13 +1420,29 @@
                                                             <!--<div id="corPC3u2" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC3u2 <= input.corPC3rho0 || input.corPC3u2 >= 1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>
+                                                            <div data-display-if="input.corPC3u2 == 0" style="padding-left:7px;">
+                                                            	<div data-display-if="input.corPC3u2 <= input.corPC3rho0">
+	                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                <div data-display-if="input.corPC3u2 > input.corPC3rho0">
+	                                                            	<a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
                                                             </div>
-                                                            
-                                                            <div data-display-if="input.corPC3u2 > input.corPC3rho0 && input.corPC3u2 < 1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
-                                                            </div>
+                                                            <div data-display-if="input.corPC3u2 != 0" style="padding-left:7px;">
+                                                            	<div data-display-if="!input.corPC3u2">
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                            	<div data-display-if="input.corPC3u2">
+                                                                    <div data-display-if="input.corPC3u2 <= input.corPC3rho0 || input.corPC3u2 >= 1">
+                                                                        <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)."></i>-->
+                                                                        <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (&rho;_0, 1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                    </div>
+                                                                    
+                                                                    <div data-display-if="input.corPC3u2 > input.corPC3rho0 && input.corPC3u2 < 1">
+                                                                        <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                    </div>
+                                                                </div>
+                                                             </div>
                                                    		</td>
   													</tr>
                                                 	<tr>
@@ -1284,12 +1454,13 @@
                                                             <!--<div id="corPC3alpha2" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     	</td> 
                                                         <td>
-                                                            <div data-display-if="input.corPC3alpha2 <= 0 || input.corPC3alpha2 >= 1-input.corPC3alpha1">
-                                                                <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)."></i>
+                                                            <div data-display-if="input.corPC3alpha2 <= 0 || input.corPC3alpha2 >= 1-input.corPC3alpha1" style="padding-left:7px;">
+                                                                <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)."></i>-->
+                                                                <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (0, 1-&alpha;_1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                             </div>
                                                             
-                                                            <div data-display-if="input.corPC3alpha2 > 0 && input.corPC3alpha2 < 1-input.corPC3alpha1">
-                                                                <i class="glyphicon glyphicon-ok"></i>
+                                                            <div data-display-if="input.corPC3alpha2 > 0 && input.corPC3alpha2 < 1-input.corPC3alpha1" style="padding-left:7px;">
+                                                                <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                             </div>
                                                    		</td>
   													</tr>
@@ -1336,7 +1507,7 @@
  												</fieldset>
 											</form>
                                             <!-- Normal prior: Parameter Control -->
-                                            <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                            <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="corNormalmu"><i>&mu;</i>:</label>
@@ -1346,12 +1517,24 @@
                                                         <!--<div id="corNormalmu" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
                                                     <td>
-                                                        <div data-display-if="input.corNormalmu <= -1 || input.corNormalmu >= 1">
-                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>
+                                                    	<div data-display-if="input.corNormalmu == 0" style="padding-left:7px;">
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.corNormalmu > -1 && input.corNormalmu < 1">
-                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.corNormalmu != 0" style="padding-left:7px;">
+                                                            <div data-display-if="!input.corNormalmu">
+                                                            	<a data-toggle="tooltip" data-placement="bottom" title="Input missing." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                        	</div>
+                                                            <div data-display-if="input.corNormalmu">
+                                                            	<div data-display-if="input.corNormalmu <= -1 || input.corNormalmu >= 1">
+                                                                    <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)."></i>-->
+                                                                    <a data-toggle="tooltip" data-placement="bottom" title="Input should be in the interval (-1,1)." style="color:#FF0000; text-decoration:none">Invalid!</a>
+                                                                </div>
+                                                                
+                                                                <div data-display-if="input.corNormalmu > -1 && input.corNormalmu < 1">
+                                                                    <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
+                                                                </div>
+                                                        	</div>
                                                         </div>
                                                    	</td>
                                                 </tr>
@@ -1364,12 +1547,13 @@
                                                         <!--<div id="corNormalvar" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
                                                     <td>
-                                                        <div data-display-if="input.corNormalvar <= 0">
-                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        <div data-display-if="input.corNormalvar <= 0" style="padding-left:7px;">
+                                                            <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.corNormalvar > 0">
-                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.corNormalvar > 0" style="padding-left:7px;">
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                    	</td>
                                                 </tr>
@@ -1411,7 +1595,7 @@
  												</fieldset>
 											</form>
                                             <!-- Beta prior: Parameter Control -->
-                                            <table class="form-group shiny-input-container sidebar-prior-name sidebar-table_three_seven">
+                                            <table class="form-group shiny-input-container sidebar-prior-name sidebar-table3">
                                                 <tr>
                                                     <td align="right" style="padding-right:10px;">
                                                         <label class="sidebar-prior-name-label" for="corBetaa"><i>a</i>:</label>
@@ -1421,12 +1605,13 @@
                                                         <!--<div id="corBetaa" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
                                                     <td>
-                                                        <div data-display-if="input.corBetaa <= 0">
-                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        <div data-display-if="input.corBetaa <= 0" style="padding-left:7px;">
+                                                            <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.corBetaa > 0">
-                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.corBetaa > 0" style="padding-left:7px;">
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                    	</td>
                                                 </tr>
@@ -1439,12 +1624,13 @@
                                                         <!--<div id="corBetab" class="shiny-text-output sidebar-current-prior"></div>-->
                                                     </td>
                                                     <td>
-                                                        <div data-display-if="input.corBetab <= 0">
-                                                            <i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>
+                                                        <div data-display-if="input.corBetab <= 0" style="padding-left:7px;">
+                                                            <!--<i class="glyphicon glyphicon-remove" style="color:red" data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0."></i>-->
+                                                            <a data-toggle="tooltip" data-placement="bottom" title="Input should be larger than 0." style="color:#FF0000; text-decoration:none">Invalid!</a>
                                                         </div>
                                                         
-                                                        <div data-display-if="input.corBetab > 0">
-                                                            <i class="glyphicon glyphicon-ok"></i>
+                                                        <div data-display-if="input.corBetab > 0" style="padding-left:7px;">
+                                                            <a style="color:#002AE0; text-decoration:none">&nbsp;&nbsp;&thinsp;&thinsp;&thinsp;Valid.</a>
                                                         </div>
                                                    	</td>
                                                 </tr>
@@ -2939,7 +3125,7 @@
                         <!-- ----------------------------- -->
             			<div class="tab-pane" id="mainNote-SROC" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
                         	<div class="sidebar-contain" style="width:96%; padding-right:20px">
-                            	<div id="SROCOut" class="shiny-html-output" style="display:table-cell; height:50vh; width:80vh"></div>
+                            	<div id="SROCOut" class="shiny-html-output" style="display:table-cell;"></div>
                             </div>
                             <div class="sidebar-each-block" style="margin-right:40px;">
                             	<label class="control-label">AUC estimates:</label>

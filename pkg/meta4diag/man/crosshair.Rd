@@ -9,7 +9,7 @@ Crosshair Plot.
 Takes a \code{meta4diag} object produced by the function \code{meta4diag()} and produces a crosshair plot or adds such a plot to an existing plot. Crosshair plots go back to Phillips et al. (2010).
 }
 \usage{
-\method{crosshair}{meta4diag}(x, est.type = "mean", add = FALSE, main="Crosshair Plot", xlim, ylim, ...)
+\method{crosshair}{meta4diag}(x, est.type = "mean", add = FALSE, main="Crosshair Plot", xlim, ylim, col, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,6 +30,9 @@ Takes a \code{meta4diag} object produced by the function \code{meta4diag()} and 
 }
   \item{ylim}{
   A numeric value, giving the y coordinates ranges.
+}
+\item{col}{
+  Color of cross.
 }
 \item{\dots}{
   graphics parameters can also be passed to this function.
