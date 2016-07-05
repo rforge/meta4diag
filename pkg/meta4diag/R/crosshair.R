@@ -2,25 +2,25 @@ crosshair <- function(x, ...) UseMethod("crosshair")
 
 crosshair.meta4diag = function(x, est.type="mean", add=FALSE, main="Crosshair Plot", xlim, ylim, col, ...){
   if(class(x)!="meta4diag"){stop("Wrong input given!")}
-  if(!(est.type %in% c("mean","median","mode"))){stop("Argument \"est.type\" should be \"mean\",\"median\" or \"mode\".")}
+  if(!(est.type %in% c("mean","median"))){stop("Argument \"est.type\" should be \"mean\" or \"median\".")}
 
   fitname = x$names.fitted
   fullname = paste("summary.predictor.(",fitname,")",sep="")
   
   if(est.type=="mean"){
-    est.A = x[[fullname[1]]][,1]
-    est.B = x[[fullname[2]]][,1]
+    est.A = x[[fullname[1]]][,"mean"]
+    est.B = x[[fullname[2]]][,"mean"]
   }
   if(est.type=="median"){
-    est.A = x[[fullname[1]]][,4]
-    est.B = x[[fullname[2]]][,4]
+    est.A = x[[fullname[1]]][,"0.5quant"]
+    est.B = x[[fullname[2]]][,"0.5quant"]
   }
   
   
-  lb.A = x[[fullname[1]]][,3]
-  ub.A = x[[fullname[1]]][,5]
-  lb.B = x[[fullname[2]]][,3]
-  ub.B = x[[fullname[2]]][,5]
+  lb.A = x[[fullname[1]]][,"0.025quant"]
+  ub.A = x[[fullname[1]]][,"0.975quant"]
+  lb.B = x[[fullname[2]]][,"0.025quant"]
+  ub.B = x[[fullname[2]]][,"0.975quant"]
   
   if(missing(xlim)){
     if(x$misc$model.type %in% c(1,3)){

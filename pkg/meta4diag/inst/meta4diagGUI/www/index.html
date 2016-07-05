@@ -59,25 +59,28 @@
     <h4>Meta4diag: Bayesian Bivariate Meta-analysis of Diagnostic Test Studies</h4>
     <!-- Top Control Panel -->
     <div class="row" style="background-color:#CEEBF7; height:auto; padding:5px; border:none; border-top:1px solid #DDDDDD">
-    	<a id="RunINLAButton" class="btn btn-default action-button" type="button" href="#" data-toggle="tooltip" data-placement="bottom" title="Press this button to run the model!">
+    	<a id="RunINLAButton" class="btn btn-default action-button" type="button" href="#" data-toggle="tooltip" data-placement="bottom" title="Press this button to run the model!" style="float:left">
             <i class="glyphicon glyphicon-play"></i>
             RunINLA
         </a>
-        <a id="saveModel" class="btn btn-default shiny-download-link" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to save the model!">
-            <i class="glyphicon glyphicon-save"></i>
-            Save Model
-        </a>
-      	<a id="saveEstimates" class="btn btn-default shiny-download-link" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to save the estimates!">
+        <a id="saveEstimates" class="btn btn-default shiny-download-link" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to write the estimates to a .txt file!" style="float:left; margin-left:3px">
             <i class="glyphicon glyphicon-cloud-download"></i>
-            Save Estimates
+            Write Estimates to File
       	</a>
-        <a id="tutorial" type="button" class="btn btn-default">
+        
+
+        <a id="stopButton" class="btn btn-default action-button" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to quit the GUI!" onclick="setTimeout(function(){window.close();},500);" style="float:right">
+            <i class="glyphicon glyphicon-stop"></i>
+            Quit
+      	</a>
+        
+        <a id="saveModel" class="btn btn-default shiny-download-link" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to save the model result to a R object for later use in R!" style="float:right; margin-right:3px">
+            <i class="glyphicon glyphicon-save"></i>
+            Expert Save
+        </a>
+        <a id="tutorial" type="button" class="btn btn-default" style="float:right; margin-right:3px">
             <i class="glyphicon glyphicon-grain"></i>
             Tutorial
-      	</a>
-        <a id="stopButton" class="btn btn-default action-button" type="button" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Press this button to close the window and stop shiny!" onclick="setTimeout(function(){window.close();},500);">
-            <i class="glyphicon glyphicon-stop"></i>
-            Stop
       	</a>
     </div>
     <!-- Main Body -->
@@ -2980,6 +2983,7 @@
             			<li><a href="#mainNote-Fitted" data-toggle="tab">Fitted</a></li>
                         <li><a href="#mainNote-SROC" data-toggle="tab">SROC</a></li>
                         <li><a href="#mainNote-Forest" data-toggle="tab">Forest</a></li>
+                        <li><a href="#mainNote-Funnel" data-toggle="tab">Funnel</a></li>
                         <li><a href="#mainNote-Cross" data-toggle="tab">Crosshair</a></li>
                         <li><a href="#mainNote-Rcode" data-toggle="tab">R code</a></li>
           			</ul>
@@ -3008,7 +3012,7 @@
                                     </tr>
                                 </table>
                                 <br>
-                                <p>Full Bayesian inference using integrated nested Laplace approximations (INLA) is performed on a hierarchical model with 3 levels,</p>
+                                <p>Full Bayesian inference using integrated nested Laplace approximations (INLA) is performed on a hierarchical model with 3 levels, for example, the model for analysing sensitivity and specificity jointly with a logit link function is</p>
                                 <div style="width:50%; float:left; text-align:center">
                                     <p>1. Level</p>
                                     <img src="img/welcome1.png" alt="welcome1" height="60"/>
@@ -3336,6 +3340,79 @@
                                 </div>
                                 <div style="width:25%; float:right; text-align:right">
                                     <a id="SaveCross" class="btn btn-default shiny-download-link" href="#" target="_blank">
+                                    <i class="glyphicon glyphicon-save"></i>
+                                    Save
+                                    </a>
+                                </div>
+                                      
+                            </div>
+                        </div>
+                        <!-- ----------------------------- -->
+                    	<!-- Main NoteBook Funenl content -->
+                        <!-- ----------------------------- -->
+            			<div class="tab-pane" id="mainNote-Funnel" style="width:100%; height:auto; margin:10px 20px; white-space:normal">
+                        	<div class="sidebar-contain" style="width:96%; padding-right:20px">
+                            	<div id="FunnelOut" class="shiny-html-output"></div>
+                            </div>
+                            
+                            <!-- Saving Control -->
+                            <div class="sidebar-each-block" style="margin-right:40px; height:130px;">
+                                <table class="form-group shiny-input-container" style="width:100%; margin-top:20px;">
+                                    <tr>
+                                        <td style="text-align:right; padding-right:10px;">
+                                            <label class="control-label" for="Funnel_width">Width:</label>
+                                        </td>
+                                        <td>
+                                            <input id="Funnel_width" type="number" class="form-control" value="5" min="5" max="15" step="1"/>
+                                        </td>
+                                        <td style="text-align:right; padding-right:10px;">
+                                            <label class="control-label" for="Funnel_height">Height:</label>
+                                        </td>
+                                        <td>
+                                            <input id="Funnel_height" type="number" class="form-control" value="5" min="5" max="15" step="1"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div id="funnelform" class="form-group shiny-input-radiogroup shiny-input-container" style="width:75%; float:left">
+                                    <table style="width:100%">
+                                            <tr>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="funnelform" value="pdf" checked="checked"/>
+                                                            <span style="font-size:12px;">.pdf</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="funnelform" value="eps"/>
+                                                            <span style="font-size:12px;">.eps</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="funnelform" value="png"/>
+                                                            <span style="font-size:12px;">.png</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:right; padding-right:10px;">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="funnelform" value="jpg"/>
+                                                            <span style="font-size:12px;">.jpg</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                </div>
+                                <div style="width:25%; float:right; text-align:right">
+                                    <a id="SaveFunnel" class="btn btn-default shiny-download-link" href="#" target="_blank">
                                     <i class="glyphicon glyphicon-save"></i>
                                     Save
                                     </a>

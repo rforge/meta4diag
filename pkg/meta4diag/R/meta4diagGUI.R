@@ -5,7 +5,7 @@ meta4diagGUI <-function(){
 Please use the following command to load INLA,\n
 library(INLA) \n")
     }
-    shiny::runApp(system.file('meta4diagGUI', package='meta4diag'))
+    shiny::runApp(system.file('meta4diagGUI', package='meta4diag'), launch.browser=TRUE)
   }else{
     stop("INLA need to be installed and loaded!\n
 Please use the following command to install and load INLA,\n

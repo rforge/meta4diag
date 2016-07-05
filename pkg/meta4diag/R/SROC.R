@@ -61,6 +61,9 @@ SROC.meta4diag = function(x,
   
 
   est.type = tolower(est.type)
+  if(!(est.type %in% c("mean","median"))){
+    stop("Argument \"est.type\" could only be either \"mean\" or \"median\".")
+  }
   if(est.type=="median"){est.type = "0.5quant"}
   N = x$data$fp + x$data$tn + x$data$fn + x$data$tp
   
