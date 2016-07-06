@@ -17,7 +17,9 @@ export(meta4diag,
 	print.fitted.meta4diag,
 	makeObject,
        AUC,
-       AUC.meta4diag)
+       AUC.meta4diag,
+       funnel,
+       funnel.meta4diag)
 
 
 S3method(SROC,meta4diag)
@@ -30,6 +32,7 @@ S3method(print,meta4diag)
 S3method(plot,meta4diag)
 S3method(summary,meta4diag)
 S3method(AUC,meta4diag)
+S3method(funnel,meta4diag)
 
 importFrom("grDevices", "cairo_ps", "col2rgb", "contourLines",
             "dev.off", "jpeg", "palette", "pdf", "png", "postscript",
