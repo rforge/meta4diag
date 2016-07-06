@@ -122,7 +122,7 @@
                                 	<label>Upload Data File</label>
                                     <table class="form-group shiny-input-container" >
                                     	<tr>
-                                        	<input id="datafile" class="sidebar-datainput" name="datafile" type="file" accept="text/csv,text/comma-separated-values,text/plain,.csv, .Rdata, .Rda, .rdata, .rda" style="padding-bottom:10px; padding-top:10px; "/>
+                                        	<input id="datafile" class="sidebar-datainput" name="datafile" type="file" accept="text/csv,text/comma-separated-values,text/plain, text/rda, R/rda, rda, .csv, .Rdata, .Rda, .rdata, .rda" style="padding-bottom:10px; padding-top:10px; "/>
                                         </tr>
                                         <tr style="padding-top:10px; margin-top: 10px">
                                         	<div id="datafile_progress" class="progress progress-striped active shiny-file-input-progress" >
@@ -146,7 +146,7 @@
 									</table>
                                 </div>
                                 <!-- Data info -->
-                                <div class="sidebar-each-block">
+                                <div class="sidebar-each-block" style="white-space:normal">
                                 	<label class="sidebar-prior-name-label" for="sidebardatainfo">Data Info:</label>
                                     <div id="sidebardatainfo" class="shiny-text-output" style="width:100%;"></div>
                                 </div>

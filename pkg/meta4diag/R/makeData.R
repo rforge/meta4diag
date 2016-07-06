@@ -94,9 +94,12 @@ library(INLA) \n")
             stop("Modality are given! Please give correct column number to indicate modality!!!")
           }
         }
-        if(!all(modality %in% datanames)){
-          mod.flag = FALSE
-          stop("Modality are given! Please give correct names of modality!!!")
+        if(is.character(modality)){
+          modality = tolower(modality)
+          if(!all(modality %in% datanames)){
+            mod.flag = FALSE
+            stop("Modality are given! Please give correct names of modality!!!")
+          }
         }
         if(any(c(fic,"studynames") %in% modality)){
           mod.flag = FALSE

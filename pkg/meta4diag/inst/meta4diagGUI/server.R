@@ -580,7 +580,7 @@ shinyServer(function(input, output, session) {
         df = inputDataFile()
         original_datanames = colnames(df)
         datanames = tolower(original_datanames)
-        if(dim(df)[2]>5){
+        if(dim(df)[2]>=5){
           pt_variables = original_datanames[-which(datanames %in% c("studynames","tp","tn","fp","fn"))]
           pt_variables = c("None", pt_variables)
         }else{
@@ -884,16 +884,8 @@ shinyServer(function(input, output, session) {
   
   #----------- INLA Version ---------------#
   output$inlaversion  = renderPrint({
-    #   cat(length(input$partialdata))
-    #   cat("\n")
-        # cat(input$modelnos)
-    #     cat("\n")
-    #     cat(class(input$datamodality))
-    #     cat("\n")
-    #     cat(input$partialdata)
-    #     cat("\n")
-    #     cat(class(input$partialdata))
-    #     cat("\n")
+    cat(input$datamodality)
+    cat("\n")
     cat(paste("INLA version.........: ", inla.version("version"),sep=""))
     cat("\n")
     cat(paste("INLA date............: ", inla.version("date"),sep=""))
