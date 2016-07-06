@@ -884,8 +884,8 @@ shinyServer(function(input, output, session) {
   
   #----------- INLA Version ---------------#
   output$inlaversion  = renderPrint({
-    cat(input$datamodality)
-    cat("\n")
+#     cat(input$datamodality)
+#     cat("\n")
     cat(paste("INLA version.........: ", inla.version("version"),sep=""))
     cat("\n")
     cat(paste("INLA date............: ", inla.version("date"),sep=""))
