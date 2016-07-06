@@ -9,7 +9,8 @@
 }
 \usage{
   \method{funnel}{meta4diag}(x, est.type="median",intervals=c(0.025,0.975), 
-                             lwd=1, arrow.lty=1,col="black",main="Funnel Plot", xlim, ylim, ...)
+  lwd=1, arrow.lty=1,col="black",
+  main="Funnel Plot", xlim, ylim, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
