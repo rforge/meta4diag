@@ -158,14 +158,17 @@ library(INLA) \n")
     if(link=="logit"){
       model$linkfunc = function(x){return(log(x/(1-x)))}
       model$inv.linkfunc = function(x){return(exp(x)/(1+exp(x)))}
+      model$c.inv.linkfunc = function(x){return(1-exp(x)/(1+exp(x)))}
     }
     if(link=="probit"){
       model$linkfunc = function(x){return(qnorm(x))}
       model$inv.linkfunc = function(x){return(pnorm(x))}
+      model$c.inv.linkfunc = function(x){return(1-pnorm(x))}
     }
     if(link=="cloglog"){
       model$linkfunc = function(x){return(log(-log(1-x)))}
       model$inv.linkfunc = function(x){return(1-exp(-exp(x)))}
+      model$c.inv.linkfunc = function(x){return(exp(-exp(x)))}
     }
     
     return(model)

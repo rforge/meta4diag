@@ -190,7 +190,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -206,7 +206,7 @@ library(INLA) \n")
         names.expected.accuracy.transform = paste("mean(",names.transf.fitted,")",sep="")
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$c.inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -228,7 +228,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -241,7 +241,7 @@ library(INLA) \n")
         names.expected.accuracy.transform = c(names.expected.accuracy.transform1, names.expected.accuracy.transform2)
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$c.inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -260,7 +260,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -272,7 +272,7 @@ library(INLA) \n")
         names.expected.accuracy.transform = unlist(lapply(names.transf.fitted,function(x) paste("mean(",x,".",um,")",sep="")))
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$c.inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
@@ -290,7 +290,7 @@ library(INLA) \n")
         
         names.temp = names(model[["marginals.lincomb.derived"]])
         marginals.expected.accuracy.original = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.original) = names.expected.accuracy.original
         
@@ -303,7 +303,7 @@ library(INLA) \n")
         names.expected.accuracy.transform = c(names.expected.accuracy.transform1, names.expected.accuracy.transform2)
         
         marginals.expected.accuracy.transform = lapply(names.temp, function(y){
-          INLA::inla.tmarginal(function(x) 1-model$inv.linkfunc(x), model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
+          INLA::inla.tmarginal(model$c.inv.linkfunc, model[["marginals.lincomb.derived"]][[y]], n=n.marginal.point)
         })
         names(marginals.expected.accuracy.transform) = names.expected.accuracy.transform
         
