@@ -1,4 +1,4 @@
-runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5, 0.975), verbose=FALSE){
+runModel <- function(outdata, outpriors, link="logit", quantiles = c(0.025, 0.5, 0.975), verbose=FALSE, num.threads = 1){
   if(requireNamespace("INLA", quietly = TRUE)){
     if (!(sum(search()=="package:INLA"))==1){
       stop("INLA need to be loaded! \n
@@ -120,7 +120,7 @@ library(INLA) \n")
                              paste(varnames, collapse= " + "), "-1"))
       
       model = INLA::inla(fm, family="binomial", data=data, Ntrials=Ntrials, quantiles=quantiles,
-                         verbose=verbose, lincomb = lc,  
+                         verbose=verbose, lincomb = lc, num.threads = num.threads,
                          control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),
@@ -138,7 +138,7 @@ library(INLA) \n")
       
       
       model = INLA::inla(fm, family="binomial", data=data, Ntrials=Ntrials, quantiles=quantiles,
-                         verbose=verbose, lincomb = lc,  
+                         verbose=verbose, lincomb = lc,  num.threads = num.threads,
                          control.inla=list(lincomb.derived.correlation.matrix = TRUE),
                          control.predictor=list(compute=TRUE),
                          control.family = list(link = link),

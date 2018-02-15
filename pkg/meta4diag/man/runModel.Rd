@@ -6,7 +6,7 @@
 }
 \usage{
 runModel(outdata, outpriors, link = "logit", 
-  quantiles = c(0.025, 0.5, 0.975), verbose = FALSE)
+  quantiles = c(0.025, 0.5, 0.975), verbose = FALSE, num.threads = 1)
 }
 \arguments{
   \item{outdata}{
@@ -25,6 +25,9 @@ runModel(outdata, outpriors, link = "logit",
   \item{verbose}{
 	Boolean (default:FALSE) indicating whether the program should run in a verbose mode.
 }
+\item{num.threads}{
+    Maximum number of threads the inla-program will use. xFor Windows this defaults to 1, otherwise its defaults to NULL (for which the system takes over control).
+  }
 }
 
 \value{

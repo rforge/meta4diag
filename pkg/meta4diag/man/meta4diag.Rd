@@ -13,7 +13,7 @@ meta4diag(data=NULL, model.type = 1,
           wishart.par = c(4, 1, 1, 0),
           init = c(0.01,0.01,0), link="logit", quantiles=c(0.025,0.5,0.975),
           modality = NULL, covariates = NULL,
-          verbose = FALSE, nsample=FALSE)
+          verbose = FALSE, nsample=FALSE,num.threads = 1, seed=0L)
 }
 \arguments{
   \item{data}{
@@ -181,6 +181,12 @@ meta4diag(data=NULL, model.type = 1,
   \item{nsample}{
     A numerical value specifying the number of posterior samples, default is 5000. The posterior samples are used to compute the marginals and estimates values of non-linear functions, such as log radios and diagnostic odds radios. If \code{nsample} is given, \code{summary.summarized.statistics}, \code{summary.fitted.LRpos}, \code{summary.fitted.LRneg}, \code{summary.fitted.DOR} and samples of \eqn{E(se)}, \eqn{E(sp)}, \eqn{E(1-se)} and \eqn{E(1-sp)} will be returned.
   }
+  \item{num.threads}{
+    Maximum number of threads the inla-program will use. xFor Windows this defaults to 1, otherwise its defaults to NULL (for which the system takes over control).
+  }
+  \item{seed}{
+  A numerical value specifying the random seed to control the RNG for generating posterior samples if nsample > 0. If you want reproducible results, you ALSO need to control the seed for the RNG in R by controlling the variable .Random.seed or using the function set.seed.
+  }
 }
 
 \details{
@@ -245,12 +251,15 @@ value (maximum 1) the more seriously.}
 
 
 \references{
-  Havard Rue, Sara Martino, and Nicholas Chopin (2009). Approximate
+  \cite{Rue H., Martino S, and Chopin N. (2009). Approximate
   Bayesian Inference for Latent Gaussian Models Using Integrated Nested
-  Laplace Approximations. Journal of the Royal Statistical Society B,
-  71, 319-392. (www.r-inla.org) 
+  Laplace Approximations. \emph{Journal of the Royal Statistical Society B}
+  \bold{71}: 319--392. (www.r-inla.org)}
 
-Simpson DP, Martins TG, Riebler A, Fuglstad GA, Rue H, Sorbye SH (2014) Penalised Model Component Complexity: A principled, Practical Approach to Constructing Priors. Arxiv e-prints. 1403.4630 
+\cite{Simpson DP, Martins TG, Riebler A, Fuglstad GA, Rue H, Sorbye SH (2014) Penalised Model Component Complexity: A principled, Practical Approach to Constructing Priors. \emph{Arxiv e-prints. 1403.4630}}
+
+\cite{Guo, J., Riebler, A. and Rue H. (2017) Bayesian bivariate meta-analysis of diagnostic test studies with interpretable priors. \emph{Statistics in Medicine}
+    \bold{36(19)}: 3039--3058.}
 }
 \author{
   Jingyi Guo and Andrea Riebler 

@@ -1,4 +1,4 @@
-makeObject <- function(model, nsample=FALSE){
+makeObject <- function(model, nsample=FALSE,seed = 0L){
   if(requireNamespace("INLA", quietly = TRUE)){
     if (!(sum(search()=="package:INLA"))==1){
       stop("INLA need to be loaded! \n
@@ -446,10 +446,11 @@ library(INLA) \n")
       ## samples from posteriors
       ############################
       options(warn=-1)
-      samples = INLA::inla.posterior.sample(n = nsample, model)
+      #set.seed(seed)
+      samples = INLA::inla.posterior.sample(n = nsample, model, seed=seed)
       options(warn=0)
       predictors.samples = do.call(cbind,lapply(c(1:nsample), function(x) samples[[x]]$latent[1:dim(outdata$internaldata)[1]]))
-
+      #predictors.samples = round(predictors.samples, 2)
       ##############################
       ## fixed and hyperpar samples
       ##############################
@@ -458,6 +459,7 @@ library(INLA) \n")
         a = samples[[x]]$latent[(length.latent-dim(model$summary.fixed)[1]+1):length.latent]
         return(a)
       }))
+      #fixed.samples = round(fixed.samples, 2)
       fixed.names = rownames(model$summary.fixed)
       rownames(fixed.samples) = fixed.names
       
@@ -465,6 +467,7 @@ library(INLA) \n")
         a = samples[[x]]$hyperpar
         return(a)
       }))
+      #hyperpar.samples = round(hyperpar.samples, 2)
       hyperpar.names = c("var_phi", "var_psi", "rho")
       rownames(hyperpar.samples) = hyperpar.names
       

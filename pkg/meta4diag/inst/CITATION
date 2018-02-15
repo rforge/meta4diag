@@ -1,0 +1,18 @@
+bibentry(bibtype = "Article",
+  title        = "{meta4diag}: Bayesian Bivariate Meta-Analysis of Diagnostic Test Studies for Routine Practice",
+  author       = c(person(given = "Jingyi",
+                          family = "Guo",
+                          email = "jingyi.guo@math.ntnu.no"),
+                   person(given = "Andrea",
+                          family = "Riebler",
+                          email = "andrea.riebler@math.ntnu.no")),
+  journal      = "Journal of Statistical Software",
+  year         = "2018",
+  volume       = "83",
+  number       = "1",
+  pages        = "1--31",
+  doi          = "10.18637/jss.v083.i01",
+
+  header       = "To cite meta4diag in publications use:"
+)
+

@@ -4,7 +4,7 @@ meta4diag = function(data=NULL, model.type = 1,
                      wishart.par = c(4, 1, 1, 0),
                      init = c(0.01,0.01,0), link="logit", quantiles=c(0.025,0.5,0.975),
                      modality=NULL, covariates = NULL,
-                     verbose = FALSE, nsample=FALSE){
+                     verbose = FALSE, nsample=FALSE,num.threads = 1,seed = 0L){
   if(requireNamespace("INLA", quietly = TRUE)){
     if (!(sum(search()=="package:INLA"))==1){
       stop("INLA need to be loaded! \n
@@ -71,10 +71,10 @@ library(INLA) \n")
     outdata = makeData(data = data, model.type = model.type, modality = modality, covariates = covariates)
     
     ################ Run model in INLA
-    model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose)
+    model = runModel(outdata=outdata, outpriors=outpriors, link=link, quantiles=quantiles, verbose = verbose, num.threads = num.threads)
     
     ##########################  construct the result
-    res = makeObject(model, nsample=nsample)
+    res = makeObject(model, nsample=nsample, seed=seed)
     
     return(res)
   }else{
@@ -84,7 +84,6 @@ install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
 library(INLA) \n")
   }
 }
-
 
 
 

@@ -101,6 +101,6 @@ print.fitted.meta4diag = function(x,...){
   if(accuracy.type=="llrneg"){
     cat('log negative likelihood ratio (LLR-): \n')
   }
-  print(round(x$fitted.value,3))
+  print(signif(x$fitted.value,4))
   cat("\n")
 }
