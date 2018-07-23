@@ -1,6 +1,6 @@
 meta4diag: A free user-friendly graphical interface for diagnostic meta-analysis with INLA.
-Version 1.0.20 Copyright (c) 2015 R-INLA Group.
-Update Fri 24 Aug 13:24:00 CEST 2015.
+Version 2.0.8 Copyright (c) 2018 R-INLA Group.
+Update Thu 19 Jul 11:57:00 CEST 2018.
  
                         
 1. Press 'Open' button to load a data set.

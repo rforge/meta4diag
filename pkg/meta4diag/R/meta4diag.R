@@ -80,7 +80,7 @@ library(INLA) \n")
   }else{
     stop("INLA need to be installed and loaded!\n
 Please use the following command to install and load INLA,\n
-install.packages(\"INLA\", repos=\"http://www.math.ntnu.no/inla/R/testing\") \n
+install.packages(\"INLA\", repos=c(getOption(\"repos\"), INLA=\"https://inla.r-inla-download.org/R/testing\"), dep=TRUE) \n
 library(INLA) \n")
   }
 }
